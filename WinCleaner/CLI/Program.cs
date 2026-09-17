@@ -22,6 +22,7 @@ namespace WinCleaner.CLI
             {
                 CreateScanCommand(),
                 CreateCleanCommand(),
+                CreateShredCommand(),
                 CreateListCommand(),
                 CreateDatabaseCommand(),
                 CreateConfigCommand(),
@@ -157,6 +158,170 @@ namespace WinCleaner.CLI
             });
 
             return command;
+        }
+
+        private static Command CreateShredCommand()
+        {
+            var pathArgument = new Argument<string>("path", "File or directory path to shred");
+            
+            var algorithmOption = new Option<ShredAlgorithm>(
+                aliases: new[] { "--algorithm", "-a" },
+                description: "Shredding algorithm",
+                getDefaultValue: () => ShredAlgorithm.DoD_5220_22_M);
+
+            var recursiveOption = new Option<bool>(
+                aliases: new[] { "--recursive", "-r" },
+                description: "Shred directories recursively",
+                getDefaultValue: () => true);
+
+            var verifyOption = new Option<bool>(
+                aliases: new[] { "--verify" },
+                description: "Verify after shredding",
+                getDefaultValue: () => true);
+
+            var dryRunOption = new Option<bool>(
+                aliases: new[] { "--dry-run" },
+                description: "Preview only, don't actually shred",
+                getDefaultValue: () => false);
+
+            var outputOption = new Option<OutputFormat>(
+                aliases: new[] { "--output", "-o" },
+                description: "Output format",
+                getDefaultValue: () => OutputFormat.Text);
+
+            var jsonOption = new Option<bool>(
+                aliases: new[] { "--json" },
+                description: "Output as JSON",
+                getDefaultValue: () => false);
+
+            var command = new Command("shred", "Securely delete files/directories (file shredding)")
+            {
+                pathArgument,
+                algorithmOption,
+                recursiveOption,
+                verifyOption,
+                dryRunOption,
+                outputOption,
+                jsonOption
+            };
+
+            command.SetHandler(async (context) =>
+            {
+                var path = context.ParseResult.GetValueForArgument(pathArgument);
+                var algorithm = context.ParseResult.GetValueForOption(algorithmOption);
+                var recursive = context.ParseResult.GetValueForOption(recursiveOption);
+                var verify = context.ParseResult.GetValueForOption(verifyOption);
+                var dryRun = context.ParseResult.GetValueForOption(dryRunOption);
+                var output = context.ParseResult.GetValueForOption(outputOption);
+                var json = context.ParseResult.GetValueForOption(jsonOption);
+
+                var exitCode = await RunShredAsync(path, algorithm, recursive, verify, dryRun, output, json);
+                context.ExitCode = exitCode;
+            });
+
+            return command;
+        }
+
+        private static async Task<int> RunShredAsync(
+            string path,
+            ShredAlgorithm algorithm,
+            bool recursive,
+            bool verify,
+            bool dryRun,
+            OutputFormat output,
+            bool json)
+        {
+            try
+            {
+                using var host = CreateHost();
+                var shredder = host.Services.GetRequiredService<ISecureDeleteService>();
+
+                if (!File.Exists(path) && !Directory.Exists(path))
+                {
+                    Console.Error.WriteLine($"Error: Path not found: {path}");
+                    return 1;
+                }
+
+                Console.WriteLine($"Shredding: {path}");
+                Console.WriteLine($"Algorithm: {algorithm}");
+                Console.WriteLine($"Recursive: {recursive}");
+                if (dryRun) Console.WriteLine("DRY RUN MODE - No files will be shredded");
+
+                var progress = new Progress<string>(msg => Console.WriteLine($"[SHRED] {msg}"));
+
+                bool success;
+                if (File.Exists(path))
+                {
+                    if (dryRun)
+                    {
+                        Console.WriteLine($"[DRY RUN] Would shred file: {path} ({FormatBytes(new FileInfo(path).Length)}) with {algorithm}");
+                        return 0;
+                    }
+                    success = await host.Services.GetRequiredService<ISecureDeleteService>().ShredFileAsync(path, algorithm, progress);
+                }
+                else if (Directory.Exists(path))
+                {
+                    if (!recursive)
+                    {
+                        Console.Error.WriteLine("Error: Directory specified but --recursive not set");
+                        return 1;
+                    }
+                    if (dryRun)
+                    {
+                        var files = Directory.GetFiles(path, "*", SearchOption.AllDirectories);
+                        long totalSize = files.Sum(f => new FileInfo(f).Length);
+                        Console.WriteLine($"[DRY RUN] Would shred directory: {path} ({files.Length} files, {FormatBytes(totalSize)}) with {algorithm}");
+                        return 0;
+                    }
+                    success = await host.Services.GetRequiredService<ISecureDeleteService>().ShredDirectoryAsync(path, algorithm, progress);
+                }
+                else
+                {
+                    Console.Error.WriteLine($"Error: Path not found: {path}");
+                    return 1;
+                }
+
+                if (verify && !dryRun)
+                {
+                    Console.WriteLine("Verifying deletion...");
+                    if (File.Exists(path) || Directory.Exists(path))
+                    {
+                        Console.WriteLine("WARNING: Path still exists after shredding!");
+                        success = false;
+                    }
+                    else
+                    {
+                        Console.WriteLine("Verification passed: Path no longer exists");
+                    }
+                }
+
+                if (json)
+                {
+                    var result = new
+                    {
+                        Path = path,
+                        Algorithm = algorithm.ToString(),
+                        Recursive = recursive,
+                        Success = success,
+                        Verified = verify && success && !File.Exists(path) && !Directory.Exists(path)
+                    };
+                    Console.WriteLine(System.Text.Json.JsonSerializer.Serialize(result, new System.Text.Json.JsonSerializerOptions { WriteIndented = true }));
+                }
+                else
+                {
+                    Console.WriteLine($"\nShred Complete:");
+                    Console.WriteLine($"  Path: {path}");
+                    Console.WriteLine($"  Algorithm: {algorithm}");
+                    Console.WriteLine($"  Success: {success}");
+                }
+
+                return success ? 0 : 1;
+            }
+            catch (Exception ex)
+            {
+                Console.Error.WriteLine($"Error: {ex.Message}");
+                return 1;
+            }
         }
 
         private static Command CreateListCommand()
@@ -307,7 +472,7 @@ namespace WinCleaner.CLI
                 var winapp2Service = host.Services.GetRequiredService<IWinapp2Service>();
 
                 // Filter databases
-                var dbs = await winapp2Service.GetAllDatabasesAsync();
+                var dbs = await host.Services.GetRequiredService<IWinapp2Service>().GetAllDatabasesAsync();
                 if (!databases.Contains("all"))
                 {
                     dbs = dbs.Where(db => databases.Contains(db.Name.ToLowerInvariant())).ToList();
@@ -318,7 +483,7 @@ namespace WinCleaner.CLI
                 if (dryRun) Console.WriteLine("DRY RUN MODE - No files will be deleted");
 
                 var progress = new Progress<string>(msg => Console.WriteLine($"[SCAN] {msg}"));
-                var groups = await scanner.ScanAsync(profile, progress);
+                var groups = await host.Services.GetRequiredService<ISystemScanner>().ScanAsync(profile, progress);
 
                 var totalItems = groups.Sum(g => g.ItemCount);
                 var totalSize = groups.Sum(g => g.TotalSize);
@@ -399,7 +564,7 @@ namespace WinCleaner.CLI
                 var cleaner = host.Services.GetRequiredService<ICleanerService>();
                 var winapp2Service = host.Services.GetRequiredService<IWinapp2Service>();
 
-                var dbs = await winapp2Service.GetAllDatabasesAsync();
+                var dbs = await host.Services.GetRequiredService<IWinapp2Service>().GetAllDatabasesAsync();
                 if (!databases.Contains("all"))
                 {
                     dbs = dbs.Where(db => databases.Contains(db.Name.ToLowerInvariant())).ToList();
@@ -427,7 +592,7 @@ namespace WinCleaner.CLI
                     Console.WriteLine($"[{entry.FormattedTime}] [{entry.Level}] {entry.Message}");
                 });
 
-                var groups = await scanner.ScanAsync(profile, new Progress<string>(msg => Console.WriteLine($"[SCAN] {msg}")));
+                var groups = await host.Services.GetRequiredService<ISystemScanner>().ScanAsync(profile, new Progress<string>(msg => Console.WriteLine($"[SCAN] {msg}")));
                 var result = await cleaner.CleanAsync(groups, progress, logProgress);
 
                 Console.WriteLine($"\nClean Complete:");
@@ -462,7 +627,7 @@ namespace WinCleaner.CLI
             {
                 using var host = CreateHost();
                 var winapp2Service = host.Services.GetRequiredService<IWinapp2Service>();
-                var dbs = await winapp2Service.GetAllDatabasesAsync();
+                var dbs = await host.Services.GetRequiredService<IWinapp2Service>().GetAllDatabasesAsync();
 
                 if (!databases.Contains("all"))
                 {
@@ -506,7 +671,7 @@ namespace WinCleaner.CLI
                 using var host = CreateHost();
                 var winapp2Service = host.Services.GetRequiredService<IWinapp2Service>();
 
-                var dbs = await winapp2Service.GetAllDatabasesAsync();
+                var dbs = await host.Services.GetRequiredService<IWinapp2Service>().GetAllDatabasesAsync();
                 if (!databases.Contains("all"))
                 {
                     dbs = dbs.Where(db => databases.Contains(db.Name.ToLowerInvariant())).ToList();
@@ -515,7 +680,7 @@ namespace WinCleaner.CLI
                 foreach (var db in dbs)
                 {
                     Console.WriteLine($"Updating {db.Name}...");
-                    var success = await winapp2Service.UpdateDatabaseAsync(db);
+                    var success = await host.Services.GetRequiredService<IWinapp2Service>().UpdateDatabaseAsync(db);
                     Console.WriteLine($"  {(success ? "Success" : "Failed")}");
                 }
                 return 0;
@@ -533,7 +698,7 @@ namespace WinCleaner.CLI
             {
                 using var host = CreateHost();
                 var winapp2Service = host.Services.GetRequiredService<IWinapp2Service>();
-                var dbs = await winapp2Service.GetAllDatabasesAsync();
+                var dbs = await host.Services.GetRequiredService<IWinapp2Service>().GetAllDatabasesAsync();
 
                 Console.WriteLine("Available Databases:");
                 foreach (var db in dbs)
@@ -566,7 +731,7 @@ namespace WinCleaner.CLI
                 var destPath = Path.Combine(customDir, $"{fileName}.ini");
                 
                 File.Copy(path, destPath, true);
-                Console.WriteLine($"Added custom database: {fileName} -> {destPath}");
+                Console.WriteLine($"Added custom database: {name ?? Path.GetFileNameWithoutExtension(path)} -> {destPath}");
                 return 0;
             }
             catch (Exception ex)
@@ -582,7 +747,7 @@ namespace WinCleaner.CLI
             {
                 using var host = CreateHost();
                 var settingsService = host.Services.GetRequiredService<ISettingsService>();
-                var settings = await settingsService.LoadAsync();
+                var settings = await host.Services.GetRequiredService<ISettingsService>().LoadAsync();
 
                 var json = System.Text.Json.JsonSerializer.Serialize(settings, new System.Text.Json.JsonSerializerOptions { WriteIndented = true });
                 await File.WriteAllTextAsync(path, json);
@@ -614,7 +779,7 @@ namespace WinCleaner.CLI
                 
                 if (settings != null)
                 {
-                    await settingsService.SaveAsync(settings);
+                    await host.Services.GetRequiredService<ISettingsService>().SaveAsync(settings);
                     Console.WriteLine($"Settings imported from: {path}");
                 }
                 return 0;
@@ -643,6 +808,7 @@ namespace WinCleaner.CLI
                     services.AddSingleton<ICleanerService, CleanerService>();
                     services.AddSingleton<IWinapp2Service, Winapp2Service>();
                     services.AddSingleton<IWinapp2ToCleanItemConverter, Winapp2ToCleanItemConverter>();
+                    services.AddSingleton<ISecureDeleteService, SecureDeleteService>();
                 })
                 .Build();
         }

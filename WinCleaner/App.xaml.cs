@@ -57,6 +57,7 @@ namespace WinCleaner
                     services.AddSingleton<ICleanerService, CleanerService>();
                     services.AddSingleton<IWinapp2Service, Winapp2Service>();
                     services.AddSingleton<IWinapp2ToCleanItemConverter, Winapp2ToCleanItemConverter>();
+                    services.AddSingleton<ISecureDeleteService, SecureDeleteService>();
 
                     // ViewModels
                     services.AddTransient<MainViewModel>();
