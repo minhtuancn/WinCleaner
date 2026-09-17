@@ -1,0 +1,103 @@
+# Build outputs
+bin/
+obj/
+*.exe
+*.dll
+*.pdb
+*.xml
+
+# Publish outputs
+publish/
+*.nupkg
+
+# IDE/Editor
+.vs/
+.idea/
+*.sln.docstates
+*.suo
+*.user
+*.userosscache
+*.sln.ide
+
+# VS Code
+.vscode/*
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
+
+# Rider
+.idea/
+
+# OS
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+$RECYCLE.BIN/
+System Volume Information/
+
+# Logs
+*.log
+logs/
+*.txt
+
+# Test results
+TestResults/
+*.trx
+*.coverage
+*.coveragexml
+
+# NuGet
+packages/
+*.nupkg
+*.snupkg
+
+# Dotnet
+.dotnet/
+*.runtimeconfig.json
+*.runtimeconfig.dev.json
+
+# Benchmark
+BenchmarkDotNet.Artifacts/
+
+# Profiling
+*.prof
+*.samp
+
+# Temporary files
+*.tmp
+*.temp
+temp/
+tmp/
+
+# Local settings
+appsettings.Development.json
+appsettings.Local.json
+settings.json
+*.settings
+
+# Certificate
+*.pfx
+*.p12
+*.cert
+
+# Icons/Resources (generated)
+Resources/icon.ico
+
+# Documentation build
+docs/_build/
+docs/.vitepress/dist/
+
+# Language server
+.csharp/
+
+# Global
+*.orig
+*.bak
+*~
+
+# Release artifacts
+Release/
+*.zip
+*.msi
+*.exe.config
