@@ -32,10 +32,17 @@ namespace WinCleaner.Services
     public class SystemScanner : ISystemScanner
     {
         private readonly ICleanerService _cleanerService;
+        private readonly IWinapp2Service _winapp2Service;
+        private readonly IWinapp2ToCleanItemConverter _winapp2Converter;
 
-        public SystemScanner(ICleanerService cleanerService)
+        public SystemScanner(
+            ICleanerService cleanerService,
+            IWinapp2Service winapp2Service,
+            IWinapp2ToCleanItemConverter winapp2Converter)
         {
             _cleanerService = cleanerService;
+            _winapp2Service = winapp2Service;
+            _winapp2Converter = winapp2Converter;
         }
 
         public async Task<List<DriveInfoModel>> GetDrivesAsync()
@@ -334,6 +341,9 @@ namespace WinCleaner.Services
                 groups.Add(winOldGroup);
             }
 
+            // Winapp2 Community Rules (available in all profiles)
+            await AddWinapp2EntriesAsync(groups, profile, progress, cancellationToken);
+
             // Calculate sizes
             progress?.Report("Đang tính toán dung lượng...");
             await CalculateAllSizes(groups, progress, cancellationToken);
@@ -414,6 +424,67 @@ namespace WinCleaner.Services
                 return await Task.Run(() => item.SizeCalculator!(item), cancellationToken);
             }
             return 0;
+        }
+
+        private async Task AddWinapp2EntriesAsync(List<CleanCategoryGroup> groups, CleanProfile profile, IProgress<string>? progress, CancellationToken cancellationToken)
+        {
+            try
+            {
+                progress?.Report("Đang tải Winapp2 community rules...");
+                
+                var databases = await _winapp2Service.GetAllDatabasesAsync(cancellationToken);
+                if (databases.Count == 0)
+                {
+                    // Try to download if no local databases
+                    try
+                    {
+                        await _winapp2Service.DownloadAndParseAsync(Winapp2Constants.Winapp2Url, "Winapp2", cancellationToken);
+                        databases = await _winapp2Service.GetAllDatabasesAsync(cancellationToken);
+                    }
+                    catch
+                    {
+                        // Ignore download errors, continue with built-in only
+                    }
+                }
+
+                if (databases.Count > 0)
+                {
+                    var enabledEntries = _winapp2Service.FilterEnabledEntries(databases);
+                    
+                    // Filter by detection criteria
+                    var detectedEntries = enabledEntries.Where(e => _winapp2Service.CheckDetection(e)).ToList();
+                    
+                    if (detectedEntries.Count > 0)
+                    {
+                        progress?.Report($"Tìm thấy {detectedEntries.Count} Winapp2 entries phù hợp...");
+                        
+                        var winapp2Items = _winapp2Converter.ConvertEntries(detectedEntries);
+                        
+                        // Filter by profile risk level
+                        var profileEntries = winapp2Items.Where(item => 
+                            item.SupportedProfiles?.Contains(profile.ToString()) ?? true).ToList();
+
+                        if (profileEntries.Count > 0)
+                        {
+                            var winapp2Group = CreateCategoryGroup(
+                                CleanCategory.DevToolsCache, 
+                                "Winapp2 Community Rules", 
+                                $"Cộng đồng Winapp2 - {detectedEntries.Count} entries được phát hiện ({profileEntries.Count} phù hợp profile {profile})", 
+                                ItemRiskLevel.Safe);
+                            
+                            winapp2Group.Items.AddRange(profileEntries);
+                            groups.Add(winapp2Group);
+                            
+                            progress?.Report($"Đã thêm {profileEntries.Count} Winapp2 entries vào danh sách quét");
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                progress?.Report($"Lỗi tải Winapp2: {ex.Message}");
+                // Continue without Winapp2 entries
+            }
         }
 
         private long GetDirectorySize(string path)

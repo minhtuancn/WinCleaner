@@ -1,5 +1,6 @@
 using System;
 using System.IO;
+using System.Net.Http;
 using System.Windows;  // WPF Application
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -47,10 +48,15 @@ namespace WinCleaner
                         builder.AddConsole();
                     });
 
+                    // HttpClient for Winapp2 downloads
+                    services.AddHttpClient<IWinapp2Service, Winapp2Service>();
+
                     // Services
                     services.AddSingleton<ISettingsService, SettingsService>();
                     services.AddSingleton<ISystemScanner, SystemScanner>();
                     services.AddSingleton<ICleanerService, CleanerService>();
+                    services.AddSingleton<IWinapp2Service, Winapp2Service>();
+                    services.AddSingleton<IWinapp2ToCleanItemConverter, Winapp2ToCleanItemConverter>();
 
                     // ViewModels
                     services.AddTransient<MainViewModel>();
