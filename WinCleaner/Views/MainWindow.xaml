@@ -14,12 +14,6 @@
         Background="{StaticResource BackgroundBrush}"
         FontFamily="{StaticResource DefaultFont}">
 
-    <Window.Resources>
-        <models:BytesToStringConverter x:Key="BytesToStringConverter"/>
-        <models:CleanProfileToStringConverter x:Key="ProfileToStringConverter"/>
-        <models:BoolToVisibilityConverter x:Key="BoolToVisibilityConverter"/>
-    </Window.Resources>
-
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>     <!-- Header -->
@@ -48,14 +42,14 @@
                 </StackPanel>
 
                 <StackPanel Grid.Column="1" HorizontalAlignment="Center" VerticalAlignment="Center" Orientation="Horizontal">
-                    <Border Style="{StaticResource DriveInfoCard}" Margin="0,0,16,0" DataContext="{Binding Drives[0]}">
+                    <Border Style="{StaticResource DriveInfoCard}" Margin="0,0,16,0" DataContext="{Binding Drives[0], FallbackValue={x:Null}}">
                         <StackPanel Orientation="Horizontal">
                             <TextBlock Text="💾" FontSize="16" VerticalAlignment="Center"/>
                             <StackPanel Margin="8,0,0,0">
-                                <TextBlock Text="{Binding Name}" FontWeight="SemiBold" FontSize="{StaticResource FontSizeNormal}"/>
+                                <TextBlock Text="{Binding Name, FallbackValue='No drives'}" FontWeight="SemiBold" FontSize="{StaticResource FontSizeNormal}"/>
                                 <TextBlock>
-                                    <Run Text="{Binding UsedSpaceFormatted, Mode=OneWay}"/> / <Run Text="{Binding TotalSizeFormatted, Mode=OneWay}"/>
-                                    <Run Text=" ("/><Run Text="{Binding UsedPercent, StringFormat='{}{0:0.#}%', Mode=OneWay}"/><Run Text=")"/>
+                                    <Run Text="{Binding UsedSpaceFormatted, Mode=OneWay, FallbackValue='0 B'}"/> / <Run Text="{Binding TotalSizeFormatted, Mode=OneWay, FallbackValue='0 B'}"/>
+                                    <Run Text=" ("/><Run Text="{Binding UsedPercent, StringFormat='{}{0:0.#}%', Mode=OneWay, FallbackValue='0%'}"/><Run Text=")"/>
                                 </TextBlock>
                             </StackPanel>
                         </StackPanel>

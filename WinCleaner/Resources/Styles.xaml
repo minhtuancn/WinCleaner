@@ -79,9 +79,9 @@
     <!-- Shadows -->
     <DropShadowEffect x:Key="ShadowSmall" BlurRadius="4" ShadowDepth="1" Opacity="0.1" Color="Black"/>
     <DropShadowEffect x:Key="ShadowMedium" BlurRadius="8" ShadowDepth="2" Opacity="0.15" Color="Black"/>
-    <DropShadowEffect x:Key="ShadowLarge" BlurRadius="16" ShadowDepth="4" Opacity="0_2" Color="Black"/>
+    <DropShadowEffect x:Key="ShadowLarge" BlurRadius="16" ShadowDepth="4" Opacity="0.2" Color="Black"/>
 
-<!-- Base Control Styles -->
+    <!-- Base Control Styles -->
     <Style TargetType="TextBlock">
         <Setter Property="FontFamily" Value="{StaticResource DefaultFont}"/>
         <Setter Property="FontSize" Value="{StaticResource FontSizeNormal}"/>
@@ -289,6 +289,102 @@
         </Setter>
     </Style>
 
+    <!-- Expander ToggleButton Style (must be before CategoryTreeViewItem) -->
+    <Style x:Key="ExpanderToggleButtonStyle" TargetType="ToggleButton">
+        <Setter Property="Width" Value="20"/>
+        <Setter Property="Height" Value="20"/>
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="ToggleButton">
+                    <Border Background="Transparent">
+                        <Path x:Name="Arrow" 
+                              Data="M0,0 L6,6 L12,0" 
+                              Stroke="{StaticResource TextSecondaryBrush}" 
+                              StrokeThickness="2" 
+                              StrokeStartLineCap="Round" 
+                              StrokeEndLineCap="Round" 
+                              VerticalAlignment="Center" 
+                              HorizontalAlignment="Center"
+                              RenderTransformOrigin="0.5,0.5">
+                            <Path.RenderTransform>
+                                <RotateTransform Angle="0"/>
+                            </Path.RenderTransform>
+                        </Path>
+                    </Border>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsChecked" Value="True">
+                            <Setter TargetName="Arrow" Property="RenderTransform">
+                                <Setter.Value>
+                                    <RotateTransform Angle="90"/>
+                                </Setter.Value>
+                            </Setter>
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <!-- Modern ScrollBar (must be before ScrollViewer) -->
+    <Style x:Key="ModernScrollBar" TargetType="ScrollBar">
+        <Setter Property="Background" Value="Transparent"/>
+        <Setter Property="BorderThickness" Value="0"/>
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="ScrollBar">
+                    <Track x:Name="PART_Track" IsDirectionReversed="True">
+                        <Track.DecreaseRepeatButton>
+                            <RepeatButton Command="ScrollBar.PageUpCommand" Background="Transparent" BorderThickness="0"/>
+                        </Track.DecreaseRepeatButton>
+                        <Track.Thumb>
+                            <Thumb x:Name="Thumb" 
+                                   Background="{StaticResource BorderBrush}" 
+                                   BorderThickness="0"
+                                   Width="8">
+                                <Thumb.Template>
+                                    <ControlTemplate TargetType="Thumb">
+                                        <Border Background="{TemplateBinding Background}" 
+                                                CornerRadius="4" 
+                                                Margin="1,0"/>
+                                    </ControlTemplate>
+                                </Thumb.Template>
+                            </Thumb>
+                        </Track.Thumb>
+                        <Track.IncreaseRepeatButton>
+                            <RepeatButton Command="ScrollBar.PageDownCommand" Background="Transparent" BorderThickness="0"/>
+                        </Track.IncreaseRepeatButton>
+                    </Track>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <!-- ScrollViewer Style -->
+    <Style TargetType="ScrollViewer">
+        <Setter Property="VerticalScrollBarVisibility" Value="Auto"/>
+        <Setter Property="HorizontalScrollBarVisibility" Value="Disabled"/>
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="ScrollViewer">
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="Auto"/>
+                        </Grid.ColumnDefinitions>
+                        <ScrollContentPresenter/>
+                        <ScrollBar x:Name="PART_VerticalScrollBar" 
+                                   Grid.Column="1" 
+                                   Orientation="Vertical" 
+                                   Width="8"
+                                   Margin="0,4,4,4"
+                                   Visibility="{TemplateBinding ComputedVerticalScrollBarVisibility}"
+                                   Style="{StaticResource ModernScrollBar}"/>
+                    </Grid>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
     <!-- TreeViewItem Style for Categories -->
     <Style TargetType="TreeViewItem" x:Key="CategoryTreeViewItem">
         <Setter Property="IsExpanded" Value="{Binding IsExpanded, Mode=TwoWay}"/>
@@ -361,41 +457,6 @@
                     <ControlTemplate.Triggers>
                         <Trigger Property="IsExpanded" Value="True">
                             <Setter TargetName="ItemsHost" Property="Visibility" Value="Visible"/>
-                        </Trigger>
-                    </ControlTemplate.Triggers>
-                </ControlTemplate>
-            </Setter.Value>
-        </Setter>
-    </Style>
-
-    <Style x:Key="ExpanderToggleButtonStyle" TargetType="ToggleButton">
-        <Setter Property="Width" Value="20"/>
-        <Setter Property="Height" Value="20"/>
-        <Setter Property="Template">
-            <Setter.Value>
-                <ControlTemplate TargetType="ToggleButton">
-                    <Border Background="Transparent">
-                        <Path x:Name="Arrow" 
-                              Data="M0,0 L6,6 L12,0" 
-                              Stroke="{StaticResource TextSecondaryBrush}" 
-                              StrokeThickness="2" 
-                              StrokeStartLineCap="Round" 
-                              StrokeEndLineCap="Round" 
-                              VerticalAlignment="Center" 
-                              HorizontalAlignment="Center"
-                              RenderTransformOrigin="0.5,0.5">
-                            <Path.RenderTransform>
-                                <RotateTransform Angle="0"/>
-                            </Path.RenderTransform>
-                        </Path>
-                    </Border>
-                    <ControlTemplate.Triggers>
-                        <Trigger Property="IsChecked" Value="True">
-                            <Setter TargetName="Arrow" Property="RenderTransform">
-                                <Setter.Value>
-                                    <RotateTransform Angle="90"/>
-                                </Setter.Value>
-                            </Setter>
                         </Trigger>
                     </ControlTemplate.Triggers>
                 </ControlTemplate>
@@ -579,61 +640,4 @@
         <Setter Property="Effect" Value="{StaticResource ShadowSmall}"/>
     </Style>
 
-    <!-- ScrollViewer Style -->
-    <Style TargetType="ScrollViewer">
-        <Setter Property="VerticalScrollBarVisibility" Value="Auto"/>
-        <Setter Property="HorizontalScrollBarVisibility" Value="Disabled"/>
-        <Setter Property="Template">
-            <Setter.Value>
-                <ControlTemplate TargetType="ScrollViewer">
-                    <Grid>
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="*"/>
-                            <ColumnDefinition Width="Auto"/>
-                        </Grid.ColumnDefinitions>
-                        <ScrollContentPresenter/>
-<ScrollBar x:Name="PART_VerticalScrollBar" 
-                                   Grid.Column="1" 
-                                   Orientation="Vertical" 
-                                   Width="8"
-                                   Margin="0,4,4,4"
-                                   Visibility="{TemplateBinding ComputedVerticalScrollBarVisibility}"
-                                   Style="{DynamicResource ModernScrollBar}"/>
-                    </Grid>
-                </ControlTemplate>
-            </Setter.Value>
-        </Setter>
-    </Style>
-
-    <Style x:Key="ModernScrollBar" TargetType="ScrollBar">
-        <Setter Property="Background" Value="Transparent"/>
-        <Setter Property="BorderThickness" Value="0"/>
-        <Setter Property="Template">
-            <Setter.Value>
-                <ControlTemplate TargetType="ScrollBar">
-                    <Track x:Name="PART_Track" IsDirectionReversed="True">
-                        <Track.DecreaseRepeatButton>
-                            <RepeatButton Command="ScrollBar.PageUpCommand" Background="Transparent" BorderThickness="0"/>
-                        </Track.DecreaseRepeatButton>
-                        <Track.Thumb>
-                            <Thumb x:Name="Thumb" 
-                                   Background="{StaticResource BorderBrush}" 
-                                   BorderThickness="0"
-                                   Width="8">
-                                <Thumb.Template>
-                                    <ControlTemplate TargetType="Thumb">
-                                        <Border Background="{TemplateBinding Background}" 
-                                                CornerRadius="4" 
-                                                Margin="1,0"/>
-                                    </ControlTemplate>
-                                </Thumb.Template>
-                            </Thumb>
-                        </Track.Thumb>
-                        <Track.IncreaseRepeatButton>
-                            <RepeatButton Command="ScrollBar.PageDownCommand" Background="Transparent" BorderThickness="0"/>
-                        </Track.IncreaseRepeatButton>
-                    </Track>
-                </ControlTemplate>
-            </Setter.Value>
-        </Setter>
-    </Style></ResourceDictionary>
+</ResourceDictionary>
