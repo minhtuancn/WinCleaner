@@ -23,6 +23,7 @@ namespace WinCleaner.CLI
                 CreateScanCommand(),
                 CreateCleanCommand(),
                 CreateShredCommand(),
+                CreateScheduleCommand(),
                 CreateListCommand(),
                 CreateDatabaseCommand(),
                 CreateConfigCommand(),
@@ -444,6 +445,254 @@ namespace WinCleaner.CLI
             return configCommand;
         }
 
+        private static Command CreateScheduleCommand()
+        {
+            var listCommand = new Command("list", "List scheduled tasks");
+            var listJsonOption = new Option<bool>(
+                aliases: new[] { "--json" },
+                description: "Output as JSON",
+                getDefaultValue: () => false);
+            listCommand.AddOption(listJsonOption);
+            listCommand.SetHandler(async (context) =>
+            {
+                var json = context.ParseResult.GetValueForOption(listJsonOption);
+                var exitCode = await RunScheduleListAsync(json);
+                context.ExitCode = exitCode;
+            });
+
+            var createCommand = new Command("create", "Create scheduled task");
+            var createNameArg = new Argument<string>("name", "Task name");
+            var createActionOption = new Option<ScheduleAction>("--action", getDefaultValue: () => ScheduleAction.Clean);
+            var createProfileOption = new Option<CleanProfile>("--profile", getDefaultValue: () => CleanProfile.Safe);
+            var createTriggerOption = new Option<ScheduleTriggerType>("--trigger", getDefaultValue: () => ScheduleTriggerType.Daily);
+            var createTimeOption = new Option<TimeSpan>("--time", getDefaultValue: () => new TimeSpan(2, 0, 0));
+            var createDaysOption = new Option<DayOfWeek>("--days", getDefaultValue: () => DayOfWeek.Sunday);
+            var createDayOfMonthOption = new Option<int>("--day", getDefaultValue: () => 1);
+            var createIdleOption = new Option<int>("--idle", getDefaultValue: () => 10);
+            var createDatabasesOption = new Option<string[]>("--databases", getDefaultValue: () => new[] { "all" });
+            var createDescriptionOption = new Option<string>("--description", "Task description");
+            var createEnabledOption = new Option<bool>("--enabled", getDefaultValue: () => true);
+            var createMaxRunOption = new Option<TimeSpan>("--max-run", getDefaultValue: () => TimeSpan.FromHours(2));
+            createCommand.AddArgument(createNameArg);
+            createCommand.AddOption(createActionOption);
+            createCommand.AddOption(createProfileOption);
+            createCommand.AddOption(createTriggerOption);
+            createCommand.AddOption(createTimeOption);
+            createCommand.AddOption(createDaysOption);
+            createCommand.AddOption(createDayOfMonthOption);
+            createCommand.AddOption(createIdleOption);
+            createCommand.AddOption(createDatabasesOption);
+            createCommand.AddOption(createDescriptionOption);
+            createCommand.AddOption(createEnabledOption);
+            createCommand.AddOption(createMaxRunOption);
+            createCommand.SetHandler(async (context) =>
+            {
+                var name = context.ParseResult.GetValueForArgument(createNameArg);
+                var action = context.ParseResult.GetValueForOption(createActionOption);
+                var profile = context.ParseResult.GetValueForOption(createProfileOption);
+                var trigger = context.ParseResult.GetValueForOption(createTriggerOption);
+                var time = context.ParseResult.GetValueForOption(createTimeOption);
+                var days = context.ParseResult.GetValueForOption(createDaysOption);
+                var dayOfMonth = context.ParseResult.GetValueForOption(createDayOfMonthOption);
+                var idle = context.ParseResult.GetValueForOption(createIdleOption);
+                var databases = context.ParseResult.GetValueForOption(createDatabasesOption);
+                var description = context.ParseResult.GetValueForOption(createDescriptionOption);
+                var enabled = context.ParseResult.GetValueForOption(createEnabledOption);
+                var maxRun = context.ParseResult.GetValueForOption(createMaxRunOption);
+                var exitCode = await RunScheduleCreateAsync(name, action, profile, trigger, time, days, dayOfMonth, idle, databases, description, enabled);
+                context.ExitCode = exitCode;
+            });
+
+            var removeCommand = new Command("remove", "Remove scheduled task");
+            var removeIdArg = new Argument<string>("id", "Task ID");
+            removeCommand.AddArgument(removeIdArg);
+            removeCommand.SetHandler(async (context) =>
+            {
+                var id = context.ParseResult.GetValueForArgument(removeIdArg);
+                var exitCode = await RunScheduleRemoveAsync(id);
+                context.ExitCode = exitCode;
+            });
+
+            var enableCommand = new Command("enable", "Enable/disable scheduled task");
+            var enableIdArg = new Argument<string>("id", "Task ID");
+            var enableStateArg = new Argument<bool>("state", "Enable (true) or disable (false)");
+            enableCommand.AddArgument(enableIdArg);
+            enableCommand.AddArgument(enableStateArg);
+            enableCommand.SetHandler(async (context) =>
+            {
+                var id = context.ParseResult.GetValueForArgument(enableIdArg);
+                var state = context.ParseResult.GetValueForArgument(enableStateArg);
+                var exitCode = await RunScheduleEnableAsync(id, state);
+                context.ExitCode = exitCode;
+            });
+
+            var runCommand = new Command("run", "Run scheduled task immediately");
+            var runIdArg = new Argument<string>("id", "Task ID");
+            runCommand.AddArgument(runIdArg);
+            runCommand.SetHandler(async (context) =>
+            {
+                var id = context.ParseResult.GetValueForArgument(runIdArg);
+                var exitCode = await RunScheduleRunAsync(id);
+                context.ExitCode = exitCode;
+            });
+
+            var syncCommand = new Command("sync", "Sync with Windows Task Scheduler");
+            syncCommand.SetHandler(async (context) =>
+            {
+                var exitCode = await RunScheduleSyncAsync();
+                context.ExitCode = exitCode;
+            });
+
+            var scheduleCommand = new Command("schedule", "Manage scheduled tasks")
+            {
+                listCommand,
+                createCommand,
+                removeCommand,
+                enableCommand,
+                runCommand,
+                syncCommand
+            };
+
+            return scheduleCommand;
+        }
+
+        private static async Task<int> RunScheduleListAsync(bool json)
+        {
+            try
+            {
+                using var host = CreateHost();
+                var scheduler = host.Services.GetRequiredService<ISchedulerService>();
+                var tasks = await host.Services.GetRequiredService<ISchedulerService>().GetTasksAsync();
+
+                if (json)
+                {
+                    Console.WriteLine(System.Text.Json.JsonSerializer.Serialize(tasks, new System.Text.Json.JsonSerializerOptions { WriteIndented = true }));
+                }
+                else
+                {
+                    Console.WriteLine($"Scheduled Tasks ({tasks.Count}):");
+                    foreach (var task in tasks.OrderBy(t => t.Name))
+                    {
+                        Console.WriteLine($"  [{task.Id.Substring(0, 8)}] {task.Name} - {(task.Enabled ? "Enabled" : "Disabled")}");
+                        Console.WriteLine($"    Trigger: {task.TriggerDescription}");
+                        Console.WriteLine($"    Action: {task.ActionDescription}");
+                        Console.WriteLine($"    Profile: {task.Profile} | Databases: {string.Join(", ", task.Databases)}");
+                        if (task.LastRunTime.HasValue)
+                            Console.WriteLine($"    Last Run: {task.LastRunTime:yyyy-MM-dd HH:mm} ({task.LastRunMessage})");
+                        if (task.NextRunTime.HasValue)
+                            Console.WriteLine($"    Next Run: {task.NextRunTime:yyyy-MM-dd HH:mm}");
+                    }
+                }
+                return 0;
+            }
+            catch (Exception ex)
+            {
+                Console.Error.WriteLine($"Error: {ex.Message}");
+                return 1;
+            }
+        }
+
+        private static async Task<int> RunScheduleCreateAsync(
+            string name, ScheduleAction action, CleanProfile profile, ScheduleTriggerType trigger,
+            TimeSpan time, DayOfWeek days, int dayOfMonth, int idle,
+            string[] databases, string description, bool enabled)
+        {
+            try
+            {
+                using var host = CreateHost();
+                var scheduler = host.Services.GetRequiredService<ISchedulerService>();
+
+                var task = new ScheduledTask
+                {
+                    Name = name,
+                    Description = description,
+                    Action = action,
+                    Profile = profile,
+                    TriggerType = trigger,
+                    StartTime = time,
+                    DaysOfWeek = days,
+                    DayOfMonth = dayOfMonth,
+                    IdleMinutes = idle,
+                    Databases = databases,
+                    Enabled = enabled,
+                    MaxRunTime = TimeSpan.FromHours(2)
+                };
+
+                var success = await host.Services.GetRequiredService<ISchedulerService>().CreateTaskAsync(task);
+                Console.WriteLine(success ? $"Task created: {name} (ID: {task.Id.Substring(0, 8)})" : "Failed to create task");
+                return success ? 0 : 1;
+            }
+            catch (Exception ex)
+            {
+                Console.Error.WriteLine($"Error: {ex.Message}");
+                return 1;
+            }
+        }
+
+        private static async Task<int> RunScheduleRemoveAsync(string id)
+        {
+            try
+            {
+                using var host = CreateHost();
+                var success = await host.Services.GetRequiredService<ISchedulerService>().DeleteTaskAsync(id);
+                Console.WriteLine(success ? "Task removed" : "Task not found");
+                return success ? 0 : 1;
+            }
+            catch (Exception ex)
+            {
+                Console.Error.WriteLine($"Error: {ex.Message}");
+                return 1;
+            }
+        }
+
+        private static async Task<int> RunScheduleEnableAsync(string id, bool state)
+        {
+            try
+            {
+                using var host = CreateHost();
+                var success = await host.Services.GetRequiredService<ISchedulerService>().EnableTaskAsync(id, state);
+                Console.WriteLine(success ? $"Task {(state ? "enabled" : "disabled")}" : "Task not found");
+                return success ? 0 : 1;
+            }
+            catch (Exception ex)
+            {
+                Console.Error.WriteLine($"Error: {ex.Message}");
+                return 1;
+            }
+        }
+
+        private static async Task<int> RunScheduleRunAsync(string id)
+        {
+            try
+            {
+                using var host = CreateHost();
+                var success = await host.Services.GetRequiredService<ISchedulerService>().RunTaskAsync(id);
+                Console.WriteLine(success ? "Task completed successfully" : "Task failed");
+                return success ? 0 : 1;
+            }
+            catch (Exception ex)
+            {
+                Console.Error.WriteLine($"Error: {ex.Message}");
+                return 1;
+            }
+        }
+
+        private static async Task<int> RunScheduleSyncAsync()
+        {
+            try
+            {
+                using var host = CreateHost();
+                var success = await host.Services.GetRequiredService<ISchedulerService>().SyncWithSystemAsync();
+                Console.WriteLine(success ? "Synced with Windows Task Scheduler" : "Sync failed");
+                return success ? 0 : 1;
+            }
+            catch (Exception ex)
+            {
+                Console.Error.WriteLine($"Error: {ex.Message}");
+                return 1;
+            }
+        }
+
         private static Command CreateVersionCommand()
         {
             var command = new Command("version", "Show version information");
@@ -809,6 +1058,8 @@ namespace WinCleaner.CLI
                     services.AddSingleton<IWinapp2Service, Winapp2Service>();
                     services.AddSingleton<IWinapp2ToCleanItemConverter, Winapp2ToCleanItemConverter>();
                     services.AddSingleton<ISecureDeleteService, SecureDeleteService>();
+                    services.AddSingleton<ICustomRuleService, CustomRuleService>();
+                    services.AddSingleton<ISchedulerService, SchedulerService>();
                 })
                 .Build();
         }
