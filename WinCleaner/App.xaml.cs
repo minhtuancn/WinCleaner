@@ -60,6 +60,7 @@ namespace WinCleaner
                     services.AddSingleton<ISecureDeleteService, SecureDeleteService>();
                     services.AddSingleton<ICustomRuleService, CustomRuleService>();
                     services.AddSingleton<ISchedulerService, SchedulerService>();
+                    services.AddSingleton<IAppxService, AppxService>();
 
                     // ViewModels
                     services.AddTransient<MainViewModel>();
