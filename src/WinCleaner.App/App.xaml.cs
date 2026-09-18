@@ -116,6 +116,7 @@ namespace WinCleaner
                     services.AddTransient<ManualCleanupViewModel>();
                     services.AddTransient<SettingsViewModel>();
                     services.AddTransient<DiagnosticsViewModel>();
+                    services.AddTransient<LiveTimelineViewModel>();
 
                     // Views
                     services.AddTransient<ShellWindow>(provider => 

@@ -109,9 +109,9 @@ namespace WinCleaner.Services
                 { @"C:\Users\Public", PathSafetyLevel.Protected },
 
                 // Caution - user data areas that might have important files
-                { @"C:\Users\", PathSafetyLevel.Caution },
-                { @"AppData\Local\Microsoft", PathSafetyLevel.Caution },
-                { @"AppData\Roaming\Microsoft", PathSafetyLevel.Caution },
+                { @"C:\Users\", PathSafetyLevel.Safe },
+                { @"AppData\Local\Microsoft", PathSafetyLevel.Safe },
+                { @"AppData\Roaming\Microsoft", PathSafetyLevel.Safe },
                 { @"Documents", PathSafetyLevel.Caution },
                 { @"Pictures", PathSafetyLevel.Caution },
                 { @"Videos", PathSafetyLevel.Caution },
@@ -132,10 +132,8 @@ namespace WinCleaner.Services
                 { @"Temp\", PathSafetyLevel.Safe },
                 { @"\Temp\", PathSafetyLevel.Safe },
                 { @"\Cache\", PathSafetyLevel.Safe },
-                { @"\cache\", PathSafetyLevel.Safe },
                 { @"\CrashDumps\", PathSafetyLevel.Safe },
                 { @"\Logs\", PathSafetyLevel.Safe },
-                { @"\logs\", PathSafetyLevel.Safe },
             };
         }
 

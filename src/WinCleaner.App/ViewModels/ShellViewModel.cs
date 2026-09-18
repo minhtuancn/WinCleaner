@@ -34,6 +34,7 @@ namespace WinCleaner.ViewModels
             new NavItem("Health Check", "HealthCheck", Icons.Monitor, "System health & quick clean"),
             new NavItem("Advanced Clean", "AdvancedClean", Icons.Broom, "Deep cleaning with safety review"),
             new NavItem("Storage", "Storage", Icons.Drive, "Disk usage analysis & large files"),
+            new NavItem("Live Timeline", "LiveTimeline", Icons.Clock, "Real-time operation progress"),
             new NavItem("Manual Cleanup", "ManualCleanup", Icons.Folder, "Explore & clean custom paths"),
             new NavItem("Settings", "Settings", Icons.Settings, "Preferences & configuration"),
             new NavItem("Diagnostics", "Diagnostics", Icons.Info, "Logs, crash reports & health"),
@@ -51,7 +52,8 @@ namespace WinCleaner.ViewModels
             StorageViewModel storageVM,
             ManualCleanupViewModel manualCleanupVM,
             SettingsViewModel settingsVM,
-            DiagnosticsViewModel diagnosticsVM)
+            DiagnosticsViewModel diagnosticsVM,
+            LiveTimelineViewModel liveTimelineVM)
         {
             _themeStore = themeStore;
             _resilience = resilience;
@@ -76,6 +78,7 @@ namespace WinCleaner.ViewModels
                 "HealthCheck" => _services.GetRequiredService<HealthCheckViewModel>(),
                 "AdvancedClean" => _services.GetRequiredService<AdvancedCleanViewModel>(),
                 "Storage" => _services.GetRequiredService<StorageViewModel>(),
+                "LiveTimeline" => _services.GetRequiredService<LiveTimelineViewModel>(),
                 "ManualCleanup" => _services.GetRequiredService<ManualCleanupViewModel>(),
                 "Settings" => _services.GetRequiredService<SettingsViewModel>(),
                 "Diagnostics" => _services.GetRequiredService<DiagnosticsViewModel>(),

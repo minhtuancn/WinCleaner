@@ -19,10 +19,11 @@ namespace WinCleaner.Design
         public static readonly Geometry Collapse = Parse("M3 9h6V3M9 21V15h6M3 15l7-7 7 7");
         public static readonly Geometry ArrowRight = Parse("M5 12h14M12 5l7 7-7 7");
         public static readonly Geometry ArrowLeft = Parse("M19 12H5M12 19l-7-7 7-7");
+        public static readonly Geometry Clock = Parse("M11.5 2C6.47 2 2 6.47 2 11.5S6.47 20 11.5 20 20 13.53 20 11.5 13.53 2 11.5 2zm0 18c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58 8-8 8zm0-12v6l4.5 3-4.5 3z");
 
         // Actions
         public static readonly Geometry Search = Parse("M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z");
-        public static readonly Geometry Settings = Parse("M12.22 2h-.44a2 2 0 00-2 2v.18a2 2 0 01-1 1.73l-.43.25a2 2 0 01-2 0l-.15-.08a2 2 0 00-2.73.73l-.25.43a2 2 0 01-1.73 1H4a2 2 0 00-2 2v.44a2 2 0 002 2h.18a2 2 0 011 1.73l.25.43a2 2 0 00.73 2.73l-.43.15a2 2 0 01-1 1.73V20a2 2 0 002 2h.44a2 2 0 002-2v-.18a2 2 0 011-1.73l.43-.25a2 2 0 012 0l.15.08a2 2 0 002.73-.73l.25-.43a2 2 0 011.73-1h.18a2 2 0 002-2v-.44a2 2 0 00-2-2h-.18a2 2 0 01-1-1.73l-.25-.43a2 2 0 00-.73-2.73l.43-.15a2 2 0 011-1.73V4a2 2 0 00-2-2z");
+        public static readonly Geometry Settings = Parse("M12.22 2h-.44a2 2 0 00-2 2v.18a2 2 0 01-1 1.73l-.43.25a2 2 0 01-2 0l-.15-.08a2 2 0 00-2.73.73l-.25.43a2 2 0 01-1.73 1H4a2 2 0 00-2 2v.44a2 2 0 002 2h.18a2 2 0 011 1.73l.25.43a2 2 0 00.73 2.73l-.43.15a2 2 0 01-1 1.73V20a2 2 0 002 2h.44a2 2 0 002-2v-.18a2 2 0 011-1.73l.43-.25a2 2 0 012 0l.15.08a2 2 0 002.73-.73l.25-.43a2 2 0 011.73-1h.18a2 2 0 002-2v-.44a2 2 0 00-2-2h-.18a2 2 0 01-1-1.73l-.25-.43a2 2 0 00-.73-2.73l.43-.15a2 2 0 01-1-1.73V4a2 2 0 00-2-2z");
         public static readonly Geometry Refresh = Parse("M23 4v6h-6M1 20v-6h6M3.51 9a9 9 0 0114.98 0");
         public static readonly Geometry Delete = Parse("M3 6h18M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2");
         public static readonly Geometry Edit = Parse("M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5a2.121 2.121 0 013 3z");
@@ -61,7 +62,7 @@ namespace WinCleaner.Design
         // Hardware
         public static readonly Geometry Cpu = Parse("M12 2a10 10 0 1010 10A10 10 0 0012 2zm0 18a8 8 0 110-16 8 8 0 010 16z");
         public static readonly Geometry Memory = Parse("M6 4h16v16H6zM8 6h12v2H8zm0 4h12v2H8zm0 4h12v2H8z");
-        public static readonly Geometry Gpu = Parse("M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h8a2 2 0 002-2V4a2 2 0 00-2-2zm0 18H6V4h8v16z");
+        public static readonly Geometry Gpu = Parse("M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h8a2 2 0 002-2V4a2 2 0 002-2zm0 18H6V4h8v16z");
         public static readonly Geometry Disk = Parse("M12 2a10 10 0 1010 10A10 10 0 0012 2zm0 18a8 8 0 110-16 8 8 0 010 16z");
 
         // Helpers

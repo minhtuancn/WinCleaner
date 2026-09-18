@@ -363,3 +363,12 @@ namespace WinCleaner.Models
         }
     }
 }
+public enum TimelineEventType
+{
+    Debug,
+    Info,
+    Success,
+    Warning,
+    Error,
+    Cancel
+}
