@@ -1,0 +1,21 @@
+<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:models="clr-namespace:WinCleaner.Models;assembly=WinCleaner.Infrastructure.Windows">
+
+    <!-- Global Converters -->
+    <models:BytesToStringConverter x:Key="BytesToStringConverter"/>
+    <models:IntToVisibilityConverter x:Key="IntToVisibilityConverter"/>
+    <models:RiskLevelToBrushConverter x:Key="RiskLevelToBrushConverter"/>
+    <models:CleanStatusToBrushConverter x:Key="CleanStatusToBrushConverter"/>
+    <models:BoolToVisibilityConverter x:Key="BoolToVisibilityConverter"/>
+    <models:InverseBoolToVisibilityConverter x:Key="InverseBoolToVisibilityConverter"/>
+    <models:RiskLevelToTooltipConverter x:Key="RiskLevelToTooltipConverter"/>
+    <models:CleanStatusToVisibilityConverter x:Key="CleanStatusToVisibilityConverter"/>
+    <models:LogLevelToBrushConverter x:Key="LogLevelToBrushConverter"/>
+    <models:LogLevelToBackgroundConverter x:Key="LogLevelToBackgroundConverter"/>
+    <models:BoolToAdminTextConverter x:Key="BoolToAdminTextConverter"/>
+    <models:CleanProfileToStringConverter x:Key="CleanProfileToStringConverter"/>
+    <models:EnumToCollectionConverter x:Key="EnumToCollectionConverter"/>
+    <models:DriveUsageToBrushConverter x:Key="DriveUsageToBrushConverter"/>
+
+</ResourceDictionary>

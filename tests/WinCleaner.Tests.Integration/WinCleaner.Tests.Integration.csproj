@@ -1,0 +1,16 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net8.0-windows</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <LangVersion>latest</LangVersion>
+    <IsPackable>false</IsPackable>
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\src\WinCleaner.Core\WinCleaner.Core.csproj" />
+    <ProjectReference Include="..\..\src\WinCleaner.Infrastructure.Windows\WinCleaner.Infrastructure.Windows.csproj" />
+    <ProjectReference Include="..\..\src\WinCleaner.App\WinCleaner.App.csproj" />
+  </ItemGroup>
+</Project>
