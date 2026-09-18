@@ -693,6 +693,256 @@ namespace WinCleaner.CLI
             }
         }
 
+        private static Command CreateExtensionCommand()
+        {
+            var listCommand = new Command("list", "List installed extensions");
+            var listJsonOption = new Option<bool>("--json", "Output as JSON");
+            listCommand.AddOption(listJsonOption);
+            listCommand.SetHandler(async (context) =>
+            {
+                var json = context.ParseResult.GetValueForOption(listJsonOption);
+                var exitCode = await RunExtensionListAsync(json);
+                context.ExitCode = exitCode;
+            });
+
+            var loadCommand = new Command("load", "Load extension from assembly");
+            var loadPathArg = new Argument<string>("path", "Path to extension assembly (.dll)");
+            loadCommand.AddArgument(loadPathArg);
+            loadCommand.SetHandler(async (context) =>
+            {
+                var path = context.ParseResult.GetValueForArgument(loadPathArg);
+                var exitCode = await RunExtensionLoadAsync(path);
+                context.ExitCode = exitCode;
+            });
+
+            var unloadCommand = new Command("unload", "Unload extension");
+            var unloadIdArg = new Argument<string>("id", "Extension ID");
+            unloadCommand.AddArgument(unloadIdArg);
+            unloadCommand.SetHandler(async (context) =>
+            {
+                var id = context.ParseResult.GetValueForArgument(unloadIdArg);
+                var exitCode = await RunExtensionUnloadAsync(id);
+                context.ExitCode = exitCode;
+            });
+
+            var enableCommand = new Command("enable", "Enable/disable extension");
+            var enableIdArg = new Argument<string>("id", "Extension ID");
+            var enableStateArg = new Argument<bool>("state");
+            enableStateArg.Description = "Enable (true) or disable (false)";
+            enableCommand.AddArgument(enableIdArg);
+            enableCommand.AddArgument(enableStateArg);
+            enableCommand.SetHandler(async (context) =>
+            {
+                var id = context.ParseResult.GetValueForArgument(enableIdArg);
+                var state = context.ParseResult.GetValueForArgument(enableStateArg);
+                var exitCode = await RunExtensionEnableAsync(id, state);
+                context.ExitCode = exitCode;
+            });
+
+            var installCommand = new Command("install", "Install extension from package");
+            var installPathArg = new Argument<string>("path", "Path to extension package (.zip or .dll)");
+            installCommand.AddArgument(installPathArg);
+            installCommand.SetHandler(async (context) =>
+            {
+                var path = context.ParseResult.GetValueForArgument(installPathArg);
+                var exitCode = await RunExtensionInstallAsync(path);
+                context.ExitCode = exitCode;
+            });
+
+            var uninstallCommand = new Command("uninstall", "Uninstall extension");
+            var uninstallIdArg = new Argument<string>("id", "Extension ID");
+            uninstallCommand.AddArgument(uninstallIdArg);
+            uninstallCommand.SetHandler(async (context) =>
+            {
+                var id = context.ParseResult.GetValueForArgument(uninstallIdArg);
+                var exitCode = await RunExtensionUninstallAsync(id);
+                context.ExitCode = exitCode;
+            });
+
+            var reloadCommand = new Command("reload", "Reload extension");
+            var reloadIdArg = new Argument<string>("id", "Extension ID");
+            reloadCommand.AddArgument(reloadIdArg);
+            reloadCommand.SetHandler(async (context) =>
+            {
+                var id = context.ParseResult.GetValueForArgument(reloadIdArg);
+                var exitCode = await RunExtensionReloadAsync(id);
+                context.ExitCode = exitCode;
+            });
+
+            var discoverCommand = new Command("discover", "Discover extensions in directory");
+            var discoverPathArg = new Argument<string>("path", "Directory to search for extensions");
+            discoverCommand.AddArgument(discoverPathArg);
+            discoverCommand.SetHandler(async (context) =>
+            {
+                var path = context.ParseResult.GetValueForArgument(discoverPathArg);
+                var exitCode = await RunExtensionDiscoverAsync(path);
+                context.ExitCode = exitCode;
+            });
+
+            var extensionCommand = new Command("extension", "Manage extensions/plugins")
+            {
+                listCommand,
+                loadCommand,
+                unloadCommand,
+                enableCommand,
+                installCommand,
+                uninstallCommand,
+                reloadCommand,
+                discoverCommand
+            };
+
+            return extensionCommand;
+        }
+
+        private static async Task<int> RunExtensionListAsync(bool json)
+        {
+            try
+            {
+                using var host = CreateHost();
+                var extManager = host.Services.GetRequiredService<IExtensionManager>();
+                var extensions = await host.Services.GetRequiredService<IExtensionManager>().GetExtensionsAsync();
+
+                if (json)
+                {
+                    Console.WriteLine(System.Text.Json.JsonSerializer.Serialize(extensions, new System.Text.Json.JsonSerializerOptions { WriteIndented = true }));
+                }
+                else
+                {
+                    Console.WriteLine($"Extensions ({extensions.Count}):");
+                    foreach (var ext in extensions.OrderBy(e => e.Name))
+                    {
+                        Console.WriteLine($"  [{ext.Id.Substring(0, Math.Min(8, ext.Id.Length))}] {ext.Name} v{ext.Version} by {ext.Author}");
+                        Console.WriteLine($"    Type: {ext.Type} | {(ext.IsEnabled ? "Enabled" : "Disabled")} | {(ext.IsLoaded ? "Loaded" : "Not Loaded")}");
+                        if (!string.IsNullOrEmpty(ext.ErrorMessage))
+                            Console.WriteLine($"    Error: {ext.ErrorMessage}");
+                    }
+                }
+                return 0;
+            }
+            catch (Exception ex)
+            {
+                Console.Error.WriteLine($"Error: {ex.Message}");
+                return 1;
+            }
+        }
+
+        private static async Task<int> RunExtensionLoadAsync(string path)
+        {
+            try
+            {
+                using var host = CreateHost();
+                var success = await host.Services.GetRequiredService<IExtensionManager>().LoadExtensionAsync(path);
+                Console.WriteLine(success ? $"Extension loaded from: {path}" : "Failed to load extension");
+                return success ? 0 : 1;
+            }
+            catch (Exception ex)
+            {
+                Console.Error.WriteLine($"Error: {ex.Message}");
+                return 1;
+            }
+        }
+
+        private static async Task<int> RunExtensionUnloadAsync(string id)
+        {
+            try
+            {
+                using var host = CreateHost();
+                var success = await host.Services.GetRequiredService<IExtensionManager>().UnloadExtensionAsync(id);
+                Console.WriteLine(success ? "Extension unloaded" : "Extension not found");
+                return success ? 0 : 1;
+            }
+            catch (Exception ex)
+            {
+                Console.Error.WriteLine($"Error: {ex.Message}");
+                return 1;
+            }
+        }
+
+        private static async Task<int> RunExtensionEnableAsync(string id, bool state)
+        {
+            try
+            {
+                using var host = CreateHost();
+                var success = await host.Services.GetRequiredService<IExtensionManager>().EnableExtensionAsync(id, state);
+                Console.WriteLine(success ? $"Extension {(state ? "enabled" : "disabled")}" : "Extension not found");
+                return success ? 0 : 1;
+            }
+            catch (Exception ex)
+            {
+                Console.Error.WriteLine($"Error: {ex.Message}");
+                return 1;
+            }
+        }
+
+        private static async Task<int> RunExtensionInstallAsync(string path)
+        {
+            try
+            {
+                using var host = CreateHost();
+                var success = await host.Services.GetRequiredService<IExtensionManager>().InstallExtensionAsync(path);
+                Console.WriteLine(success ? $"Extension installed from: {path}" : "Install failed");
+                return success ? 0 : 1;
+            }
+            catch (Exception ex)
+            {
+                Console.Error.WriteLine($"Error: {ex.Message}");
+                return 1;
+            }
+        }
+
+        private static async Task<int> RunExtensionUninstallAsync(string id)
+        {
+            try
+            {
+                using var host = CreateHost();
+                var success = await host.Services.GetRequiredService<IExtensionManager>().UninstallExtensionAsync(id);
+                Console.WriteLine(success ? "Extension uninstalled" : "Extension not found");
+                return success ? 0 : 1;
+            }
+            catch (Exception ex)
+            {
+                Console.Error.WriteLine($"Error: {ex.Message}");
+                return 1;
+            }
+        }
+
+        private static async Task<int> RunExtensionReloadAsync(string id)
+        {
+            try
+            {
+                using var host = CreateHost();
+                var success = await host.Services.GetRequiredService<IExtensionManager>().ReloadExtensionAsync(id);
+                Console.WriteLine(success ? "Extension reloaded" : "Reload failed");
+                return success ? 0 : 1;
+            }
+            catch (Exception ex)
+            {
+                Console.Error.WriteLine($"Error: {ex.Message}");
+                return 1;
+            }
+        }
+
+        private static async Task<int> RunExtensionDiscoverAsync(string path)
+        {
+            try
+            {
+                using var host = CreateHost();
+                var extensions = await host.Services.GetRequiredService<IExtensionManager>().DiscoverExtensionsAsync(path);
+
+                Console.WriteLine($"Discovered {extensions.Count} extensions in {path}:");
+                foreach (var ext in extensions)
+                {
+                    Console.WriteLine($"  {ext.Name} v{ext.Version} by {ext.Author} ({ext.Type})");
+                }
+                return 0;
+            }
+            catch (Exception ex)
+            {
+                Console.Error.WriteLine($"Error: {ex.Message}");
+                return 1;
+            }
+        }
+
         private static Command CreateVersionCommand()
         {
             var command = new Command("version", "Show version information");
