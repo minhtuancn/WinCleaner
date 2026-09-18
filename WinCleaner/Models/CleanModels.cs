@@ -648,4 +648,23 @@ namespace WinCleaner.Models
             throw new NotImplementedException();
         }
     }
+
+    public class DriveUsageToBrushConverter : System.Windows.Data.IValueConverter
+    {
+        public object Convert(object value, Type targetType, object parameter, System.Globalization.CultureInfo culture)
+        {
+            if (value is double percent)
+            {
+                if (percent >= 90) return Application.Current.FindResource("ErrorBrush");
+                if (percent >= 75) return Application.Current.FindResource("WarningBrush");
+                return Application.Current.FindResource("SuccessBrush");
+            }
+            return Application.Current.FindResource("PrimaryBrush");
+        }
+
+        public object ConvertBack(object value, Type targetType, object parameter, System.Globalization.CultureInfo culture)
+        {
+            throw new NotImplementedException();
+        }
+    }
 }

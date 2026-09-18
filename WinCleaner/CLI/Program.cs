@@ -29,6 +29,7 @@ var rootCommand = new RootCommand("WinCleaner CLI - Professional System Cleaner 
                 CreateListCommand(),
                 CreateDatabaseCommand(),
                 CreateConfigCommand(),
+                CreateThemeCommand(),
                 CreateVersionCommand()
             };
 
@@ -1161,6 +1162,282 @@ var rootCommand = new RootCommand("WinCleaner CLI - Professional System Cleaner 
                         Console.WriteLine($"  ... and {missing.Count - 50} more");
                 }
                 return 0;
+            }
+            catch (Exception ex)
+            {
+                Console.Error.WriteLine($"Error: {ex.Message}");
+                return 1;
+            }
+        }
+
+        private static Command CreateThemeCommand()
+        {
+            var themeCommand = new Command("theme", "Manage UI theme");
+
+            var listCommand = new Command("list", "List available themes");
+            var listJsonOption = new Option<bool>(aliases: new[] { "--json" }, description: "Output as JSON", getDefaultValue: () => false);
+            listCommand.AddOption(listJsonOption);
+            listCommand.SetHandler(async (context) =>
+            {
+                var json = context.ParseResult.GetValueForOption(listJsonOption);
+                var exitCode = await RunThemeListAsync(json);
+                context.ExitCode = exitCode;
+            });
+            themeCommand.AddCommand(listCommand);
+
+            var setCommand = new Command("set", "Set theme");
+            var setThemeArg = new Argument<string>("theme", "Theme (Light, Dark, System)");
+            setCommand.AddArgument(setThemeArg);
+            setCommand.SetHandler(async (context) =>
+            {
+                var theme = context.ParseResult.GetValueForArgument(setThemeArg);
+                var exitCode = await RunThemeSetAsync(theme);
+                context.ExitCode = exitCode;
+            });
+            themeCommand.AddCommand(setCommand);
+
+            var currentCommand = new Command("current", "Show current theme");
+            currentCommand.SetHandler(async (context) =>
+            {
+                var exitCode = await RunThemeCurrentAsync();
+                context.ExitCode = exitCode;
+            });
+            themeCommand.AddCommand(currentCommand);
+
+            var toggleCommand = new Command("toggle", "Toggle between Light and Dark theme");
+            toggleCommand.SetHandler(async (context) =>
+            {
+                var exitCode = await RunThemeToggleAsync();
+                context.ExitCode = exitCode;
+            });
+            themeCommand.AddCommand(toggleCommand);
+
+            var accentCommand = new Command("accent", "Set accent color");
+            var accentColorArg = new Argument<string>("color", "Hex color code (e.g., #0078D4)");
+            accentCommand.AddArgument(accentColorArg);
+            accentCommand.SetHandler(async (context) =>
+            {
+                var color = context.ParseResult.GetValueForArgument(accentColorArg);
+                var exitCode = await RunThemeAccentAsync(color);
+                context.ExitCode = exitCode;
+            });
+            themeCommand.AddCommand(accentCommand);
+
+            var animCommand = new Command("animations", "Enable/disable animations");
+            var animStateArg = new Argument<bool>("state", "Enable (true) or disable (false)");
+            animCommand.AddArgument(animStateArg);
+            animCommand.SetHandler(async (context) =>
+            {
+                var state = context.ParseResult.GetValueForArgument(animStateArg);
+                var exitCode = await RunThemeAnimationsAsync(state);
+                context.ExitCode = exitCode;
+            });
+            themeCommand.AddCommand(animCommand);
+
+            var transCommand = new Command("transparency", "Enable/disable transparency effects");
+            var transStateArg = new Argument<bool>("state", "Enable (true) or disable (false)");
+            transCommand.AddArgument(transStateArg);
+            transCommand.SetHandler(async (context) =>
+            {
+                var state = context.ParseResult.GetValueForArgument(transStateArg);
+                var exitCode = await RunThemeTransparencyAsync(state);
+                context.ExitCode = exitCode;
+            });
+            themeCommand.AddCommand(transCommand);
+
+            var systemCommand = new Command("system", "Use system theme");
+            var sysStateArg = new Argument<bool>("state", "Enable (true) or disable (false)");
+            systemCommand.AddArgument(sysStateArg);
+            systemCommand.SetHandler(async (context) =>
+            {
+                var state = context.ParseResult.GetValueForArgument(sysStateArg);
+                var exitCode = await RunThemeSystemAsync(state);
+                context.ExitCode = exitCode;
+            });
+            themeCommand.AddCommand(systemCommand);
+
+            var scaleCommand = new Command("scale", "Set UI scale");
+            var scaleArg = new Argument<double>("scale", "Scale factor (0.5 - 2.0)");
+            scaleCommand.AddArgument(scaleArg);
+            scaleCommand.SetHandler(async (context) =>
+            {
+                var scale = context.ParseResult.GetValueForArgument(scaleArg);
+                var exitCode = await RunThemeScaleAsync(scale);
+                context.ExitCode = exitCode;
+            });
+            themeCommand.AddCommand(scaleCommand);
+
+            return themeCommand;
+        }
+
+        private static async Task<int> RunThemeListAsync(bool json)
+        {
+            try
+            {
+                using var host = CreateHost();
+                var themes = Enum.GetValues<AppTheme>().Cast<AppTheme>().ToList();
+                var current = host.Services.GetRequiredService<IThemeService>().CurrentTheme;
+
+                if (json)
+                {
+                    Console.WriteLine(System.Text.Json.JsonSerializer.Serialize(new { Themes = themes.Select(t => t.ToString()).ToArray(), Current = current.ToString() }, new System.Text.Json.JsonSerializerOptions { WriteIndented = true }));
+                }
+                else
+                {
+                    Console.WriteLine($"Available Themes ({themes.Count}):");
+                    foreach (var theme in themes)
+                    {
+                        var marker = theme == current ? " (current)" : "";
+                        Console.WriteLine($"  {theme}{marker}");
+                    }
+                }
+                return 0;
+            }
+            catch (Exception ex)
+            {
+                Console.Error.WriteLine($"Error: {ex.Message}");
+                return 1;
+            }
+        }
+
+        private static async Task<int> RunThemeSetAsync(string theme)
+        {
+            try
+            {
+                using var host = CreateHost();
+                if (!Enum.TryParse<AppTheme>(theme, true, out var themeEnum))
+                {
+                    Console.Error.WriteLine($"Invalid theme: {theme}. Use Light, Dark, or System");
+                    return 1;
+                }
+
+                var success = await host.Services.GetRequiredService<IThemeService>().SetThemeAsync(themeEnum);
+                Console.WriteLine(success ? $"Theme set to: {themeEnum}" : $"Failed to set theme: {themeEnum}");
+                return success ? 0 : 1;
+            }
+            catch (Exception ex)
+            {
+                Console.Error.WriteLine($"Error: {ex.Message}");
+                return 1;
+            }
+        }
+
+        private static async Task<int> RunThemeCurrentAsync()
+        {
+            try
+            {
+                using var host = CreateHost();
+                var theme = host.Services.GetRequiredService<IThemeService>().CurrentTheme;
+                Console.WriteLine($"Current theme: {theme}");
+                return 0;
+            }
+            catch (Exception ex)
+            {
+                Console.Error.WriteLine($"Error: {ex.Message}");
+                return 1;
+            }
+        }
+
+        private static async Task<int> RunThemeToggleAsync()
+        {
+            try
+            {
+                using var host = CreateHost();
+                var success = await host.Services.GetRequiredService<IThemeService>().ToggleThemeAsync();
+                Console.WriteLine(success ? "Theme toggled" : "Failed to toggle theme");
+                return success ? 0 : 1;
+            }
+            catch (Exception ex)
+            {
+                Console.Error.WriteLine($"Error: {ex.Message}");
+                return 1;
+            }
+        }
+
+        private static async Task<int> RunThemeAccentAsync(string color)
+        {
+            try
+            {
+                using var host = CreateHost();
+                if (!color.StartsWith("#") || color.Length != 7)
+                {
+                    Console.Error.WriteLine("Invalid color format. Use #RRGGBB format.");
+                    return 1;
+                }
+
+                var success = await host.Services.GetRequiredService<IThemeService>().SetAccentColorAsync(color);
+                Console.WriteLine(success ? $"Accent color set to: {color}" : "Failed to set accent color");
+                return success ? 0 : 1;
+            }
+            catch (Exception ex)
+            {
+                Console.Error.WriteLine($"Error: {ex.Message}");
+                return 1;
+            }
+        }
+
+        private static async Task<int> RunThemeAnimationsAsync(bool state)
+        {
+            try
+            {
+                using var host = CreateHost();
+                var success = await host.Services.GetRequiredService<IThemeService>().SetAnimationsEnabledAsync(state);
+                Console.WriteLine(success ? $"Animations {(state ? "enabled" : "disabled")}" : "Failed to set animations");
+                return success ? 0 : 1;
+            }
+            catch (Exception ex)
+            {
+                Console.Error.WriteLine($"Error: {ex.Message}");
+                return 1;
+            }
+        }
+
+        private static async Task<int> RunThemeTransparencyAsync(bool state)
+        {
+            try
+            {
+                using var host = CreateHost();
+                var success = await host.Services.GetRequiredService<IThemeService>().SetTransparencyEnabledAsync(state);
+                Console.WriteLine(success ? $"Transparency {(state ? "enabled" : "disabled")}" : "Failed to set transparency");
+                return success ? 0 : 1;
+            }
+            catch (Exception ex)
+            {
+                Console.Error.WriteLine($"Error: {ex.Message}");
+                return 1;
+            }
+        }
+
+        private static async Task<int> RunThemeSystemAsync(bool state)
+        {
+            try
+            {
+                using var host = CreateHost();
+                var success = await host.Services.GetRequiredService<IThemeService>().SetUseSystemThemeAsync(state);
+                Console.WriteLine(success ? $"System theme {(state ? "enabled" : "disabled")}" : "Failed to set system theme");
+                return success ? 0 : 1;
+            }
+            catch (Exception ex)
+            {
+                Console.Error.WriteLine($"Error: {ex.Message}");
+                return 1;
+            }
+        }
+
+        private static async Task<int> RunThemeScaleAsync(double scale)
+        {
+            try
+            {
+                if (scale < 0.5 || scale > 2.0)
+                {
+                    Console.Error.WriteLine("Scale must be between 0.5 and 2.0");
+                    return 1;
+                }
+
+                using var host = CreateHost();
+                var success = await host.Services.GetRequiredService<IThemeService>().SetUiScaleAsync(scale);
+                Console.WriteLine(success ? $"UI scale set to: {scale}" : "Failed to set UI scale");
+                return success ? 0 : 1;
             }
             catch (Exception ex)
             {
