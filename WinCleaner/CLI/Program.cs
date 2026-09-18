@@ -18,12 +18,14 @@ namespace WinCleaner.CLI
     {
         public static async Task<int> Main(string[] args)
         {
-            var rootCommand = new RootCommand("WinCleaner CLI - Professional System Cleaner for Windows")
+var rootCommand = new RootCommand("WinCleaner CLI - Professional System Cleaner for Windows")
             {
                 CreateScanCommand(),
                 CreateCleanCommand(),
                 CreateShredCommand(),
                 CreateScheduleCommand(),
+                CreateExtensionCommand(),
+                CreateLanguageCommand(),
                 CreateListCommand(),
                 CreateDatabaseCommand(),
                 CreateConfigCommand(),
@@ -943,6 +945,230 @@ namespace WinCleaner.CLI
             }
         }
 
+        private static Command CreateLanguageCommand()
+        {
+            var listCommand = new Command("list", "List available languages");
+            var listJsonOption = new Option<bool>("--json", "Output as JSON");
+            listCommand.AddOption(listJsonOption);
+            listCommand.SetHandler(async (context) =>
+            {
+                var json = context.ParseResult.GetValueForOption(listJsonOption);
+                var exitCode = await RunLanguageListAsync(json);
+                context.ExitCode = exitCode;
+            });
+
+            var setCommand = new Command("set", "Set current language");
+            var setLangArg = new Argument<string>("language", "Language code (e.g., en-US, vi-VN)");
+            setCommand.AddArgument(setLangArg);
+            setCommand.SetHandler(async (context) =>
+            {
+                var langCode = context.ParseResult.GetValueForArgument(setLangArg);
+                var exitCode = await RunLanguageSetAsync(langCode);
+                context.ExitCode = exitCode;
+            });
+
+            var currentCommand = new Command("current", "Show current language");
+            currentCommand.SetHandler(async (context) =>
+            {
+                var exitCode = await RunLanguageCurrentAsync();
+                context.ExitCode = exitCode;
+            });
+
+            var importCommand = new Command("import", "Import language pack from file");
+            var importPathArg = new Argument<string>("path", "Path to language pack file");
+            importCommand.AddArgument(importPathArg);
+            importCommand.SetHandler(async (context) =>
+            {
+                var path = context.ParseResult.GetValueForArgument(importPathArg);
+                var exitCode = await RunLanguageImportAsync(path);
+                context.ExitCode = exitCode;
+            });
+
+            var exportCommand = new Command("export", "Export language pack to file");
+            var exportLangArg = new Argument<string>("language", "Language code to export");
+            var exportPathArg = new Argument<string>("path", "Output file path");
+            exportCommand.AddArgument(exportLangArg);
+            exportCommand.AddArgument(exportPathArg);
+            exportCommand.SetHandler(async (context) =>
+            {
+                var lang = context.ParseResult.GetValueForArgument(exportLangArg);
+                var path = context.ParseResult.GetValueForArgument(exportPathArg);
+                var exitCode = await RunLanguageExportAsync(lang, path);
+                context.ExitCode = exitCode;
+            });
+
+            var missingCommand = new Command("missing", "Show missing translations for a language");
+            var missingLangArg = new Argument<string>("language", "Language code");
+            var missingJsonOption = new Option<bool>("--json", "Output as JSON");
+            missingCommand.AddArgument(missingLangArg);
+            missingCommand.AddOption(missingJsonOption);
+            missingCommand.SetHandler(async (context) =>
+            {
+                var lang = context.ParseResult.GetValueForArgument(missingLangArg);
+                var json = context.ParseResult.GetValueForOption(missingJsonOption);
+                var exitCode = await RunLanguageMissingAsync(lang, json);
+                context.ExitCode = exitCode;
+            });
+
+            var languageCommand = new Command("language", "Manage languages and translations")
+            {
+                listCommand,
+                setCommand,
+                currentCommand,
+                importCommand,
+                exportCommand,
+                missingCommand
+            };
+
+            return languageCommand;
+        }
+
+        private static async Task<int> RunLanguageListAsync(bool json)
+        {
+            try
+            {
+                using var host = CreateHost();
+                var localization = host.Services.GetRequiredService<ILocalizationService>();
+                var languages = await host.Services.GetRequiredService<ILocalizationService>().GetAvailableLanguagesAsync();
+
+                if (json)
+                {
+                    Console.WriteLine(System.Text.Json.JsonSerializer.Serialize(languages, new System.Text.Json.JsonSerializerOptions { WriteIndented = true }));
+                }
+                else
+                {
+                    Console.WriteLine("Available Languages:");
+                    foreach (var lang in languages)
+                    {
+                        var name = lang.ToString();
+                        Console.WriteLine($"  {name}");
+                    }
+                }
+                return 0;
+            }
+            catch (Exception ex)
+            {
+                Console.Error.WriteLine($"Error: {ex.Message}");
+                return 1;
+            }
+        }
+
+        private static async Task<int> RunLanguageSetAsync(string langCode)
+        {
+            try
+            {
+                using var host = CreateHost();
+                var localization = host.Services.GetRequiredService<ILocalizationService>();
+                
+                if (!Enum.TryParse<SupportedLanguage>(langCode, true, out var language))
+                {
+                    Console.Error.WriteLine($"Invalid language code: {langCode}");
+                    return 1;
+                }
+
+                var success = await host.Services.GetRequiredService<ILocalizationService>().SetLanguageAsync(language);
+                Console.WriteLine(success ? $"Language set to: {language}" : $"Failed to set language: {language}");
+                return success ? 0 : 1;
+            }
+            catch (Exception ex)
+            {
+                Console.Error.WriteLine($"Error: {ex.Message}");
+                return 1;
+            }
+        }
+
+        private static async Task<int> RunLanguageCurrentAsync()
+        {
+            try
+            {
+                using var host = CreateHost();
+                var localization = host.Services.GetRequiredService<ILocalizationService>();
+                Console.WriteLine($"Current language: {localization.CurrentLanguage}");
+                return 0;
+            }
+            catch (Exception ex)
+            {
+                Console.Error.WriteLine($"Error: {ex.Message}");
+                return 1;
+            }
+        }
+
+        private static async Task<int> RunLanguageImportAsync(string path)
+        {
+            try
+            {
+                using var host = CreateHost();
+                var success = await host.Services.GetRequiredService<ILocalizationService>().LoadCustomLanguagePackAsync(path);
+                Console.WriteLine(success ? $"Language pack imported from: {path}" : "Import failed");
+                return success ? 0 : 1;
+            }
+            catch (Exception ex)
+            {
+                Console.Error.WriteLine($"Error: {ex.Message}");
+                return 1;
+            }
+        }
+
+        private static async Task<int> RunLanguageExportAsync(string language, string path)
+        {
+            try
+            {
+                using var host = CreateHost();
+                
+                if (!Enum.TryParse<SupportedLanguage>(language, true, out var lang))
+                {
+                    Console.Error.WriteLine($"Invalid language code: {language}");
+                    return 1;
+                }
+
+                var success = await host.Services.GetRequiredService<ILocalizationService>().ExportLanguagePackAsync(lang, path);
+                Console.WriteLine(success ? $"Language pack exported to: {path}" : "Export failed");
+                return success ? 0 : 1;
+            }
+            catch (Exception ex)
+            {
+                Console.Error.WriteLine($"Error: {ex.Message}");
+                return 1;
+            }
+        }
+
+        private static async Task<int> RunLanguageMissingAsync(string language, bool json)
+        {
+            try
+            {
+                using var host = CreateHost();
+                
+                if (!Enum.TryParse<SupportedLanguage>(language, true, out var lang))
+                {
+                    Console.Error.WriteLine($"Invalid language code: {language}");
+                    return 1;
+                }
+
+                var missing = await host.Services.GetRequiredService<ILocalizationService>().GetMissingTranslationsAsync(lang);
+
+                if (json)
+                {
+                    Console.WriteLine(System.Text.Json.JsonSerializer.Serialize(missing, new System.Text.Json.JsonSerializerOptions { WriteIndented = true }));
+                }
+                else
+                {
+                    Console.WriteLine($"Missing translations for {language} ({missing.Count} keys):");
+                    foreach (var kvp in missing.Take(50))
+                    {
+                        Console.WriteLine($"  {kvp.Key}: {kvp.Value}");
+                    }
+                    if (missing.Count > 50)
+                        Console.WriteLine($"  ... and {missing.Count - 50} more");
+                }
+                return 0;
+            }
+            catch (Exception ex)
+            {
+                Console.Error.WriteLine($"Error: {ex.Message}");
+                return 1;
+            }
+        }
+
         private static Command CreateVersionCommand()
         {
             var command = new Command("version", "Show version information");
@@ -1313,6 +1539,7 @@ namespace WinCleaner.CLI
                     services.AddSingleton<IAppxService, AppxService>();
                     services.AddSingleton<IExplorerIntegrationService, ExplorerIntegrationService>();
                     services.AddSingleton<IWindowStateService, WindowStateService>();
+                    services.AddSingleton<ILocalizationService, LocalizationService>();
                 })
                 .Build();
         }

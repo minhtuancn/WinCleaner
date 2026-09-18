@@ -64,6 +64,7 @@ namespace WinCleaner
                     services.AddSingleton<IExplorerIntegrationService, ExplorerIntegrationService>();
                     services.AddSingleton<IWindowStateService, WindowStateService>();
                     services.AddSingleton<WinCleaner.Services.IExtensionManager, ExtensionManager>();
+                    services.AddSingleton<ILocalizationService, LocalizationService>();
 
                     // ViewModels
                     services.AddTransient<MainViewModel>();
