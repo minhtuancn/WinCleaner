@@ -16,15 +16,18 @@ namespace WinCleaner
     {
         private IHost? _host;
 
+        public static IServiceProvider Services { get; private set; }
+
         protected override async void OnStartup(StartupEventArgs e)
         {
             base.OnStartup(e);
             
             _host = CreateHostBuilder().Build();
+            Services = _host.Services;
             await _host.StartAsync();
 
-            var mainWindow = _host.Services.GetRequiredService<MainWindow>();
-            mainWindow.Show();
+            var shellWindow = _host.Services.GetRequiredService<ShellWindow>();
+            shellWindow.Show();
 
             // Initialize resilience service (registers global exception handlers)
             var resilience = _host.Services.GetRequiredService<IResilienceService>();
@@ -100,14 +103,25 @@ namespace WinCleaner
                     services.AddSingleton<IWpfThemeApplicator, WpfThemeApplicator>();
                     services.AddSingleton<IThemeService, ThemeService>();
 
-                    // ViewModels
-                    services.AddTransient<MainViewModel>();
+                    // Safety / CleanupPlan Services (Issue #3)
+                    services.AddSingleton<IPathSafetyValidator, PathSafetyValidator>();
+                    services.AddSingleton<IAppRunningGuard, AppRunningGuard>();
+                    services.AddSingleton<ICleanupPlanService, CleanupPlanService>();
+
+                    // ViewModels - App Shell pattern
+                    services.AddTransient<ShellViewModel>();
+                    services.AddTransient<HealthCheckViewModel>();
+                    services.AddTransient<AdvancedCleanViewModel>();
+                    services.AddTransient<StorageViewModel>();
+                    services.AddTransient<ManualCleanupViewModel>();
+                    services.AddTransient<SettingsViewModel>();
+                    services.AddTransient<DiagnosticsViewModel>();
 
                     // Views
-                    services.AddTransient<MainWindow>(provider => 
+                    services.AddTransient<ShellWindow>(provider => 
                     {
-                        var vm = provider.GetRequiredService<MainViewModel>();
-                        return new MainWindow { DataContext = vm };
+                        var vm = provider.GetRequiredService<ShellViewModel>();
+                        return new ShellWindow { DataContext = vm };
                     });
                 });
         }

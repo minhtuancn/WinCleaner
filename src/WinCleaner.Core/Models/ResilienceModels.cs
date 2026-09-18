@@ -10,6 +10,7 @@ namespace WinCleaner.Models
     /// </summary>
     public enum CleanupOperationStatus
     {
+        Pending,
         Success,
         Skipped,
         AccessDenied,
