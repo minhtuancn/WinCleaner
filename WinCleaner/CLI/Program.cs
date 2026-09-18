@@ -1062,6 +1062,7 @@ namespace WinCleaner.CLI
                     services.AddSingleton<ISchedulerService, SchedulerService>();
                     services.AddSingleton<IAppxService, AppxService>();
                     services.AddSingleton<IExplorerIntegrationService, ExplorerIntegrationService>();
+                    services.AddSingleton<IWindowStateService, WindowStateService>();
                 })
                 .Build();
         }

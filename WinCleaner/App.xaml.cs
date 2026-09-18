@@ -62,6 +62,7 @@ namespace WinCleaner
                     services.AddSingleton<ISchedulerService, SchedulerService>();
                     services.AddSingleton<IAppxService, AppxService>();
                     services.AddSingleton<IExplorerIntegrationService, ExplorerIntegrationService>();
+                    services.AddSingleton<IWindowStateService, WindowStateService>();
 
                     // ViewModels
                     services.AddTransient<MainViewModel>();
