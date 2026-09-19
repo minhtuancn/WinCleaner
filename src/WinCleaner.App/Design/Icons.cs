@@ -15,6 +15,7 @@ namespace WinCleaner.Design
         public static readonly Geometry ChevronLeft = Parse("M15 18l-6-6 6-6");
         public static readonly Geometry ChevronUp = Parse("M18 15l-6-6-6 6");
         public static readonly Geometry ChevronDown = Parse("M6 9l6 6 6-6");
+        public static readonly Geometry Menu = Parse("M3 12h18M3 6h18M3 18h18");
         public static readonly Geometry Expand = Parse("M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7");
         public static readonly Geometry Collapse = Parse("M3 9h6V3M9 21V15h6M3 15l7-7 7 7");
         public static readonly Geometry ArrowRight = Parse("M5 12h14M12 5l7 7-7 7");

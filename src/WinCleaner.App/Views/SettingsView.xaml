@@ -198,6 +198,62 @@
                 </StackPanel>
             </Border>
 
+            <!-- Updates -->
+            <Border Style="{StaticResource CardStyle}" Padding="{StaticResource PaddingLg}" Margin="0,0,0,24">
+                <StackPanel>
+                    <TextBlock Text="Updates" FontSize="{StaticResource FontSizeMedium}" FontWeight="SemiBold" Foreground="{DynamicResource TextPrimaryBrush}" Margin="0,0,0,12"/>
+
+                    <StackPanel Orientation="Horizontal" Margin="0,8,0,0">
+                        <TextBlock Text="Auto Check" FontSize="{StaticResource FontSizeMedium}" FontWeight="Medium" Foreground="{DynamicResource TextPrimaryBrush}" VerticalAlignment="Center" Width="140"/>
+                        <CheckBox IsChecked="{Binding AutoCheckUpdates}" VerticalAlignment="Center" Margin="12,0,0,0" Style="{StaticResource ModernCheckBoxStyle}"/>
+                    </StackPanel>
+
+                    <StackPanel Orientation="Horizontal" Margin="0,8,0,0">
+                        <TextBlock Text="Channel" FontSize="{StaticResource FontSizeMedium}" FontWeight="Medium" Foreground="{DynamicResource TextPrimaryBrush}" VerticalAlignment="Center" Width="140"/>
+                        <ComboBox Width="160" ItemsSource="{Binding AvailableChannels}" SelectedItem="{Binding UpdateChannel}" VerticalAlignment="Center" Margin="12,0,0,0">
+                            <ComboBox.ItemTemplate>
+                                <DataTemplate>
+                                    <TextBlock Text="{Binding}"/>
+                                </DataTemplate>
+                            </ComboBox.ItemTemplate>
+                        </ComboBox>
+                    </StackPanel>
+
+                    <StackPanel Orientation="Horizontal" Margin="0,8,0,0">
+                        <CheckBox Content="Auto Download" IsChecked="{Binding AutoDownloadUpdates}" VerticalAlignment="Center" Margin="12,0,0,0" Style="{StaticResource ModernCheckBoxStyle}"/>
+                        <CheckBox Content="Auto Install" IsChecked="{Binding AutoInstallUpdates}" VerticalAlignment="Center" Margin="24,0,0,0" Style="{StaticResource ModernCheckBoxStyle}"/>
+                    </StackPanel>
+
+                    <Border Style="{StaticResource CardStyle}" Padding="12" Margin="0,12,0,0" Background="{DynamicResource BackgroundBrush}" CornerRadius="{StaticResource CornerRadiusNormal}" Visibility="{Binding IsUpdateAvailable, Converter={StaticResource BoolToVisibilityConverter}}">
+                        <StackPanel>
+                            <TextBlock Text="Update Available!" FontWeight="SemiBold" Foreground="{DynamicResource SuccessBrush}" Margin="0,0,0,4"/>
+                            <TextBlock Text="{Binding AvailableUpdate.Version}" FontSize="{StaticResource FontSizeSmall}" Foreground="{DynamicResource TextPrimaryBrush}"/>
+                            <TextBlock Text="{Binding AvailableUpdate.ReleaseNotes}" FontSize="{StaticResource FontSizeSmall}" Foreground="{DynamicResource TextSecondaryBrush}" TextWrapping="Wrap" Margin="0,4,0,8"/>
+                            <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+                                <Button Style="{StaticResource SecondaryButtonStyle}" Command="{Binding DismissUpdateCommand}" Padding="12,6" Margin="0,0,8,0">
+                                    <TextBlock Text="Dismiss" VerticalAlignment="Center"/>
+                                </Button>
+                                <Button Style="{StaticResource PrimaryButtonStyle}" Command="{Binding DownloadAndInstallUpdateCommand}" IsEnabled="{Binding UpdateStatus, Converter={StaticResource InverseBoolToVisibilityConverter}, ConverterParameter=not}" Padding="16,6" MinWidth="120">
+                                    <StackPanel Orientation="Horizontal">
+                                        <Path Data="{x:Static design:Icons.Download}" Fill="{DynamicResource TextOnPrimaryBrush}" Width="14" Height="14" Stretch="Uniform" VerticalAlignment="Center" Margin="0,0,6,0"/>
+                                        <TextBlock Text="{Binding UpdateStatus, Converter={StaticResource BoolToTextConverter}, ConverterParameter='Install|Installing...'}" VerticalAlignment="Center" FontWeight="SemiBold"/>
+                                    </StackPanel>
+                                </Button>
+                            </StackPanel>
+                        </StackPanel>
+                    </Border>
+
+                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,8,0,0">
+                        <Button Style="{StaticResource SecondaryButtonStyle}" Command="{Binding CheckForUpdatesCommand}" Padding="12,6" Margin="0,0,8,0" IsEnabled="{Binding UpdateStatus, Converter={StaticResource InverseBoolToVisibilityConverter}, ConverterParameter=not}">
+                            <StackPanel Orientation="Horizontal">
+                                <Path Data="{x:Static design:Icons.Refresh}" Fill="{DynamicResource TextPrimaryBrush}" Width="14" Height="14" Stretch="Uniform" VerticalAlignment="Center" Margin="0,0,6,0"/>
+                                <TextBlock Text="{Binding UpdateStatus, Converter={StaticResource BoolToTextConverter}, ConverterParameter='Check|Checking...'}" VerticalAlignment="Center" FontWeight="SemiBold"/>
+                            </StackPanel>
+                        </Button>
+                    </StackPanel>
+                </StackPanel>
+            </Border>
+
             <!-- Actions -->
             <Border Style="{StaticResource CardStyle}" Padding="{StaticResource PaddingLg}" Margin="0,24,0,0">
                 <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">

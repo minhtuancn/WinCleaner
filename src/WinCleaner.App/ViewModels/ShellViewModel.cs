@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Windows.Input;
 using CommunityToolkit.Mvvm.ComponentModel;
@@ -28,6 +29,9 @@ namespace WinCleaner.ViewModels
 
         [ObservableProperty]
         private string _windowTitle = "WinCleaner";
+
+        // Navigation history for back button
+        private readonly Stack<string> _navigationHistory = new();
 
         public ObservableCollection<NavItem> NavigationItems { get; } = new()
         {
@@ -62,6 +66,10 @@ namespace WinCleaner.ViewModels
 
             // Initialize with Health Check view
             CurrentView = healthCheckVM;
+            _navigationHistory.Push("HealthCheck");
+
+            // Initialize HealthCheck (auto-scan)
+            _ = Task.Run(async () => await healthCheckVM.InitializeAsync());
 
             // Subscribe to theme changes
             _themeStore.SettingsChanged += (s, e) => OnPropertyChanged(nameof(IsDarkTheme));
@@ -70,9 +78,17 @@ namespace WinCleaner.ViewModels
         public bool IsDarkTheme => _themeStore.Settings.CurrentTheme == AppTheme.Dark ||
                                        (_themeStore.Settings.UseSystemTheme && IsSystemDark());
 
+        public bool CanGoBack => _navigationHistory.Count > 1;
+
         [RelayCommand]
         private void Navigate(string viewName)
         {
+            if (viewName == CurrentView?.GetType().Name.Replace("ViewModel", ""))
+                return;
+
+            _navigationHistory.Push(viewName);
+            OnPropertyChanged(nameof(CanGoBack));
+
             CurrentView = viewName switch
             {
                 "HealthCheck" => _services.GetRequiredService<HealthCheckViewModel>(),
@@ -88,6 +104,29 @@ namespace WinCleaner.ViewModels
 
         [RelayCommand]
         private void ToggleSidebar() => IsSidebarOpen = !IsSidebarOpen;
+
+        [RelayCommand]
+        private void GoBack()
+        {
+            if (_navigationHistory.Count > 1)
+            {
+                _navigationHistory.Pop(); // Remove current
+                var previous = _navigationHistory.Peek(); // Get previous
+                OnPropertyChanged(nameof(CanGoBack));
+                
+                CurrentView = previous switch
+                {
+                    "HealthCheck" => _services.GetRequiredService<HealthCheckViewModel>(),
+                    "AdvancedClean" => _services.GetRequiredService<AdvancedCleanViewModel>(),
+                    "Storage" => _services.GetRequiredService<StorageViewModel>(),
+                    "LiveTimeline" => _services.GetRequiredService<LiveTimelineViewModel>(),
+                    "ManualCleanup" => _services.GetRequiredService<ManualCleanupViewModel>(),
+                    "Settings" => _services.GetRequiredService<SettingsViewModel>(),
+                    "Diagnostics" => _services.GetRequiredService<DiagnosticsViewModel>(),
+                    _ => CurrentView
+                };
+            }
+        }
 
         [RelayCommand]
         private async Task ToggleThemeAsync()

@@ -96,15 +96,27 @@
             <ContentControl Content="{Binding CurrentView}"/>
         </Border>
 
+        <!-- Back Button (for navigation history) -->
+        <Button Grid.Column="0" Grid.ColumnSpan="2" 
+                Style="{StaticResource FloatingButtonStyle}"
+                Command="{Binding GoBackCommand}"
+                IsEnabled="{Binding CanGoBack}"
+                HorizontalAlignment="Left" VerticalAlignment="Top"
+                Margin="{StaticResource MarginMd}"
+                Width="40" Height="40"
+                ToolTip="Go Back">
+            <Path Data="{x:Static design:Icons.ChevronLeft}" Fill="{DynamicResource TextPrimaryBrush}" Width="20" Height="20" Stretch="Uniform"/>
+        </Button>
+
         <!-- Sidebar Toggle (for narrow widths) -->
         <Button Grid.Column="0" Grid.ColumnSpan="2" 
                 Style="{StaticResource FloatingButtonStyle}"
                 Command="{Binding ToggleSidebarCommand}"
                 HorizontalAlignment="Left" VerticalAlignment="Top"
-                Margin="{StaticResource MarginMd}"
+                Margin="16,76,0,0"
                 Width="40" Height="40"
                 ToolTip="Toggle Sidebar">
-            <Path Data="{x:Static design:Icons.ChevronLeft}" Fill="{DynamicResource TextPrimaryBrush}" Width="20" Height="20" Stretch="Uniform"/>
+            <Path Data="{x:Static design:Icons.Menu}" Fill="{DynamicResource TextPrimaryBrush}" Width="20" Height="20" Stretch="Uniform"/>
         </Button>
     </Grid>
 </Window>

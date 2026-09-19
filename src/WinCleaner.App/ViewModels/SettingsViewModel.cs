@@ -400,5 +400,15 @@ namespace WinCleaner.ViewModels
             IsUpdateAvailable = false;
             AvailableUpdate = null;
         }
+
+        [RelayCommand]
+        private void PickAccentColor()
+        {
+            var dialog = new System.Windows.Forms.ColorDialog();
+            if (dialog.ShowDialog() == System.Windows.Forms.DialogResult.OK)
+            {
+                AccentColor = $"#{dialog.Color.R:X2}{dialog.Color.G:X2}{dialog.Color.B:X2}";
+            }
+        }
     }
 }
