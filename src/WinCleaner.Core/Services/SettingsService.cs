@@ -11,6 +11,9 @@ namespace WinCleaner.Services
         Task<AppSettings> LoadAsync();
         Task SaveAsync(AppSettings settings);
         AppSettings GetDefaults();
+        Task ResetAsync();
+        Task ExportAsync(string path);
+        Task ImportAsync(string path);
     }
 
     public class SettingsService : ISettingsService
@@ -82,6 +85,27 @@ namespace WinCleaner.Services
                 AllowTrailingCommas = true,
                 ReadCommentHandling = JsonCommentHandling.Skip
             };
+        }
+
+        public async Task ResetAsync()
+        {
+            var defaults = GetDefaults();
+            await SaveAsync(defaults);
+        }
+
+        public async Task ExportAsync(string path)
+        {
+            var settings = await LoadAsync();
+            var json = JsonSerializer.Serialize(settings, GetJsonOptions());
+            await File.WriteAllTextAsync(path, json);
+        }
+
+        public async Task ImportAsync(string path)
+        {
+            string json = await File.ReadAllTextAsync(path);
+            var settings = JsonSerializer.Deserialize<AppSettings>(json, GetJsonOptions());
+            if (settings != null)
+                await SaveAsync(settings);
         }
     }
 }

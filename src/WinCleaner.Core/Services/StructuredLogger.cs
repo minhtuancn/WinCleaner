@@ -60,6 +60,7 @@ namespace WinCleaner.Services
         Task FlushAsync(CancellationToken ct = default);
         Task<IReadOnlyList<StructuredLogEntry>> GetRecentLogsAsync(int count, CancellationToken ct = default);
         string GetLogDirectory();
+        void Clear();
     }
 
     public class StructuredLogger : IStructuredLogger, IDisposable
@@ -296,6 +297,18 @@ namespace WinCleaner.Services
         }
 
         public string GetLogDirectory() => _logDirectory;
+
+        public void Clear()
+        {
+            lock (_fileLock)
+            {
+                _queue.Clear();
+                _currentFileIndex = 0;
+                _currentFileSize = 0;
+                _currentWriter?.Dispose();
+                _currentWriter = null;
+            }
+        }
 
         private void CleanupOldLogsAsync(CancellationToken ct)
         {

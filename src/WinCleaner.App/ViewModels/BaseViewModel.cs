@@ -19,11 +19,21 @@ namespace WinCleaner.ViewModels
         [ObservableProperty]
         private bool _isProgressIndeterminate;
 
-        public event Action<string>? LogMessage;
+        internal Action<string>? LogMessage;
 
         protected void Log(string message, LogLevel level = LogLevel.Info)
         {
             LogMessage?.Invoke($"[{DateTime.Now:HH:mm:ss}] [{level}] {message}");
+        }
+
+        public void SubscribeToLog(Action<string> handler)
+        {
+            LogMessage += handler;
+        }
+
+        public void UnsubscribeFromLog(Action<string> handler)
+        {
+            LogMessage -= handler;
         }
 
         protected void LogInfo(string message) => Log(message, LogLevel.Info);
