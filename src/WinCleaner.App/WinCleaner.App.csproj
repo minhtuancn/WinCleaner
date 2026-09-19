@@ -15,6 +15,15 @@
     <LangVersion>latest</LangVersion>
     <ApplicationHighDpiMode>PerMonitorV2</ApplicationHighDpiMode>
     <WarningsNotAsErrors>CS1591;CS1998;CS8600;CS8601;CS8603;CS8604;CS8618;CA1416;VSTHRD200;VSTHRD103</WarningsNotAsErrors>
+    
+    <!-- MSIX Packaging (requires Windows App SDK workload) -->
+    <EnablePreviewMsixTooling>true</EnablePreviewMsixTooling>
+    <WindowsAppSDKSelfContained>true</WindowsAppSDKSelfContained>
+    <RuntimeIdentifier>win-x64</RuntimeIdentifier>
+    <PublishProfile>Properties\PublishProfiles\win-x64.pubxml</PublishProfile>
+    <AppxPackageFileName>WinCleaner_$(Version)_x64.msix</AppxPackageFileName>
+    <AppxBundle>Never</AppxBundle>
+    <AppxPackageDir>$(OutDir)AppxPackages\</AppxPackageDir>
   </PropertyGroup>
 
   <ItemGroup>
@@ -27,5 +36,14 @@
     <None Update="appsettings.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Include="Assets\*.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Package.appxmanifest">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
   </ItemGroup>
 </Project>

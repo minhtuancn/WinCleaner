@@ -11,7 +11,7 @@
 | **Inspector UI** (Blazor WASM – `FluentCleaner.Inspector`) | ✅ | ❌ Disabled | 📋 Planned | Scaffolded but disabled (build issues); needs fix |
 | **Multi‑language JSON localisation** (13 languages) | ✅ | 6 languages (en, vi, de, fr, zh-CN, zh-TW) | ✅ Done | `ResourceService` + embedded JSON resources |
 | **Silent runner** (`SilentRunner.cs`) for headless clean | ✅ | CLI `--silent` flag | ✅ Done | Global `-s/--silent` flag suppresses all output except errors, exit codes for automation |
-| **Professional installer** – MSIX/EXE, code‑sign, auto‑update, close‑running‑app | ✅ (MSIX build) | MSI only, no signing | 📋 Planned | MSIX + signing |
+| **Professional installer** – MSIX/EXE, code‑sign, auto‑update, close‑running‑app | ✅ (MSIX build) | MSIX infrastructure ready | 🔄 In-progress | Package.appxmanifest, Assets, Publish profile, Windows App SDK reference; requires wasm-tools workload for full build |
 | **Rich CI** – Dependabot, Renovate, CodeQL, security policy | ✅ | ✅ Implemented | ✅ Done | `.github/dependabot.yml`, `renovate.json`, `CODEOWNERS`, `SECURITY.md`, `CONTRIBUTING.md`, issue/PR templates, label set |
 | **Auto-update service** (`IUpdateService`, `UpdateService`) | ✅ | ✅ Implemented | ✅ Done | GitHub Releases polling, silent MSI install, Settings UI |
 | **Settings persistence** | ✅ | ✅ Implemented | ✅ Done | Theme + update channel persisted |
