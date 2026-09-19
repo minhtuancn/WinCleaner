@@ -1,4 +1,4 @@
-﻿<UserControl x:Class="WinCleaner.Views.StorageView"
+<UserControl x:Class="WinCleaner.Views.StorageView"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
@@ -8,11 +8,11 @@
              mc:Ignorable="d"
              d:DataContext="{d:DesignInstance Type=vm:StorageViewModel, IsDesignTimeCreatable=False}">
 
-    <ScrollViewer VerticalScrollBarVisibility="Auto" Padding="{StaticResource SpacingLg}">
+    <ScrollViewer VerticalScrollBarVisibility="Auto" Padding="{StaticResource PaddingLg}">
         <StackPanel>
 
             <!-- Header -->
-            <Border Style="{StaticResource CardStyle}" Padding="{StaticResource SpacingLg}" Margin="0,0,0,24">
+            <Border Style="{StaticResource CardStyle}" Padding="{StaticResource PaddingLg}" Margin="0,0,0,24">
                 <Grid>
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="Auto"/>
@@ -53,7 +53,7 @@
             </Border>
 
             <!-- Drive Summary -->
-            <Border Style="{StaticResource CardStyle}" Padding="{StaticResource SpacingLg}" Margin="0,0,0,24" Visibility="{Binding SelectedDrive, Converter={StaticResource NotNullToVisibilityConverter}}">
+            <Border Style="{StaticResource CardStyle}" Padding="{StaticResource PaddingLg}" Margin="0,0,0,24" Visibility="{Binding SelectedDrive, Converter={StaticResource NotNullToVisibilityConverter}}">
                 <Grid>
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="Auto"/>
@@ -81,7 +81,7 @@
             </Border>
 
             <!-- All Drives Grid -->
-            <Border Style="{StaticResource CardStyle}" Padding="{StaticResource SpacingLg}" Margin="0,0,0,24" Visibility="{Binding Drives.Count, Converter={StaticResource GreaterThanZeroToVisibilityConverter}}">
+            <Border Style="{StaticResource CardStyle}" Padding="{StaticResource PaddingLg}" Margin="0,0,0,24" Visibility="{Binding Drives.Count, Converter={StaticResource GreaterThanZeroToVisibilityConverter}}">
                 <StackPanel>
                     <TextBlock Text="All Drives" FontSize="{StaticResource FontSizeMedium}" FontWeight="SemiBold" Foreground="{DynamicResource TextPrimaryBrush}" Margin="0,0,0,12"/>
                     <ItemsControl ItemsSource="{Binding Drives}">
@@ -113,7 +113,7 @@
             </Border>
 
             <!-- Analysis Results -->
-            <Border Style="{StaticResource CardStyle}" Padding="{StaticResource SpacingLg}" Margin="0,0,0,24" Visibility="{Binding FolderTree.Count, Converter={StaticResource GreaterThanZeroToVisibilityConverter}}">
+            <Border Style="{StaticResource CardStyle}" Padding="{StaticResource PaddingLg}" Margin="0,0,0,24" Visibility="{Binding FolderTree.Count, Converter={StaticResource GreaterThanZeroToVisibilityConverter}}">
                 <StackPanel>
                     <TextBlock Text="Folder Tree" FontSize="{StaticResource FontSizeMedium}" FontWeight="SemiBold" Foreground="{DynamicResource TextPrimaryBrush}" Margin="0,0,0,12"/>
                     <TreeView ItemsSource="{Binding FolderTree}" Background="Transparent" BorderThickness="0">
@@ -167,13 +167,13 @@
             </Border>
 
             <!-- Large Files -->
-            <Border Style="{StaticResource CardStyle}" Padding="{StaticResource SpacingLg}" Margin="0,0,0,24" Visibility="{Binding LargeFiles.Count, Converter={StaticResource GreaterThanZeroToVisibilityConverter}}">
+            <Border Style="{StaticResource CardStyle}" Padding="{StaticResource PaddingLg}" Margin="0,0,0,24" Visibility="{Binding LargeFiles.Count, Converter={StaticResource GreaterThanZeroToVisibilityConverter}}">
                 <StackPanel>
                     <TextBlock Text="Largest Files" FontSize="{StaticResource FontSizeMedium}" FontWeight="SemiBold" Foreground="{DynamicResource TextPrimaryBrush}" Margin="0,0,0,12"/>
                     <ItemsControl ItemsSource="{Binding LargeFiles}">
                         <ItemsControl.ItemTemplate>
                             <DataTemplate>
-                                <Border Style="{StaticResource ListItemStyle}" Margin="0,2" Padding="{StaticResource SpacingMd}">
+                                <Border Style="{StaticResource ListItemStyle}" Margin="0,2" Padding="{StaticResource PaddingMd}">
                                     <Grid>
                                         <Grid.ColumnDefinitions>
                                             <ColumnDefinition Width="Auto"/>
@@ -198,13 +198,13 @@
             </Border>
 
             <!-- File Types -->
-            <Border Style="{StaticResource CardStyle}" Padding="{StaticResource SpacingLg}" Visibility="{Binding FileTypes.Count, Converter={StaticResource GreaterThanZeroToVisibilityConverter}}">
+            <Border Style="{StaticResource CardStyle}" Padding="{StaticResource PaddingLg}" Visibility="{Binding FileTypes.Count, Converter={StaticResource GreaterThanZeroToVisibilityConverter}}">
                 <StackPanel>
                     <TextBlock Text="File Types" FontSize="{StaticResource FontSizeMedium}" FontWeight="SemiBold" Foreground="{DynamicResource TextPrimaryBrush}" Margin="0,0,0,12"/>
                     <ItemsControl ItemsSource="{Binding FileTypes}">
                         <ItemsControl.ItemTemplate>
                             <DataTemplate>
-                                <Border Style="{StaticResource ListItemStyle}" Margin="0,2" Padding="{StaticResource SpacingMd}">
+                                <Border Style="{StaticResource ListItemStyle}" Margin="0,2" Padding="{StaticResource PaddingMd}">
                                     <Grid>
                                         <Grid.ColumnDefinitions>
                                             <ColumnDefinition Width="Auto"/>

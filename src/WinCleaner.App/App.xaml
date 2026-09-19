@@ -1,13 +1,38 @@
 <Application x:Class="WinCleaner.App"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-             xmlns:local="clr-namespace:WinCleaner">
+             xmlns:local="clr-namespace:WinCleaner"
+             xmlns:vm="clr-namespace:WinCleaner.ViewModels"
+             xmlns:v="clr-namespace:WinCleaner.Views">
     <Application.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
                 <ResourceDictionary Source="Resources/Converters.xaml"/>
                 <ResourceDictionary Source="Resources/Styles.xaml"/>
             </ResourceDictionary.MergedDictionaries>
+
+            <!-- ViewModel to View DataTemplates -->
+            <DataTemplate DataType="{x:Type vm:HealthCheckViewModel}">
+                <v:HealthCheckView/>
+            </DataTemplate>
+            <DataTemplate DataType="{x:Type vm:AdvancedCleanViewModel}">
+                <v:AdvancedCleanView/>
+            </DataTemplate>
+            <DataTemplate DataType="{x:Type vm:StorageViewModel}">
+                <v:StorageView/>
+            </DataTemplate>
+            <DataTemplate DataType="{x:Type vm:ManualCleanupViewModel}">
+                <v:ManualCleanupView/>
+            </DataTemplate>
+            <DataTemplate DataType="{x:Type vm:SettingsViewModel}">
+                <v:SettingsView/>
+            </DataTemplate>
+            <DataTemplate DataType="{x:Type vm:DiagnosticsViewModel}">
+                <v:DiagnosticsView/>
+            </DataTemplate>
+            <DataTemplate DataType="{x:Type vm:LiveTimelineViewModel}">
+                <v:LiveTimelineView/>
+            </DataTemplate>
         </ResourceDictionary>
     </Application.Resources>
 </Application>

@@ -1,4 +1,4 @@
-﻿<UserControl x:Class="WinCleaner.Views.HealthCheckView"
+<UserControl x:Class="WinCleaner.Views.HealthCheckView"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
@@ -23,11 +23,11 @@
         </Style>
     </UserControl.Resources>
 
-    <ScrollViewer VerticalScrollBarVisibility="Auto" Padding="{StaticResource SpacingLg}">
+    <ScrollViewer VerticalScrollBarVisibility="Auto" Padding="{StaticResource PaddingLg}">
         <StackPanel>
 
             <!-- Header Row: Title + System Drive Summary -->
-            <Border Style="{StaticResource CardStyle}" Padding="{StaticResource SpacingLg}" Margin="0,0,0,24">
+            <Border Style="{StaticResource CardStyle}" Padding="{StaticResource PaddingLg}" Margin="0,0,0,24">
                 <Grid>
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="Auto"/>
@@ -68,7 +68,7 @@
             </Border>
 
             <!-- Reclaimable Space (Primary Metric) -->
-            <Border Style="{StaticResource CardStyle}" Padding="{StaticResource SpacingLg}" Margin="0,0,0,24">
+            <Border Style="{StaticResource CardStyle}" Padding="{StaticResource PaddingLg}" Margin="0,0,0,24">
                 <Grid>
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="Auto"/>
@@ -88,7 +88,7 @@
             </Border>
 
             <!-- Storage Pressure Bar -->
-            <Border Style="{StaticResource CardStyle}" Padding="{StaticResource SpacingLg}" Margin="0,0,0,24" Visibility="{Binding StoragePressurePercent, Converter={StaticResource GreaterThanZeroToVisibilityConverter}}">
+            <Border Style="{StaticResource CardStyle}" Padding="{StaticResource PaddingLg}" Margin="0,0,0,24" Visibility="{Binding StoragePressurePercent, Converter={StaticResource GreaterThanZeroToVisibilityConverter}}">
                 <StackPanel>
                     <Grid>
                         <Grid.ColumnDefinitions>
@@ -104,7 +104,7 @@
             </Border>
 
             <!-- Reclaimable Breakdown (Horizontal Bar Chart) -->
-            <Border Style="{StaticResource CardStyle}" Padding="{StaticResource SpacingLg}" Margin="0,0,0,24" Visibility="{Binding ReclaimableBreakdown.Count, Converter={StaticResource GreaterThanZeroToVisibilityConverter}}">
+            <Border Style="{StaticResource CardStyle}" Padding="{StaticResource PaddingLg}" Margin="0,0,0,24" Visibility="{Binding ReclaimableBreakdown.Count, Converter={StaticResource GreaterThanZeroToVisibilityConverter}}">
                 <StackPanel>
                     <TextBlock Text="Reclaimable Breakdown" FontSize="{StaticResource FontSizeMedium}" FontWeight="SemiBold" Foreground="{DynamicResource TextPrimaryBrush}" Margin="0,0,0,12"/>
                     <ItemsControl ItemsSource="{Binding ReclaimableBreakdown}">
@@ -155,7 +155,7 @@
             </Border>
 
             <!-- System Info Block (Single compact block per #27) -->
-            <Border Style="{StaticResource CardStyle}" Padding="{StaticResource SpacingLg}" Margin="0,0,0,24" Visibility="{Binding SystemInfo.OSVersion, Converter={StaticResource StringNotEmptyToVisibilityConverter}}">
+            <Border Style="{StaticResource CardStyle}" Padding="{StaticResource PaddingLg}" Margin="0,0,0,24" Visibility="{Binding SystemInfo.OSVersion, Converter={StaticResource StringNotEmptyToVisibilityConverter}}">
                 <StackPanel>
                     <TextBlock Text="System Information" FontSize="{StaticResource FontSizeMedium}" FontWeight="SemiBold" Foreground="{DynamicResource TextPrimaryBrush}" Margin="0,0,0,12"/>
                     <Grid>
@@ -202,13 +202,13 @@
             </Border>
 
             <!-- Categories List (Collapsible) -->
-            <Border Style="{StaticResource CardStyle}" Padding="{StaticResource SpacingLg}" Visibility="{Binding Categories.Count, Converter={StaticResource GreaterThanZeroToVisibilityConverter}}">
+            <Border Style="{StaticResource CardStyle}" Padding="{StaticResource PaddingLg}" Visibility="{Binding Categories.Count, Converter={StaticResource GreaterThanZeroToVisibilityConverter}}">
                 <StackPanel>
                     <TextBlock Text="Categories" FontSize="{StaticResource FontSizeMedium}" FontWeight="SemiBold" Foreground="{DynamicResource TextPrimaryBrush}" Margin="0,0,0,12"/>
                     <ItemsControl ItemsSource="{Binding Categories}">
                         <ItemsControl.ItemTemplate>
                             <DataTemplate>
-                                <Border Style="{StaticResource ListItemStyle}" Margin="0,2" Padding="{StaticResource SpacingMd}">
+                                <Border Style="{StaticResource ListItemStyle}" Margin="0,2" Padding="{StaticResource PaddingMd}">
                                     <Grid>
                                         <Grid.ColumnDefinitions>
                                             <ColumnDefinition Width="Auto"/>

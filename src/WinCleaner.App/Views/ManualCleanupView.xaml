@@ -1,4 +1,4 @@
-﻿<UserControl x:Class="WinCleaner.Views.ManualCleanupView"
+<UserControl x:Class="WinCleaner.Views.ManualCleanupView"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
@@ -8,11 +8,11 @@
              mc:Ignorable="d"
              d:DataContext="{d:DesignInstance Type=vm:ManualCleanupViewModel, IsDesignTimeCreatable=False}">
 
-    <ScrollViewer VerticalScrollBarVisibility="Auto" Padding="{StaticResource SpacingLg}">
+    <ScrollViewer VerticalScrollBarVisibility="Auto" Padding="{StaticResource PaddingLg}">
         <StackPanel>
 
             <!-- Header -->
-            <Border Style="{StaticResource CardStyle}" Padding="{StaticResource SpacingLg}" Margin="0,0,0,24">
+            <Border Style="{StaticResource CardStyle}" Padding="{StaticResource PaddingLg}" Margin="0,0,0,24">
                 <Grid>
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="Auto"/>
@@ -39,7 +39,7 @@
             </Border>
 
             <!-- Tree View -->
-            <Border Style="{StaticResource CardStyle}" Padding="{StaticResource SpacingLg}" Margin="0,0,0,24" Visibility="{Binding RootNodes.Count, Converter={StaticResource GreaterThanZeroToVisibilityConverter}}">
+            <Border Style="{StaticResource CardStyle}" Padding="{StaticResource PaddingLg}" Margin="0,0,0,24" Visibility="{Binding RootNodes.Count, Converter={StaticResource GreaterThanZeroToVisibilityConverter}}">
                 <StackPanel>
                     <TextBlock Text="Folders" FontSize="{StaticResource FontSizeMedium}" FontWeight="SemiBold" Foreground="{DynamicResource TextPrimaryBrush}" Margin="0,0,0,12"/>
                     <TreeView ItemsSource="{Binding RootNodes}" Background="Transparent" BorderThickness="0">
@@ -100,7 +100,7 @@
             </Border>
 
             <!-- Node Detail -->
-            <Border Style="{StaticResource CardStyle}" Padding="{StaticResource SpacingLg}" Margin="0,0,0,24" Visibility="{Binding NodeDetail, Converter={StaticResource NotNullToVisibilityConverter}}">
+            <Border Style="{StaticResource CardStyle}" Padding="{StaticResource PaddingLg}" Margin="0,0,0,24" Visibility="{Binding NodeDetail, Converter={StaticResource NotNullToVisibilityConverter}}">
                 <StackPanel>
                     <TextBlock Text="Details" FontSize="{StaticResource FontSizeMedium}" FontWeight="SemiBold" Foreground="{DynamicResource TextPrimaryBrush}" Margin="0,0,0,12"/>
                     <Grid>

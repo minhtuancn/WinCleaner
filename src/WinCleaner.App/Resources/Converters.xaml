@@ -6,6 +6,8 @@
     <models:EqualConverter x:Key="EqualConverter"/>
     <models:NotEqualConverter x:Key="NotEqualConverter"/>
     <models:InverseBooleanToVisibilityConverter x:Key="InverseBooleanToVisibilityConverter"/>
+    <models:InverseBoolConverter x:Key="InverseBoolConverter"/>
+    <models:BoolToTextConverter x:Key="BoolToTextConverter"/>
     <models:BytesToStringConverter x:Key="BytesToStringConverter"/>
     <models:IntToVisibilityConverter x:Key="IntToVisibilityConverter"/>
     <models:RiskLevelToBrushConverter x:Key="RiskLevelToBrushConverter"/>
@@ -20,5 +22,19 @@
     <models:CleanProfileToStringConverter x:Key="CleanProfileToStringConverter"/>
     <models:EnumToCollectionConverter x:Key="EnumToCollectionConverter"/>
     <models:DriveUsageToBrushConverter x:Key="DriveUsageToBrushConverter"/>
+    <models:GreaterThanZeroToVisibilityConverter x:Key="GreaterThanZeroToVisibilityConverter"/>
+    <models:NotNullToVisibilityConverter x:Key="NotNullToVisibilityConverter"/>
+    <models:StringNotEmptyToVisibilityConverter x:Key="StringNotEmptyToVisibilityConverter"/>
+    <models:PercentToWidthConverter x:Key="PercentToWidthConverter"/>
+    <models:GreaterThanFiveToVisibilityConverter x:Key="GreaterThanFiveToVisibilityConverter"/>
+    <models:CategoryToIconConverter x:Key="CategoryToIconConverter"/>
+    <models:HealthStatusToBrushConverter x:Key="HealthStatusToBrushConverter"/>
+    <models:HealthStatusToIconConverter x:Key="HealthStatusToIconConverter"/>
+    <models:LogLevelToIconConverter x:Key="LogLevelToIconConverter"/>
+    <models:SafetyLevelToIconConverter x:Key="SafetyLevelToIconConverter"/>
+    <models:SafetyLevelToBrushConverter x:Key="SafetyLevelToBrushConverter"/>
+    <models:SafetyLevelToVisibilityConverter x:Key="SafetyLevelToVisibilityConverter"/>
+    <models:EventTypeToIconConverter x:Key="EventTypeToIconConverter"/>
+    <models:BoolToIconConverter x:Key="BoolToIconConverter"/>
 
 </ResourceDictionary>

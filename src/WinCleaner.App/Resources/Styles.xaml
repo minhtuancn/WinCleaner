@@ -669,6 +669,16 @@
         <Setter Property="Padding" Value="8,6"/>
     </Style>
 
+    <!-- Card Style -->
+    <Style x:Key="CardStyle" TargetType="Border">
+        <Setter Property="Background" Value="{StaticResource SurfaceBrush}"/>
+        <Setter Property="BorderBrush" Value="{StaticResource BorderBrush}"/>
+        <Setter Property="BorderThickness" Value="1"/>
+        <Setter Property="CornerRadius" Value="{StaticResource CornerRadiusNormal}"/>
+        <Setter Property="Padding" Value="{StaticResource PaddingLg}"/>
+        <Setter Property="Effect" Value="{StaticResource ShadowSmall}"/>
+    </Style>
+
     <!-- Info Card Style -->
     <Style x:Key="InfoCardStyle" TargetType="Border">
         <Setter Property="Background" Value="{StaticResource SurfaceBrush}"/>
@@ -677,6 +687,15 @@
         <Setter Property="CornerRadius" Value="{StaticResource CornerRadiusNormal}"/>
         <Setter Property="Padding" Value="10,8"/>
         <Setter Property="Effect" Value="{StaticResource ShadowSmall}"/>
+    </Style>
+
+    <!-- List Item Style -->
+    <Style x:Key="ListItemStyle" TargetType="Border">
+        <Setter Property="Background" Value="{StaticResource SurfaceBrush}"/>
+        <Setter Property="BorderBrush" Value="{StaticResource BorderBrush}"/>
+        <Setter Property="BorderThickness" Value="0,0,0,1"/>
+        <Setter Property="CornerRadius" Value="0"/>
+        <Setter Property="Padding" Value="{StaticResource PaddingMd}"/>
     </Style>
 
     <!-- Modern TabItem Style -->
