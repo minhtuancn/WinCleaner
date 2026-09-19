@@ -20,7 +20,7 @@
   <ItemGroup>
     <ProjectReference Include="..\WinCleaner.Core\WinCleaner.Core.csproj" />
     <ProjectReference Include="..\WinCleaner.Infrastructure.Windows\WinCleaner.Infrastructure.Windows.csproj" />
-    <PackageReference Include="Microsoft.Web.WebView2" Version="1.0.3124.44" />
+    <PackageReference Include="Microsoft.Web.WebView2" Version="1.0.4191.47" />
   </ItemGroup>
 
   <ItemGroup>
