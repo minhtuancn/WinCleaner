@@ -361,7 +361,7 @@ jobs:
           path: release/classic
 
       - name: Create Release
-        uses: softprops/action-gh-release@v2
+        uses: softprops/action-gh-release@v3
         with:
           tag_name: v${{ needs.validate-version.outputs.version }}
           name: WinCleaner ${{ needs.validate-version.outputs.version }}
