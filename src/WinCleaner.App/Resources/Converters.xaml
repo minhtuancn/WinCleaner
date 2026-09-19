@@ -13,6 +13,7 @@
     <models:RiskLevelToBrushConverter x:Key="RiskLevelToBrushConverter"/>
     <models:CleanStatusToBrushConverter x:Key="CleanStatusToBrushConverter"/>
     <models:BoolToVisibilityConverter x:Key="BoolToVisibilityConverter"/>
+    <models:BoolToVisibilityConverter x:Key="BooleanToVisibilityConverter"/>
     <models:InverseBoolToVisibilityConverter x:Key="InverseBoolToVisibilityConverter"/>
     <models:RiskLevelToTooltipConverter x:Key="RiskLevelToTooltipConverter"/>
     <models:CleanStatusToVisibilityConverter x:Key="CleanStatusToVisibilityConverter"/>
