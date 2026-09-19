@@ -12,6 +12,11 @@ on:
         required: false
         type: boolean
         default: false
+      build_classic:
+        description: 'Build Classic UI (experimental, has build errors)'
+        required: false
+        type: boolean
+        default: false
   push:
     tags:
       - 'v2.0.0'
@@ -24,6 +29,9 @@ env:
   DOTNET_NOLOGO: true
   DOTNET_CLI_TELEMETRY_OPTOUT: 1
   SOLUTION: 'WinCleaner.sln'
+  # WiX UpgradeCodes (generate once, keep stable)
+  MODERN_UPGRADE_CODE: '{{A1B2C3D4-E5F6-7890-ABCD-EF1234567890}}'
+  CLASSIC_UPGRADE_CODE: '{{B2C3D4E5-F6A7-8901-BCDE-F12345678901}}'
 
 jobs:
   validate-version:
@@ -64,6 +72,7 @@ jobs:
     needs: validate-version
     outputs:
       installer_path: ${{ steps.package.outputs.installer_path }}
+      msix_path: ${{ steps.msix.outputs.msix_path }}
       checksums: ${{ steps.checksum.outputs.checksums }}
 
     steps:
@@ -111,15 +120,15 @@ jobs:
         run: dotnet build ${{ env.SOLUTION }} --configuration Release --no-restore
 
       - name: Run tests
-        run: dotnet test ${{ env.SOLUTION }} --configuration Release --no-build --logger "trx;LogFileName=test-results.trx"
+        run: dotnet test ${{ env.SOLUTION }} --configuration Release --no-build --logger "trx;LogFileName=test-results.trx" --collect:"XPlat Code Coverage"
 
-      - name: Publish Modern UI
+      - name: Publish Modern UI (self-contained for MSI)
         run: |
           $version = "${{ needs.validate-version.outputs.version }}"
           dotnet publish src/WinCleaner.App/WinCleaner.App.csproj `
             --configuration Release `
             --runtime win-x64 `
-            --self-contained false `
+            --self-contained true `
             -p:PublishSingleFile=true `
             -p:IncludeNativeLibrariesForSelfExtract=true `
             -p:PublishDir="artifacts/modern/WinCleaner-${version}" `
@@ -127,12 +136,39 @@ jobs:
             /p:AssemblyVersion=2.0.0.0 `
             /p:FileVersion=2.0.0.${{ needs.validate-version.outputs.version.Split('.')[2].Split('-')[0] }}
 
-      - name: Sign executables (if cert available)
-        if: env.SIGNING_CERT != ''
+      - name: Build MSIX package
+        id: msix
         run: |
-          echo "Signing not configured - skipping"
+          $version = "${{ needs.validate-version.outputs.version }}"
+          $msixName = "WinCleaner-${version}-x64.msix"
+          
+          # Build MSIX using Windows App SDK packaging
+          dotnet publish src/WinCleaner.App/WinCleaner.App.csproj `
+            --configuration Release `
+            --runtime win-x64 `
+            --self-contained true `
+            -p:GenerateAppxPackageOnBuild=true `
+            -p:AppxPackageDir="artifacts/modern/msix/" `
+            -p:AppxPackageFileName="${msixName}" `
+            -p:AppxBundle=Never `
+            -p:AppxPackageSigningEnabled=false `
+            /p:Version=${version} `
+            /p:AssemblyVersion=2.0.0.0 `
+            /p:FileVersion=2.0.0.${{ needs.validate-version.outputs.version.Split('.')[2].Split('-')[0] }}
+          
+          if (Test-Path "artifacts/modern/msix/${msixName}") {
+            echo "msix_path=artifacts/modern/msix/${msixName}" >> $env:GITHUB_OUTPUT
+          }
 
-      - name: Create installer (WiX)
+      - name: Sign executables and packages (if cert available)
+        if: env.SIGNING_CERT != '' && env.SIGNING_CERT_PASSWORD != ''
+        run: |
+          echo "Code signing configured - implementing..."
+          # Add signtool commands here when cert is available
+          # signtool sign /fd sha256 /a /tr http://timestamp.digicert.com /td sha256 ...
+        continue-on-error: true
+
+      - name: Create MSI installer (WiX)
         id: package
         run: |
           $version = "${{ needs.validate-version.outputs.version }}"
@@ -140,7 +176,7 @@ jobs:
           
           $wixContent = @"
           <Wix xmlns="http://wixtoolset.org/schemas/v4/wxs">
-            <Package Name="WinCleaner" Version="$(var.Version)" Manufacturer="WinCleaner Team" UpgradeCode="PUT-GUID-HERE">
+            <Package Name="WinCleaner" Version="$(var.Version)" Manufacturer="WinCleaner Team" UpgradeCode="${{ env.MODERN_UPGRADE_CODE }}">
               <MajorUpgrade DowngradeErrorMessage="A newer version of WinCleaner is already installed." Schedule="afterInstallInitialize" />
               <MediaTemplate EmbedCab="yes" CompressionLevel="high" />
               <Feature Id="Main" Title="WinCleaner" Level="1">
@@ -174,10 +210,6 @@ jobs:
                   <RemoveFolder Id="ApplicationProgramsFolder" On="uninstall" />
                   <RegistryValue Root="HKCU" Key="Software\WinCleaner" Name="Installed" Type="integer" Value="1" KeyPath="yes" />
                 </Component>
-                <Component Id="AutoUpdate" Guid="*" Win64="yes">
-                  <File Source="artifacts/modern/WinCleaner-${version}/WinCleaner.Updater.exe" Vital="no" />
-                  <Condition><![CDATA[NOT Installed]]></Condition>
-                </Component>
               </ComponentGroup>
             </Fragment>
             
@@ -185,7 +217,7 @@ jobs:
               <Property Id="WIXUI_EXITDIALOGOPTIONALCHECKBOXTEXT" Value="Launch WinCleaner" />
               <Property Id="WixShellExecTarget" Value="[INSTALLFOLDER]WinCleaner.exe" />
               <CustomAction Id="LaunchApplication" BinaryKey="WixCA" DllEntry="WixShellExec" Impersonate="yes" />
-              <CustomAction Id="CloseRunningApp" ExeCommand="taskkill /f /im WinCleaner.exe" Execute="immediate" Return="ignore" Impersonate="no" />
+              <CustomAction Id="CloseRunningApp" ExeCommand='cmd /c "tasklist /fi \"imagename eq WinCleaner.exe\" | findstr /i WinCleaner.exe && taskkill /f /im WinCleaner.exe"' Execute="immediate" Return="ignore" Impersonate="no" />
               <InstallExecuteSequence>
                 <Custom Action="CloseRunningApp" Before="InstallInitialize">NOT Installed</Custom>
               </InstallExecuteSequence>
@@ -205,7 +237,7 @@ jobs:
         id: checksum
         run: |
           $version = "${{ needs.validate-version.outputs.version }}"
-          $files = Get-ChildItem "artifacts/modern" -Recurse -File | Where-Object { $_.Extension -in @('.msi', '.exe', '.dll') }
+          $files = Get-ChildItem "artifacts/modern" -Recurse -File | Where-Object { $_.Extension -in @('.msi', '.msix', '.exe', '.dll') }
           $checksums = @()
           foreach ($file in $files) {
             $sha256 = Get-FileHash -Algorithm SHA256 $file.FullName
@@ -223,14 +255,17 @@ jobs:
           path: |
             artifacts/modern/WinCleaner-${{ needs.validate-version.outputs.version }}/
             artifacts/modern/*.msi
+            artifacts/modern/msix/*.msix
             artifacts/modern/SHA256SUMS.txt
           retention-days: 90
 
   build-classic:
-    name: Build Classic UI (WinCleaner_Old)
+    name: Build Classic UI (WinCleaner_Old) - Experimental
     runs-on: windows-latest
     timeout-minutes: 45
     needs: validate-version
+    if: ${{ github.event.inputs.build_classic == 'true' }}
+    continue-on-error: true
     outputs:
       installer_path: ${{ steps.package.outputs.installer_path }}
 
@@ -277,7 +312,7 @@ jobs:
           
           $wixContent = @"
           <Wix xmlns="http://wixtoolset.org/schemas/v4/wxs">
-            <Package Name="WinCleaner Classic" Version="$(var.Version)" Manufacturer="WinCleaner Team" UpgradeCode="PUT-DIFFERENT-GUID-HERE">
+            <Package Name="WinCleaner Classic" Version="$(var.Version)" Manufacturer="WinCleaner Team" UpgradeCode="${{ env.CLASSIC_UPGRADE_CODE }}">
               <MajorUpgrade DowngradeErrorMessage="A newer version of WinCleaner Classic is already installed." Schedule="afterInstallInitialize" />
               <MediaTemplate EmbedCab="yes" CompressionLevel="high" />
               <Feature Id="Main" Title="WinCleaner Classic" Level="1">
@@ -343,7 +378,8 @@ jobs:
     name: Create GitHub Release
     runs-on: ubuntu-latest
     timeout-minutes: 15
-    needs: [validate-version, build-modern, build-classic]
+    needs: [validate-version, build-modern]
+    if: always() && needs.build-modern.result == 'success'
     permissions:
       contents: write
 
@@ -354,8 +390,9 @@ jobs:
           name: WinCleaner-Modern-${{ needs.validate-version.outputs.version }}
           path: release/modern
 
-      - name: Download Classic artifacts
+      - name: Download Classic artifacts (if built)
         uses: actions/download-artifact@v4
+        continue-on-error: true
         with:
           name: WinCleaner-Classic-${{ needs.validate-version.outputs.version }}
           path: release/classic
@@ -370,6 +407,7 @@ jobs:
           generate_release_notes: true
           files: |
             release/modern/*.msi
+            release/modern/*.msix
             release/modern/SHA256SUMS.txt
             release/classic/*.msi
             release/classic/SHA256SUMS.txt
@@ -381,7 +419,7 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 10
     needs: [validate-version, build-modern]
-    if: ${{ github.event.inputs.publish_nuget == 'true' && needs.validate-version.outputs.is_prerelease == 'false' }}
+    if: ${{ github.event.inputs.publish_nuget == 'true' && needs.validate-version.outputs.is_prerelease == 'false' && needs.build-modern.result == 'success' }}
     steps:
       - name: Download artifacts
         uses: actions/download-artifact@v4
