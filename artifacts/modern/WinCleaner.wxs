@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Wix xmlns="http://wixtoolset.org/schemas/v4/wxs">
+  <Package Name="WinCleaner" Version="2.0.0.0" Manufacturer="WinCleaner Team" UpgradeCode="A1B2C3D4-E5F6-7890-ABCD-EF1234567890">
+    <MajorUpgrade DowngradeErrorMessage="A newer version of WinCleaner is already installed." Schedule="afterInstallInitialize" />
+    <MediaTemplate EmbedCab="yes" CompressionLevel="high" />
+    <Feature Id="Main" Title="WinCleaner" Level="1">
+      <ComponentGroupRef Id="ProductComponents" />
+    </Feature>
+  </Package>
+
+  <Fragment>
+    <Directory Id="TARGETDIR" Name="SourceDir">
+      <Directory Id="ProgramFilesFolder">
+        <Directory Id="INSTALLFOLDER" Name="WinCleaner" />
+      </Directory>
+      <Directory Id="ProgramMenuFolder">
+        <Directory Id="ApplicationProgramsFolder" Name="WinCleaner" />
+      </Directory>
+      <Directory Id="DesktopFolder" Name="Desktop" />
+    </Directory>
+  </Fragment>
+
+  <Fragment>
+    <ComponentGroup Id="ProductComponents">
+      <Component Id="MainExecutable" Guid="*" Directory="INSTALLFOLDER">
+        <File Source="src/WinCleaner.App/artifacts/modern/WinCleaner-2.0.0/WinCleaner.exe" KeyPath="yes" Vital="yes" Checksum="yes" />
+        <File Source="src/WinCleaner.App/artifacts/modern/WinCleaner-2.0.0/WinCleaner.Core.xml" />
+        <File Source="src/WinCleaner.App/artifacts/modern/WinCleaner-2.0.0/WinCleaner.Infrastructure.Windows.xml" />
+        <File Source="src/WinCleaner.App/artifacts/modern/WinCleaner-2.0.0/WinCleaner.xml" />
+        <File Source="src/WinCleaner.App/artifacts/modern/WinCleaner-2.0.0/Microsoft.Web.WebView2.Core.xml" />
+        <File Source="src/WinCleaner.App/artifacts/modern/WinCleaner-2.0.0/Microsoft.Web.WebView2.WinForms.xml" />
+        <File Source="src/WinCleaner.App/artifacts/modern/WinCleaner-2.0.0/Microsoft.Web.WebView2.Wpf.xml" />
+        <File Source="src/WinCleaner.App/artifacts/modern/WinCleaner-2.0.0/Package.appxmanifest" />
+      </Component>
+      <Component Id="Shortcuts" Guid="*" Directory="ApplicationProgramsFolder">
+        <Shortcut Id="StartMenuShortcut" Name="WinCleaner" Target="[INSTALLFOLDER]WinCleaner.exe" WorkingDirectory="INSTALLFOLDER" />
+        <Shortcut Id="DesktopShortcut" Directory="DesktopFolder" Name="WinCleaner" Target="[INSTALLFOLDER]WinCleaner.exe" WorkingDirectory="INSTALLFOLDER" />
+        <RemoveFolder Id="ApplicationProgramsFolder" On="uninstall" />
+        <RegistryValue Root="HKCU" Key="Software\WinCleaner" Name="Installed" Type="integer" Value="1" KeyPath="yes" />
+      </Component>
+    </ComponentGroup>
+  </Fragment>
+</Wix>
