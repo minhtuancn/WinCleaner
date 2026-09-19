@@ -1,0 +1,27 @@
+name: "WinCleaner CodeQL Configuration"
+
+disable-default-queries: false
+
+queries:
+  - uses: security-extended
+  - uses: security-and-quality
+
+paths-ignore:
+  - "**/bin/**"
+  - "**/obj/**"
+  - "**/tests/**"
+  - "**/*.Designer.cs"
+  - "**/*.g.cs"
+  - "**/WinCleaner_Old/**"
+  - "**/.references/**"
+
+paths:
+  - "src/"
+
+# Custom query suites for WinCleaner-specific concerns
+query-filters:
+  - exclude:
+      id: cs/unsafe-reflection
+      id: cs/unsafe-deserialization
+      id: cs/sql-injection
+      id: cs/path-injection

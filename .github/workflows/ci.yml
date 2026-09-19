@@ -10,6 +10,8 @@ env:
   DOTNET_VERSION: '8.0.x'
   DOTNET_NOLOGO: true
   DOTNET_CLI_TELEMETRY_OPTOUT: 1
+  # Quality Gate thresholds
+  COVERAGE_THRESHOLD: 15
 
 jobs:
   build-and-test:
@@ -32,14 +34,55 @@ jobs:
       - name: Install WiX Toolset
         run: dotnet tool install --global wix --version 4.0.5
 
+      - name: Install ReportGenerator
+        run: dotnet tool install --global dotnet-reportgenerator-globaltool --version 5.4.3
+
       - name: Restore dependencies
         run: dotnet restore WinCleaner.sln
 
       - name: Build solution
         run: dotnet build WinCleaner.sln --configuration Release --no-restore
 
-      - name: Run unit tests
-        run: dotnet test WinCleaner.sln --configuration Release --no-build --logger "trx;LogFileName=test-results.trx" --collect:"XPlat Code Coverage"
+      - name: Run unit tests with coverage
+        run: |
+          dotnet test WinCleaner.sln --configuration Release --no-build \
+            --logger "trx;LogFileName=test-results.trx" \
+            --collect:"XPlat Code Coverage" \
+            -- DataCollectionRunSettings.DataCollectors.DataCollector.Configuration.Format=cobertura
+
+      - name: Generate coverage report
+        run: |
+          $coverageFiles = Get-ChildItem -Recurse -Filter "coverage.cobertura.xml"
+          if ($coverageFiles) {
+            $reportDir = "coverage-report"
+            New-Item -ItemType Directory -Force -Path $reportDir
+            reportgenerator `
+              -reports:"$($coverageFiles.FullName -join ';')" `
+              -targetdir:$reportDir `
+              -reporttypes:"HtmlInline_AzurePipelines;Cobertura;Badges" `
+              -verbosity:Info
+            echo "REPORT_DIR=$reportDir" >> $env:GITHUB_OUTPUT
+          } else {
+            Write-Warning "No coverage files found"
+          }
+        id: coverage
+
+      - name: Check coverage threshold
+        if: always() && steps.coverage.outputs.REPORT_DIR != ''
+        run: |
+          $threshold = ${{ env.COVERAGE_THRESHOLD }}
+          $summaryFile = "$(steps.coverage.outputs.REPORT_DIR)/Summary.xml"
+          if (Test-Path $summaryFile) {
+            [xml]$summary = Get-Content $summaryFile
+            $lineRate = [double]$summary.CoverageSession.LineRate * 100
+            Write-Host "Line coverage: $([math]::Round($lineRate, 2))% (threshold: $threshold%)"
+            if ($lineRate -lt $threshold) {
+              Write-Error "Coverage $([math]::Round($lineRate, 2))% is below threshold $threshold%"
+              exit 1
+            }
+          } else {
+            Write-Warning "Summary.xml not found, skipping threshold check"
+          }
 
       - name: Upload test results
         uses: actions/upload-artifact@v4
@@ -49,13 +92,53 @@ jobs:
           path: "**/test-results.trx"
           retention-days: 7
 
-      - name: Upload coverage
+      - name: Upload coverage report
         uses: actions/upload-artifact@v4
-        if: always()
+        if: always() && steps.coverage.outputs.REPORT_DIR != ''
         with:
-          name: coverage
-          path: "**/coverage.cobertura.xml"
-          retention-days: 7
+          name: coverage-report
+          path: ${{ steps.coverage.outputs.REPORT_DIR }}
+          retention-days: 30
+
+      - name: Upload coverage badge
+        uses: actions/upload-artifact@v4
+        if: always() && steps.coverage.outputs.REPORT_DIR != ''
+        with:
+          name: coverage-badge
+          path: ${{ steps.coverage.outputs.REPORT_DIR }}/badge.svg
+          retention-days: 30
+
+  static-analysis:
+    name: Static Analysis
+    runs-on: windows-latest
+    timeout-minutes: 20
+    needs: build-and-test
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: ${{ env.DOTNET_VERSION }}
+          cache: true
+
+      - name: Run Roslyn analyzers
+        run: |
+          dotnet build WinCleaner.sln --configuration Release --no-restore /p:RunAnalyzers=true /p:EnforceCodeStyleInBuild=true
+
+      - name: Check for TODO/FIXME comments
+        run: |
+          $todos = Get-ChildItem -Recurse -Include *.cs | Select-String -Pattern "(TODO|FIXME|HACK|BUG)" | Select-Object LineNumber, FileName, Line
+          if ($todos) {
+            Write-Host "Found TODO/FIXME/HACK/BUG comments:"
+            $todos | Format-Table -AutoSize | Out-Host
+          } else {
+            Write-Host "No TODO/FIXME/HACK/BUG comments found"
+          }
 
   security-scan:
     name: Security Scan
@@ -72,8 +155,16 @@ jobs:
         with:
           dotnet-version: ${{ env.DOTNET_VERSION }}
 
-      - name: Run security audit
-        run: dotnet list WinCleaner.sln package --vulnerable --include-transitive
+      - name: Run security audit (NuGet)
+        run: |
+          $result = dotnet list WinCleaner.sln package --vulnerable --include-transitive
+          if ($LASTEXITCODE -ne 0) {
+            Write-Host "Vulnerable packages found:"
+            Write-Host $result
+            exit 1
+          } else {
+            Write-Host "No vulnerable packages found"
+          }
 
       - name: Run CodeQL Analysis
         uses: github/codeql-action/init@v3
@@ -85,6 +176,34 @@ jobs:
         uses: github/codeql-action/analyze@v3
         with:
           category: "/language:csharp"
+
+      - name: Check for secrets in code
+        run: |
+          $patterns = @(
+            "api[_-]?key",
+            "secret",
+            "password",
+            "token",
+            "connectionstring",
+            "private[_-]?key"
+          )
+          $files = Get-ChildItem -Recurse -Include *.cs,*.json,*.xml,*.config,*.yml,*.yaml | Where-Object { $_.FullName -notmatch "\\.git|obj|bin" }
+          $found = $false
+          foreach ($file in $files) {
+            $content = Get-Content $file.FullName -Raw
+            foreach ($pattern in $patterns) {
+              if ($content -match "(?i)$pattern\s*[:=]\s*['\"`][^'\"`\s]{8,}") {
+                Write-Warning "Potential secret in $($file.FullName): matches $pattern"
+                $found = $true
+              }
+            }
+          }
+          if ($found) {
+            Write-Error "Potential secrets detected in codebase"
+            exit 1
+          } else {
+            Write-Host "No obvious secrets detected"
+          }
 
   docker-build:
     name: Docker Build Test
@@ -99,3 +218,25 @@ jobs:
       - name: Build Docker image
         run: |
           docker build -t wincleaner:ci -f Dockerfile .
+
+  quality-gate:
+    name: Quality Gate
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    needs: [build-and-test, static-analysis, security-scan]
+    if: always()
+
+    steps:
+      - name: Check all jobs passed
+        run: |
+          $failed = @()
+          if ("${{ needs.build-and-test.result }}" -ne "success") { $failed += "build-and-test" }
+          if ("${{ needs.static-analysis.result }}" -ne "success") { $failed += "static-analysis" }
+          if ("${{ needs.security-scan.result }}" -ne "success") { $failed += "security-scan" }
+          
+          if ($failed) {
+            Write-Error "Quality Gate FAILED. Failed jobs: $($failed -join ', ')"
+            exit 1
+          } else {
+            Write-Host "✅ Quality Gate PASSED - All checks successful"
+          }
