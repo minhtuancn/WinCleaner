@@ -1,1 +1,0 @@
-using System.Reflection; var asm = Assembly.LoadFrom("../../../src/WinCleaner.Core/bin/Debug/net8.0/WinCleaner.Core.dll"); foreach (var name in asm.GetManifestResourceNames()) { Console.WriteLine(name); }
