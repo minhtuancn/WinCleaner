@@ -1,0 +1,25 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project>
+  <PropertyGroup>
+    <VersionPrefix>2.0.0</VersionPrefix>
+    <VersionSuffix>beta.1</VersionSuffix>
+    <Version>$(VersionPrefix)-$(VersionSuffix)</Version>
+    <AssemblyVersion>2.0.0.0</AssemblyVersion>
+    <FileVersion>2.0.0.1</FileVersion>
+    <InformationalVersion>2.0.0-beta.1+$(GitCommitSha)</InformationalVersion>
+    <Product>WinCleaner</Product>
+    <Authors>WinCleaner Team</Authors>
+    <Company>WinCleaner</Company>
+    <Copyright>Copyright © 2026 WinCleaner Team</Copyright>
+    <Description>Professional, Safe &amp; Free Windows Cleaner</Description>
+    <PackageProjectUrl>https://github.com/minhtuancn/WinCleaner</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/minhtuancn/WinCleaner.git</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
+    <PackageTags>cleaner;windows;optimization;maintenance</PackageTags>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <PublishSingleFile>true</PublishSingleFile>
+    <SelfContained>false</SelfContained>
+    <RuntimeIdentifier>win-x64</RuntimeIdentifier>
+    <PlatformTarget>x64</PlatformTarget>
+  </PropertyGroup>
+</Project>

@@ -1816,6 +1816,11 @@ var rootCommand = new RootCommand("WinCleaner CLI - Professional System Cleaner 
                     services.AddSingleton<IExplorerIntegrationService, ExplorerIntegrationService>();
                     services.AddSingleton<ILocalizationService, LocalizationService>();
 
+                    // New services
+                    services.AddSingleton<ICookieService, CookieService>();
+                    services.AddSingleton<ITaskSchedulerService, TaskSchedulerService>();
+                    services.AddSingleton<IAiExplainer, AiExplainer>();
+
                     // Theme configuration store (no WPF dependencies)
                     services.AddSingleton<IThemeConfigurationStore, ThemeConfigurationStore>();
                 })

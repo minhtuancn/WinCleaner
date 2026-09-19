@@ -35,6 +35,20 @@ namespace WinCleaner
 
             // Wire WPF dispatcher crash handling
             _host.Services.GetRequiredService<WpfCrashHandler>().Register();
+            
+            // Check for updates on startup
+            if (_host.Services.GetRequiredService<IThemeConfigurationStore>().Settings.AutoCheckUpdates)
+            {
+                _ = Task.Run(async () =>
+                {
+                    try
+                    {
+                        await Task.Delay(5000); // Wait for UI to load
+                        await _host.Services.GetRequiredService<IUpdateService>().CheckForUpdatesAsync();
+                    }
+                    catch { }
+                });
+            }
         }
 
         protected override async void OnExit(ExitEventArgs e)
@@ -77,6 +91,15 @@ namespace WinCleaner
                     // HttpClient for Winapp2 downloads
                     services.AddHttpClient<IWinapp2Service, Winapp2Service>();
 
+                    // HttpClient for Update service
+                    services.AddHttpClient<IUpdateService, UpdateService>(client =>
+                    {
+                        client.BaseAddress = new Uri("https://api.github.com/");
+                        client.DefaultRequestHeaders.UserAgent.ParseAdd("WinCleaner/2.0");
+                        client.DefaultRequestHeaders.Accept.ParseAdd("application/vnd.github.v3+json");
+                        client.Timeout = TimeSpan.FromSeconds(30);
+                    });
+
                     // Core Services
                     services.AddSingleton<ISettingsService, SettingsService>();
                     services.AddSingleton<ISystemScanner, SystemScanner>();
@@ -92,6 +115,11 @@ namespace WinCleaner
                     services.AddSingleton<WinCleaner.Services.IExtensionManager, ExtensionManager>();
                     services.AddSingleton<ILocalizationService, LocalizationService>();
 
+                    // New services (Cookie, TaskScheduler, AI)
+                    services.AddSingleton<ICookieService, CookieService>();
+                    services.AddSingleton<ITaskSchedulerService, TaskSchedulerService>();
+                    services.AddSingleton<IAiExplainer, AiExplainer>();
+
                     // Resilience / Production Services (Issue #21)
                     services.AddSingleton<IStructuredLogger, StructuredLogger>();
                     services.AddSingleton<IResilienceService, ResilienceService>();
@@ -102,6 +130,9 @@ namespace WinCleaner
                     services.AddSingleton<IThemeConfigurationStore, ThemeConfigurationStore>();
                     services.AddSingleton<IWpfThemeApplicator, WpfThemeApplicator>();
                     services.AddSingleton<IThemeService, ThemeService>();
+
+                    // Update service (Issue #20, #21)
+                    services.AddSingleton<IUpdateService, UpdateService>();
 
                     // Safety / CleanupPlan Services (Issue #3)
                     services.AddSingleton<IPathSafetyValidator, PathSafetyValidator>();

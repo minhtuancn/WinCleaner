@@ -23,6 +23,7 @@ namespace WinCleaner.Services
         Task<bool> SetUiScaleAsync(double scale);
         Task<bool> SetUseSystemThemeAsync(bool useSystem);
         Task<bool> ToggleThemeAsync();
+        Task<bool> SetUpdateSettingsAsync(bool autoCheck, UpdateChannel channel, bool autoDownload, bool autoInstall);
     }
 
     public class ThemeSettingsChangedEventArgs : EventArgs
@@ -227,6 +228,31 @@ namespace WinCleaner.Services
         {
             var newTheme = _settings.CurrentTheme == AppTheme.Dark ? AppTheme.Light : AppTheme.Dark;
             return await SetThemeAsync(newTheme);
+        }
+
+        public async Task<bool> SetUpdateSettingsAsync(bool autoCheck, UpdateChannel channel, bool autoDownload, bool autoInstall)
+        {
+            try
+            {
+                var previousSettings = _settings.Clone();
+                _settings.AutoCheckUpdates = autoCheck;
+                _settings.UpdateChannel = channel;
+                _settings.AutoDownloadUpdates = autoDownload;
+                _settings.AutoInstallUpdates = autoInstall;
+                await SaveSettingsAsync();
+                
+                SettingsChanged?.Invoke(this, new ThemeSettingsChangedEventArgs
+                {
+                    PreviousSettings = previousSettings,
+                    NewSettings = _settings.Clone()
+                });
+                return true;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Failed to set update settings");
+                return false;
+            }
         }
 
         private AppTheme GetSystemTheme()

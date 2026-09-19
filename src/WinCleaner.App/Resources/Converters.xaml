@@ -3,6 +3,9 @@
                     xmlns:models="clr-namespace:WinCleaner.Models;assembly=WinCleaner.Infrastructure.Windows">
 
     <!-- Global Converters -->
+    <models:EqualConverter x:Key="EqualConverter"/>
+    <models:NotEqualConverter x:Key="NotEqualConverter"/>
+    <models:InverseBooleanToVisibilityConverter x:Key="InverseBooleanToVisibilityConverter"/>
     <models:BytesToStringConverter x:Key="BytesToStringConverter"/>
     <models:IntToVisibilityConverter x:Key="IntToVisibilityConverter"/>
     <models:RiskLevelToBrushConverter x:Key="RiskLevelToBrushConverter"/>

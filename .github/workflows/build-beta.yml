@@ -1,0 +1,292 @@
+name: Build Beta
+
+on:
+  workflow_dispatch:
+    inputs:
+      version_suffix:
+        description: 'Version suffix (e.g., beta.2, rc.1)'
+        required: false
+        default: 'beta'
+      publish_nuget:
+        description: 'Publish to NuGet'
+        required: false
+        type: boolean
+        default: false
+  push:
+    tags:
+      - 'v2.0.0-beta*'
+
+env:
+  DOTNET_VERSION: '8.0.x'
+  DOTNET_NOLOGO: true
+  DOTNET_CLI_TELEMETRY_OPTOUT: 1
+  SOLUTION: 'WinCleaner.sln'
+
+jobs:
+  build-modern:
+    name: Build Modern UI (WinCleaner)
+    runs-on: windows-latest
+    timeout-minutes: 45
+    outputs:
+      version: ${{ steps.set-version.outputs.version }}
+      installer_path: ${{ steps.package.outputs.installer_path }}
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: ${{ env.DOTNET_VERSION }}
+          cache: true
+
+      - name: Install WiX Toolset
+        run: dotnet tool install --global wix --version 4.0.5
+
+      - name: Determine version
+        id: set-version
+        run: |
+          $versionJson = Get-Content version.json | ConvertFrom-Json
+          $suffix = "${{ github.event.inputs.version_suffix || $versionJson.versionSuffix }}"
+          $buildNumber = $versionJson.buildNumber + 1
+          
+          $newVersion = "$($versionJson.versionPrefix)-$suffix.$buildNumber"
+          $versionJson.versionSuffix = "$suffix.$buildNumber"
+          $versionJson.version = $newVersion
+          $versionJson.buildNumber = $buildNumber
+          $versionJson.releaseDate = Get-Date -Format "yyyy-MM-dd"
+          
+          $versionJson | ConvertTo-Json -Depth 5 | Set-Content version.json
+          
+          echo "version=$newVersion" >> $env:GITHUB_OUTPUT
+          echo "VERSION=$newVersion" >> $env:GITHUB_ENV
+
+      - name: Update Version.props with build number
+        run: |
+          $content = Get-Content Version.props
+          $content = $content -replace '<VersionSuffix>.*</VersionSuffix>', "<VersionSuffix>${{ env.VERSION_SUFFIX }}.${{ steps.set-version.outputs.version.Split('.')[-1] }}</VersionSuffix>"
+          $content = $content -replace '<FileVersion>.*</FileVersion>', "<FileVersion>2.0.0.${{ steps.set-version.outputs.version.Split('.')[-1] }}</FileVersion>"
+          $content | Set-Content Version.props
+
+      - name: Restore dependencies
+        run: dotnet restore ${{ env.SOLUTION }}
+
+      - name: Build Modern UI solution
+        run: |
+          dotnet build src/WinCleaner.App/WinCleaner.App.csproj --configuration Release --no-restore /p:Version=${{ env.VERSION }} /p:AssemblyVersion=2.0.0.0 /p:FileVersion=2.0.0.${{ steps.set-version.outputs.version.Split('.')[-1] }}
+
+      - name: Publish Modern UI (self-contained, single file)
+        run: |
+          dotnet publish src/WinCleaner.App/WinCleaner.App.csproj `
+            --configuration Release `
+            --runtime win-x64 `
+            --self-contained false `
+            -p:PublishSingleFile=true `
+            -p:IncludeNativeLibrariesForSelfExtract=true `
+            -p:PublishDir="artifacts/modern/WinCleaner-${{ env.VERSION }}" `
+            /p:Version=${{ env.VERSION }}
+
+      - name: Create installer (WiX)
+        id: package
+        run: |
+          $version = "${{ env.VERSION }}"
+          $installerName = "WinCleaner-${version}-x64.msi"
+          
+          # Create WiX project on the fly
+          $wixContent = @"
+          <Wix xmlns="http://wixtoolset.org/schemas/v4/wxs">
+            <Package Name="WinCleaner" Version="$(var.Version)" Manufacturer="WinCleaner Team" UpgradeCode="PUT-GUID-HERE">
+              <MajorUpgrade DowngradeErrorMessage="A newer version of WinCleaner is already installed." />
+              <MediaTemplate EmbedCab="yes" />
+              <Feature Id="Main" Title="WinCleaner" Level="1">
+                <ComponentGroupRef Id="ProductComponents" />
+              </Feature>
+            </Package>
+            
+            <Fragment>
+              <Directory Id="TARGETDIR" Name="SourceDir">
+                <Directory Id="ProgramFilesFolder">
+                  <Directory Id="INSTALLFOLDER" Name="WinCleaner" />
+                </Directory>
+                <Directory Id="ProgramMenuFolder">
+                  <Directory Id="ApplicationProgramsFolder" Name="WinCleaner" />
+                </Directory>
+                <Directory Id="DesktopFolder" Name="Desktop" />
+              </Directory>
+            </Fragment>
+            
+            <Fragment>
+              <ComponentGroup Id="ProductComponents" Directory="INSTALLFOLDER">
+                <Component Id="MainExecutable" Guid="*">
+                  <File Source="artifacts/modern/WinCleaner-${version}/WinCleaner.exe" KeyPath="yes" />
+                </Component>
+                <Component Id="Shortcuts" Guid="*">
+                  <Shortcut Id="StartMenuShortcut" Directory="ApplicationProgramsFolder" Name="WinCleaner" Target="[INSTALLFOLDER]WinCleaner.exe" WorkingDirectory="INSTALLFOLDER" />
+                  <Shortcut Id="DesktopShortcut" Directory="DesktopFolder" Name="WinCleaner" Target="[INSTALLFOLDER]WinCleaner.exe" WorkingDirectory="INSTALLFOLDER" />
+                  <RemoveFolder Id="ApplicationProgramsFolder" On="uninstall" />
+                  <RegistryValue Root="HKCU" Key="Software\WinCleaner" Name="Installed" Type="integer" Value="1" KeyPath="yes" />
+                </Component>
+              </ComponentGroup>
+            </Fragment>
+            
+            <Fragment>
+              <Property Id="WIXUI_EXITDIALOGOPTIONALCHECKBOXTEXT" Value="Launch WinCleaner" />
+              <Property Id="WixShellExecTarget" Value="[INSTALLFOLDER]WinCleaner.exe" />
+              <CustomAction Id="LaunchApplication" BinaryKey="WixCA" DllEntry="WixShellExec" Impersonate="yes" />
+              <UI>
+                <Publish Dialog="ExitDialog" Control="Finish" Event="DoAction" Value="LaunchApplication" Order="1">WIXUI_EXITDIALOGOPTIONALCHECKBOX = 1 and NOT Installed</Publish>
+              </UI>
+            </Fragment>
+          </Wix>
+          "@
+          
+          $wixContent | Set-Content "artifacts/modern/WinCleaner.wxs" -Encoding UTF8
+          
+          # Build MSI
+          wix build "artifacts/modern/WinCleaner.wxs" -o "artifacts/modern/${installerName}" -v Version="${version}"
+          
+          echo "installer_path=artifacts/modern/${installerName}" >> $env:GITHUB_OUTPUT
+
+      - name: Upload Modern UI artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: WinCleaner-Modern-${{ env.VERSION }}
+          path: |
+            artifacts/modern/WinCleaner-${{ env.VERSION }}/
+            artifacts/modern/*.msi
+          retention-days: 30
+
+  build-classic:
+    name: Build Classic UI (WinCleaner_Old)
+    runs-on: windows-latest
+    timeout-minutes: 45
+    outputs:
+      installer_path: ${{ steps.package.outputs.installer_path }}
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: ${{ env.DOTNET_VERSION }}
+          cache: true
+
+      - name: Install WiX Toolset
+        run: dotnet tool install --global wix --version 4.0.5
+
+      - name: Restore dependencies
+        run: dotnet restore WinCleaner_Old/WinCleaner.csproj
+
+      - name: Build Classic UI
+        run: |
+          dotnet build WinCleaner_Old/WinCleaner.csproj --configuration Release --no-restore /p:Version=${{ needs.build-modern.outputs.version }}
+
+      - name: Publish Classic UI
+        run: |
+          dotnet publish WinCleaner_Old/WinCleaner.csproj `
+            --configuration Release `
+            --runtime win-x64 `
+            --self-contained false `
+            -p:PublishSingleFile=true `
+            -p:PublishDir="artifacts/classic/WinCleaner-Old-${{ needs.build-modern.outputs.version }}"
+
+      - name: Create Classic installer
+        id: package
+        run: |
+          $version = "${{ needs.build-modern.outputs.version }}"
+          $installerName = "WinCleaner-Classic-${version}-x64.msi"
+          
+          $wixContent = @"
+          <Wix xmlns="http://wixtoolset.org/schemas/v4/wxs">
+            <Package Name="WinCleaner Classic" Version="$(var.Version)" Manufacturer="WinCleaner Team" UpgradeCode="PUT-DIFFERENT-GUID-HERE">
+              <MajorUpgrade DowngradeErrorMessage="A newer version of WinCleaner Classic is already installed." />
+              <MediaTemplate EmbedCab="yes" />
+              <Feature Id="Main" Title="WinCleaner Classic" Level="1">
+                <ComponentGroupRef Id="ProductComponents" />
+              </Feature>
+            </Package>
+            
+            <Fragment>
+              <Directory Id="TARGETDIR" Name="SourceDir">
+                <Directory Id="ProgramFilesFolder">
+                  <Directory Id="INSTALLFOLDER" Name="WinCleaner Classic" />
+                </Directory>
+                <Directory Id="ProgramMenuFolder">
+                  <Directory Id="ApplicationProgramsFolder" Name="WinCleaner Classic" />
+                </Directory>
+                <Directory Id="DesktopFolder" Name="Desktop" />
+              </Directory>
+            </Fragment>
+            
+            <Fragment>
+              <ComponentGroup Id="ProductComponents" Directory="INSTALLFOLDER">
+                <Component Id="MainExecutable" Guid="*">
+                  <File Source="artifacts/classic/WinCleaner-Old-${version}/WinCleaner.exe" KeyPath="yes" />
+                </Component>
+                <Component Id="Shortcuts" Guid="*">
+                  <Shortcut Id="StartMenuShortcut" Directory="ApplicationProgramsFolder" Name="WinCleaner Classic" Target="[INSTALLFOLDER]WinCleaner.exe" WorkingDirectory="INSTALLFOLDER" />
+                  <Shortcut Id="DesktopShortcut" Directory="DesktopFolder" Name="WinCleaner Classic" Target="[INSTALLFOLDER]WinCleaner.exe" WorkingDirectory="INSTALLFOLDER" />
+                  <RemoveFolder Id="ApplicationProgramsFolder" On="uninstall" />
+                  <RegistryValue Root="HKCU" Key="Software\WinCleaner Classic" Name="Installed" Type="integer" Value="1" KeyPath="yes" />
+                </Component>
+              </ComponentGroup>
+            </Fragment>
+          </Wix>
+          "@
+          
+          $wixContent | Set-Content "artifacts/classic/WinCleaner-Classic.wxs" -Encoding UTF8
+          wix build "artifacts/classic/WinCleaner-Classic.wxs" -o "artifacts/classic/${installerName}" -v Version="${version}"
+          
+          echo "installer_path=artifacts/classic/${installerName}" >> $env:GITHUB_OUTPUT
+
+      - name: Upload Classic UI artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: WinCleaner-Classic-${{ needs.build-modern.outputs.version }}
+          path: |
+            artifacts/classic/WinCleaner-Old-${{ needs.build-modern.outputs.version }}/
+            artifacts/classic/*.msi
+          retention-days: 30
+
+  create-release:
+    name: Create GitHub Release
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    needs: [build-modern, build-classic]
+    if: github.event_name == 'workflow_dispatch' || startsWith(github.ref, 'refs/tags/')
+    permissions:
+      contents: write
+
+    steps:
+      - name: Download Modern artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: WinCleaner-Modern-${{ needs.build-modern.outputs.version }}
+          path: release/modern
+
+      - name: Download Classic artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: WinCleaner-Classic-${{ needs.build-modern.outputs.version }}
+          path: release/classic
+
+      - name: Create Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: v${{ needs.build-modern.outputs.version }}
+          name: WinCleaner ${{ needs.build-modern.outputs.version }}
+          draft: false
+          prerelease: true
+          generate_release_notes: true
+          files: |
+            release/modern/*.msi
+            release/classic/*.msi
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

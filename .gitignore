@@ -101,3 +101,8 @@ Release/
 *.zip
 *.msi
 *.exe.config
+# Reference repos (not to be committed)
+FluentCleaner_ref/
+
+# Reference repositories (not to be committed)
+.references/

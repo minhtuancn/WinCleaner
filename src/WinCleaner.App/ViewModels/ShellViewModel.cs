@@ -68,7 +68,7 @@ namespace WinCleaner.ViewModels
         }
 
         public bool IsDarkTheme => _themeStore.Settings.CurrentTheme == AppTheme.Dark ||
-                                   (_themeStore.Settings.UseSystemTheme && IsSystemDark());
+                                       (_themeStore.Settings.UseSystemTheme && IsSystemDark());
 
         [RelayCommand]
         private void Navigate(string viewName)

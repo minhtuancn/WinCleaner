@@ -14,15 +14,6 @@
         Background="{DynamicResource BackgroundBrush}"
         Foreground="{DynamicResource TextPrimaryBrush}">
 
-    <Window.Resources>
-        <ResourceDictionary>
-            <ResourceDictionary.MergedDictionaries>
-                <ResourceDictionary Source="Resources/Converters.xaml"/>
-                <ResourceDictionary Source="Resources/Styles.xaml"/>
-            </ResourceDictionary.MergedDictionaries>
-        </ResourceDictionary>
-    </Window.Resources>
-
     <Grid>
         <Grid.ColumnDefinitions>
             <ColumnDefinition x:Name="SidebarColumn" Width="280"/>
@@ -42,7 +33,7 @@
                 </Grid.RowDefinitions>
 
                 <!-- App Header -->
-                <Border Grid.Row="0" Padding="{StaticResource SpacingMd}" BorderBrush="{DynamicResource DividerBrush}" BorderThickness="0,0,0,1">
+                <Border Grid.Row="0" Padding="{StaticResource PaddingMd}" BorderBrush="{DynamicResource DividerBrush}" BorderThickness="0,0,0,1">
                     <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
                         <Border Width="32" Height="32" CornerRadius="{StaticResource RadiusMd}" Background="{DynamicResource PrimaryBrush}">
                             <Path Data="{x:Static design:Icons.Broom}" Fill="{DynamicResource TextOnPrimaryBrush}" Width="16" Height="16" Stretch="Uniform" HorizontalAlignment="Center" VerticalAlignment="Center"/>
@@ -55,7 +46,7 @@
                 </Border>
 
                 <!-- Navigation -->
-                <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto" Padding="{StaticResource SpacingSm}">
+                <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto" Padding="{StaticResource PaddingSm}">
                     <ItemsControl ItemsSource="{Binding NavigationItems}">
                         <ItemsControl.ItemTemplate>
                             <DataTemplate>
@@ -81,7 +72,7 @@
                 </ScrollViewer>
 
                 <!-- Bottom Actions -->
-                <Border Grid.Row="2" Padding="{StaticResource SpacingMd}" BorderBrush="{DynamicResource DividerBrush}" BorderThickness="0,1,0,0">
+                <Border Grid.Row="2" Padding="{StaticResource PaddingMd}" BorderBrush="{DynamicResource DividerBrush}" BorderThickness="0,1,0,0">
                     <StackPanel>
                         <Button Style="{StaticResource SecondaryButtonStyle}" Command="{Binding ToggleThemeCommand}">
                             <StackPanel Orientation="Horizontal">
@@ -110,7 +101,7 @@
                 Style="{StaticResource FloatingButtonStyle}"
                 Command="{Binding ToggleSidebarCommand}"
                 HorizontalAlignment="Left" VerticalAlignment="Top"
-                Margin="{StaticResource SpacingMd}"
+                Margin="{StaticResource MarginMd}"
                 Width="40" Height="40"
                 ToolTip="Toggle Sidebar">
             <Path Data="{x:Static design:Icons.ChevronLeft}" Fill="{DynamicResource TextPrimaryBrush}" Width="20" Height="20" Stretch="Uniform"/>

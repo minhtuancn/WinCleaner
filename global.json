@@ -1,0 +1,14 @@
+{
+  "sdk": {
+    "version": "8.0.203",
+    "rollForward": "latestFeature"
+  },
+  "projects": [
+    "src/WinCleaner.App",
+    "src/WinCleaner.Cli",
+    "src/WinCleaner.Core",
+    "src/WinCleaner.Infrastructure.Windows",
+    "tests/WinCleaner.Tests.Unit",
+    "tests/WinCleaner.Tests.Integration"
+  ]
+}

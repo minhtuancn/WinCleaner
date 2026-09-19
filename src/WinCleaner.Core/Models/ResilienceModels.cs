@@ -251,7 +251,7 @@ namespace WinCleaner.Models
         public List<string> Errors { get; set; } = new();
 
         public bool IsCompleted => OverallStatus == CleanupOverallStatus.Completed || 
-                                   OverallStatus == CleanupOverallStatus.CompletedWithWarnings;
+                                    OverallStatus == CleanupOverallStatus.CompletedWithWarnings;
 
         public void AddResult(CleanupOperationResult result)
         {

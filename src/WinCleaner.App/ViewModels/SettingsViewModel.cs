@@ -20,6 +20,7 @@ namespace WinCleaner.ViewModels
         private readonly ISettingsService _settingsService;
         private readonly IThemeConfigurationStore _themeStore;
         private readonly ILogger<SettingsViewModel> _logger;
+        private readonly IUpdateService _updateService;
 
         [ObservableProperty]
         private AppSettings _settings;
@@ -49,6 +50,9 @@ namespace WinCleaner.ViewModels
         private ObservableCollection<string> _availableLanguages = new() { "vi-VN", "en-US" };
 
         [ObservableProperty]
+        private ObservableCollection<AppTheme> _availableThemes = new() { AppTheme.Light, AppTheme.Dark, AppTheme.System };
+
+        [ObservableProperty]
         private bool _autoCloseAfterClean;
 
         [ObservableProperty]
@@ -69,14 +73,69 @@ namespace WinCleaner.ViewModels
         [ObservableProperty]
         private ObservableCollection<string> _customPaths = new();
 
+        // Update settings
+        [ObservableProperty]
+        private bool _autoCheckUpdates = true;
+
+        [ObservableProperty]
+        private UpdateChannel _updateChannel = UpdateChannel.Stable;
+
+        [ObservableProperty]
+        private bool _autoDownloadUpdates = false;
+
+        [ObservableProperty]
+        private bool _autoInstallUpdates = false;
+
+        [ObservableProperty]
+        private UpdateStatus _updateStatus = UpdateStatus.Idle;
+
+        [ObservableProperty]
+        private string _updateStatusMessage = string.Empty;
+
+        [ObservableProperty]
+        private double _updateProgress;
+
+        [ObservableProperty]
+        private Models.UpdateInfo? _availableUpdate;
+
+        [ObservableProperty]
+        private bool _isUpdateAvailable;
+
+        public ObservableCollection<UpdateChannel> AvailableChannels { get; } = new() 
+        { 
+            UpdateChannel.Stable, 
+            UpdateChannel.Beta, 
+            UpdateChannel.Preview 
+        };
+
         public SettingsViewModel(
             ISettingsService settingsService,
             IThemeConfigurationStore themeStore,
-            ILogger<SettingsViewModel> logger)
+            ILogger<SettingsViewModel> logger,
+            IUpdateService updateService)
         {
             _settingsService = settingsService;
             _themeStore = themeStore;
             _logger = logger;
+            _updateService = updateService;
+            
+            _updateService.UpdateStatusChanged += OnUpdateStatusChanged;
+        }
+
+        private void OnUpdateStatusChanged(object? sender, UpdateStatusChangedEventArgs e)
+        {
+            System.Windows.Application.Current?.Dispatcher?.Invoke(() =>
+            {
+                UpdateStatus = e.Status;
+                UpdateStatusMessage = e.Message;
+                UpdateProgress = e.Progress;
+                
+                if (e.UpdateInfo != null)
+                {
+                    AvailableUpdate = e.UpdateInfo;
+                    IsUpdateAvailable = e.Status == UpdateStatus.Available;
+                }
+            });
         }
 
         public async Task InitializeAsync()
@@ -108,6 +167,12 @@ namespace WinCleaner.ViewModels
                 ExcludedPaths = new ObservableCollection<string>(Settings.ExcludedPaths);
                 CustomPaths = new ObservableCollection<string>(Settings.CustomPaths);
 
+                // Load update settings from theme store
+                AutoCheckUpdates = _themeStore.Settings.AutoCheckUpdates;
+                UpdateChannel = _themeStore.Settings.UpdateChannel;
+                AutoDownloadUpdates = _themeStore.Settings.AutoDownloadUpdates;
+                AutoInstallUpdates = _themeStore.Settings.AutoInstallUpdates;
+
                 LogInfo("Settings loaded");
             }
             catch (Exception ex)
@@ -135,6 +200,7 @@ namespace WinCleaner.ViewModels
                 await _themeStore.SetTransparencyEnabledAsync(EnableTransparency);
                 await _themeStore.SetUiScaleAsync(UiScale);
                 await _themeStore.SetUseSystemThemeAsync(UseSystemTheme);
+                await _themeStore.SetUpdateSettingsAsync(AutoCheckUpdates, UpdateChannel, AutoDownloadUpdates, AutoInstallUpdates);
 
                 // Update settings
                 Settings.Theme = UseSystemTheme ? "System" : SelectedTheme.ToString();
@@ -278,6 +344,61 @@ namespace WinCleaner.ViewModels
         private void RemoveCustomPath(string path)
         {
             CustomPaths.Remove(path);
+        }
+
+        [RelayCommand]
+        private async Task CheckForUpdatesAsync()
+        {
+            try
+            {
+                IsBusy = true;
+                var update = await _updateService.CheckForUpdatesAsync();
+                if (update != null)
+                {
+                    AvailableUpdate = update;
+                    IsUpdateAvailable = true;
+                }
+            }
+            catch (Exception ex)
+            {
+                LogError($"Update check failed: {ex.Message}");
+            }
+            finally
+            {
+                IsBusy = false;
+            }
+        }
+
+        [RelayCommand]
+        private async Task DownloadAndInstallUpdateAsync()
+        {
+            if (AvailableUpdate == null) return;
+
+            try
+            {
+                IsBusy = true;
+                var progress = new Progress<double>(p => UpdateProgress = p);
+                var success = await _updateService.DownloadAndInstallUpdateAsync(AvailableUpdate, progress);
+                if (success)
+                {
+                    LogSuccess("Update installed, restarting...");
+                }
+            }
+            catch (Exception ex)
+            {
+                LogError($"Update failed: {ex.Message}");
+            }
+            finally
+            {
+                IsBusy = false;
+            }
+        }
+
+        [RelayCommand]
+        private void DismissUpdate()
+        {
+            IsUpdateAvailable = false;
+            AvailableUpdate = null;
         }
     }
 }

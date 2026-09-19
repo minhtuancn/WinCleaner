@@ -13,6 +13,13 @@ namespace WinCleaner.Models
         System
     }
 
+    public enum UpdateChannel
+    {
+        Stable,
+        Beta,
+        Preview
+    }
+
     public class ThemeSettings : ObservableObject
     {
         private AppTheme _currentTheme = AppTheme.System;
@@ -21,6 +28,14 @@ namespace WinCleaner.Models
         private bool _enableAnimations = true;
         private bool _enableTransparency = true;
         private double _uiScale = 1.0;
+
+        // Update settings
+        private bool _autoCheckUpdates = true;
+        private UpdateChannel _updateChannel = UpdateChannel.Stable;
+        private bool _autoDownloadUpdates = false;
+        private bool _autoInstallUpdates = false;
+        private DateTime? _lastUpdateCheck;
+        private string? _lastKnownVersion;
 
         public AppTheme CurrentTheme
         {
@@ -66,6 +81,43 @@ namespace WinCleaner.Models
             _ => "System Default"
         };
 
+        // Update settings properties
+        public bool AutoCheckUpdates
+        {
+            get => _autoCheckUpdates;
+            set => SetProperty(ref _autoCheckUpdates, value);
+        }
+
+        public UpdateChannel UpdateChannel
+        {
+            get => _updateChannel;
+            set => SetProperty(ref _updateChannel, value);
+        }
+
+        public bool AutoDownloadUpdates
+        {
+            get => _autoDownloadUpdates;
+            set => SetProperty(ref _autoDownloadUpdates, value);
+        }
+
+        public bool AutoInstallUpdates
+        {
+            get => _autoInstallUpdates;
+            set => SetProperty(ref _autoInstallUpdates, value);
+        }
+
+        public DateTime? LastUpdateCheck
+        {
+            get => _lastUpdateCheck;
+            set => SetProperty(ref _lastUpdateCheck, value);
+        }
+
+        public string? LastKnownVersion
+        {
+            get => _lastKnownVersion;
+            set => SetProperty(ref _lastKnownVersion, value);
+        }
+
         /// <summary>
         /// Creates a deep clone of the ThemeSettings for change tracking
         /// </summary>
@@ -78,7 +130,13 @@ namespace WinCleaner.Models
                 AccentColor = AccentColor,
                 EnableAnimations = EnableAnimations,
                 EnableTransparency = EnableTransparency,
-                UiScale = UiScale
+                UiScale = UiScale,
+                AutoCheckUpdates = AutoCheckUpdates,
+                UpdateChannel = UpdateChannel,
+                AutoDownloadUpdates = AutoDownloadUpdates,
+                AutoInstallUpdates = AutoInstallUpdates,
+                LastUpdateCheck = LastUpdateCheck,
+                LastKnownVersion = LastKnownVersion
             };
         }
     }

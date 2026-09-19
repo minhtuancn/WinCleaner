@@ -18,6 +18,7 @@ namespace WinCleaner.Services
         List<Winapp2Entry> FilterEnabledEntries(List<Winapp2Database> databases);
         string ExpandEnvironmentVariables(string path);
         bool CheckDetection(Winapp2Entry entry);
+        List<Winapp2Entry> ParseIniContent(string content);
     }
 
     public class Winapp2Service : IWinapp2Service
@@ -300,12 +301,13 @@ namespace WinCleaner.Services
             return false;
         }
 
-        private List<Winapp2Entry> ParseIniContent(string content)
+        public List<Winapp2Entry> ParseIniContent(string content)
         {
             var entries = new List<Winapp2Entry>();
             var lines = content.Split(new[] { '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries);
             
             Winapp2Entry currentEntry = null;
+            var currentEntryLines = new List<string>();
             int lineNumber = 0;
 
             foreach (var rawLine in lines)
@@ -322,6 +324,7 @@ namespace WinCleaner.Services
                     // Save previous entry
                     if (currentEntry != null && !string.IsNullOrEmpty(currentEntry.Name))
                     {
+                        currentEntry.RawText = string.Join("\n", currentEntryLines);
                         entries.Add(currentEntry);
                     }
 
@@ -330,12 +333,14 @@ namespace WinCleaner.Services
                     {
                         Section = line.Substring(1, line.Length - 2).Trim()
                     };
+                    currentEntryLines.Clear();
+                    currentEntryLines.Add(rawLine);
                     continue;
                 }
 
                 if (currentEntry == null) continue;
 
-                // Parse key=value
+                currentEntryLines.Add(rawLine);
                 int eqIndex = line.IndexOf('=');
                 if (eqIndex <= 0) continue;
 
@@ -382,6 +387,14 @@ namespace WinCleaner.Services
                     case "regkey5":
                         currentEntry.RegKeys.Add(ParseRegKey(value));
                         break;
+                    case "excludekey":
+                    case "excludekey1":
+                    case "excludekey2":
+                    case "excludekey3":
+                    case "excludekey4":
+                    case "excludekey5":
+                        currentEntry.ExcludeKeys.Add(ParseExcludeKey(value));
+                        break;
                 }
             }
 
@@ -426,6 +439,22 @@ namespace WinCleaner.Services
             };
 
             return regKey;
+        }
+
+        private Winapp2ExcludeKey ParseExcludeKey(string value)
+        {
+            // Format: Path|Pattern|Recurse
+            // Example: %AppData%\Mozilla\Firefox\Profiles\*|*.sqlite|RECURSE
+            var parts = value.Split('|');
+            
+            var excludeKey = new Winapp2ExcludeKey
+            {
+                Path = parts.Length > 0 ? parts[0].Trim() : "",
+                Pattern = parts.Length > 1 ? parts[1].Trim() : "*.*",
+                Recurse = parts.Length > 2 && parts[2].Trim().Equals("RECURSE", StringComparison.OrdinalIgnoreCase)
+            };
+
+            return excludeKey;
         }
     }
 }

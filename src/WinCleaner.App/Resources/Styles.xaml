@@ -165,13 +165,6 @@
         <Setter Property="Foreground" Value="White"/>
     </Style>
 
-    <Style TargetType="Button" BasedOn="{StaticResource BaseButtonStyle}" x:Key="SecondaryButtonStyle">
-        <Setter Property="Background" Value="{StaticResource SurfaceBrush}"/>
-        <Setter Property="Foreground" Value="{StaticResource TextPrimaryBrush}"/>
-        <Setter Property="BorderBrush" Value="{StaticResource BorderBrush}"/>
-        <Setter Property="BorderThickness" Value="1"/>
-    </Style>
-
     <Style TargetType="Button" BasedOn="{StaticResource BaseButtonStyle}" x:Key="DangerButtonStyle">
         <Setter Property="Background" Value="{StaticResource ErrorBrush}"/>
         <Setter Property="Foreground" Value="White"/>

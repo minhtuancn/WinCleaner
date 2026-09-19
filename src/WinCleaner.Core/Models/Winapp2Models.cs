@@ -31,6 +31,7 @@ namespace WinCleaner.Models
         private int _rebootOk = 0;
         private List<Winapp2FileKey> _fileKeys = new();
         private List<Winapp2RegKey> _regKeys = new();
+        private List<Winapp2ExcludeKey> _excludeKeys = new();
         private string _sourceDatabase = "";
         private bool _isEnabled = true;
         private long _estimatedSize = 0;
@@ -96,6 +97,12 @@ namespace WinCleaner.Models
             set => SetProperty(ref _regKeys, value);
         }
 
+        public List<Winapp2ExcludeKey> ExcludeKeys
+        {
+            get => _excludeKeys;
+            set => SetProperty(ref _excludeKeys, value);
+        }
+
         public string SourceDatabase
         {
             get => _sourceDatabase;
@@ -121,6 +128,8 @@ namespace WinCleaner.Models
         }
 
         public string EstimatedSizeFormatted => FormatBytes(EstimatedSize);
+
+        public string RawText { get; set; } = "";
 
         public bool HasDetection => !string.IsNullOrEmpty(Detect) || !string.IsNullOrEmpty(DetectFile) || !string.IsNullOrEmpty(DetectOS);
 
@@ -234,6 +243,31 @@ namespace WinCleaner.Models
         {
             get => _valueName;
             set => SetProperty(ref _valueName, value);
+        }
+
+        public bool Recurse
+        {
+            get => _recurse;
+            set => SetProperty(ref _recurse, value);
+        }
+    }
+
+    public class Winapp2ExcludeKey : ObservableObject
+    {
+        private string _path = "";
+        private string _pattern = "*.*";
+        private bool _recurse = false;
+
+        public string Path
+        {
+            get => _path;
+            set => SetProperty(ref _path, value);
+        }
+
+        public string Pattern
+        {
+            get => _pattern;
+            set => SetProperty(ref _pattern, value);
         }
 
         public bool Recurse

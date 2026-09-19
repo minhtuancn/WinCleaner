@@ -523,7 +523,8 @@ namespace WinCleaner.Services
                 }
 
                 // Fallback: use file creation time
-                var location = assembly.Location;
+                var baseDir = AppContext.BaseDirectory;
+                var location = Path.Combine(baseDir, "WinCleaner.dll");
                 if (File.Exists(location))
                     return File.GetCreationTimeUtc(location).ToString("yyyy-MM-dd");
             }
