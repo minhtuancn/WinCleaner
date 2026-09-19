@@ -59,6 +59,61 @@
                     └─────────────────┘
 ```
 
+### Project Structure
+
+```
+WinCleaner/
+├── src/
+│   ├── WinCleaner.Core/                 # Domain models, services, parser (net8.0)
+│   │   ├── Models/                      # CleanModels, Winapp2Models, AppxModels, etc.
+│   │   ├── Services/                    # Parser, Scanner, Cleaner, Scheduler, Cookie, AI, etc.
+│   │   ├── Resources/                   # Embedded JSON localization (en, vi, de, fr, zh-CN, zh-TW)
+│   │   └── WinCleaner.Core.csproj
+│   ├── WinCleaner.Infrastructure.Windows/ # WPF converters, ThemeService, WindowState (net8.0-windows)
+│   │   ├── Models/Converters.cs         # All IValueConverter implementations
+│   │   ├── Services/                    # ThemeService, WindowStateService, WpfCrashHandler
+│   │   └── WinCleaner.Infrastructure.Windows.csproj
+│   ├── WinCleaner.App/                  # WPF Application (net8.0-windows)
+│   │   ├── ViewModels/                  # ShellViewModel + 7 page ViewModels
+│   │   ├── Views/                       # ShellWindow + 7 page Views (XAML)
+│   │   ├── Design/                      # Design System (ColorPalette, Typography, Spacing, Icons)
+│   │   ├── Resources/                   # Styles.xaml, Converters.xaml, Themes/
+│   │   ├── Assets/                      # PNG icons for MSIX packaging
+│   │   ├── Package.appxmanifest         # MSIX manifest
+│   │   ├── Properties/PublishProfiles/  # MSIX publish profile
+│   │   └── WinCleaner.App.csproj
+│   ├── WinCleaner.Cli/                  # CLI Application (net8.0)
+│   │   ├── CLI/Program.cs               # System.CommandLine commands
+│   │   └── WinCleaner.Cli.csproj
+│   └── WinCleaner.Inspector/            # Blazor WASM Inspector (net8.0, disabled - build issues)
+├── tests/
+│   ├── WinCleaner.Tests.Unit/           # xUnit + Moq + FluentAssertions (48 tests)
+│   └── WinCleaner.Tests.Integration/    # Integration tests (placeholder)
+├── docs/
+│   └── architecture/                    # Architecture docs, feature-matrix.md
+├── .github/
+│   ├── workflows/                       # CI, Beta build, Release build
+│   ├── ISSUE_TEMPLATE/                  # Bug report, Feature request
+│   ├── dependabot.yml                   # Automated dependency updates
+│   ├── PULL_REQUEST_TEMPLATE.md
+│   ├── CODEOWNERS
+│   └── LABELS.md
+├── WinCleaner.sln
+├── Directory.Build.props                # Central build config, analyzers, warnings
+├── Directory.Packages.props             # Central package management
+├── Version.props / version.json         # Single source of truth for version
+├── global.json                          # .NET SDK version pinning
+├── .editorconfig                        # Consistent formatting
+├── renovate.json                        # Advanced dependency automation
+├── CODEOWNERS                           # Code ownership for reviews
+├── SECURITY.md                          # Vulnerability reporting policy
+├── CONTRIBUTING.md                      # Development guide
+├── ROADMAP.md                           # Milestone-based roadmap
+├── CHANGELOG.md                         # Version history
+├── LICENSE                              # MIT License
+└── README.md
+```
+
 ### Key Design Principles
 
 - **Clean Architecture**: Core is platform-agnostic; Windows-specific code isolated
