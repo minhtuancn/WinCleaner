@@ -1,0 +1,241 @@
+﻿<UserControl x:Class="WinCleaner.Views.HealthCheckView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:vm="clr-namespace:WinCleaner.ViewModels"
+             xmlns:design="clr-namespace:WinCleaner.Design"
+             mc:Ignorable="d"
+             d:DataContext="{d:DesignInstance Type=vm:HealthCheckViewModel, IsDesignTimeCreatable=False}">
+
+    <UserControl.Resources>
+        <SolidColorBrush x:Key="CatWarningBrush" Color="#FF8C00"/>
+        <SolidColorBrush x:Key="CatInfoBrush" Color="#0078D4"/>
+        <SolidColorBrush x:Key="CatPrimaryBrush" Color="#0078D4"/>
+        <SolidColorBrush x:Key="CatSuccessBrush" Color="#107C10"/>
+        <SolidColorBrush x:Key="CatErrorBrush" Color="#D13438"/>
+        <SolidColorBrush x:Key="CatSecondaryBrush" Color="#605E5C"/>
+
+        <Style x:Key="CategoryBarStyle" TargetType="Border">
+            <Setter Property="Height" Value="28"/>
+            <Setter Property="CornerRadius" Value="4"/>
+            <Setter Property="Margin" Value="0,2"/>
+        </Style>
+    </UserControl.Resources>
+
+    <ScrollViewer VerticalScrollBarVisibility="Auto" Padding="{StaticResource SpacingLg}">
+        <StackPanel>
+
+            <!-- Header Row: Title + System Drive Summary -->
+            <Border Style="{StaticResource CardStyle}" Padding="{StaticResource SpacingLg}" Margin="0,0,0,24">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+
+                    <!-- Title -->
+                    <StackPanel Grid.Column="0" VerticalAlignment="Center">
+                        <TextBlock Text="Health Check" FontSize="{StaticResource FontSizeXLarge}" FontWeight="Bold" Foreground="{DynamicResource TextPrimaryBrush}"/>
+                        <TextBlock Text="System health &amp; quick clean" FontSize="{StaticResource FontSizeMedium}" Foreground="{DynamicResource TextSecondaryBrush}" Margin="0,4,0,0"/>
+                    </StackPanel>
+
+                    <!-- System Drive Info (center) -->
+                    <Border Grid.Column="1" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="24,0">
+                        <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                            <Path Data="{x:Static design:Icons.Drive}" Fill="{DynamicResource PrimaryBrush}" Width="20" Height="20" Stretch="Uniform" VerticalAlignment="Center" Margin="0,0,12,0"/>
+                            <StackPanel VerticalAlignment="Center">
+                                <TextBlock Text="{Binding SystemDriveInfo}" FontSize="{StaticResource FontSizeMedium}" FontWeight="SemiBold" Foreground="{DynamicResource TextPrimaryBrush}"/>
+                                <TextBlock Text="{Binding DriveSummary}" FontSize="{StaticResource FontSizeSmall}" Foreground="{DynamicResource TextSecondaryBrush}"/>
+                            </StackPanel>
+                        </StackPanel>
+                    </Border>
+
+                    <!-- Primary Action (right) -->
+                    <Button Grid.Column="2" 
+                            Style="{StaticResource PrimaryButtonStyle}"
+                            Command="{Binding ScanAsyncCommand}"
+                            IsEnabled="{Binding IsScanning, Converter={StaticResource InverseBoolConverter}}"
+                            Padding="24,12"
+                            MinWidth="160">
+                        <StackPanel Orientation="Horizontal">
+                            <Path Data="{x:Static design:Icons.Search}" Fill="{DynamicResource TextOnPrimaryBrush}" Width="16" Height="16" Stretch="Uniform" VerticalAlignment="Center" Margin="0,0,8,0"/>
+                            <TextBlock Text="{Binding IsScanning, Converter={StaticResource BoolToTextConverter}, ConverterParameter='Analyze|Scanning...'}" VerticalAlignment="Center" FontWeight="SemiBold"/>
+                        </StackPanel>
+                    </Button>
+                </Grid>
+            </Border>
+
+            <!-- Reclaimable Space (Primary Metric) -->
+            <Border Style="{StaticResource CardStyle}" Padding="{StaticResource SpacingLg}" Margin="0,0,0,24">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+
+                    <Border Grid.Column="0" Width="80" Height="80" CornerRadius="40" Background="{DynamicResource PrimaryLightBrush}">
+                        <TextBlock Text="💾" FontSize="32" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                    </Border>
+
+                    <StackPanel Grid.Column="1" VerticalAlignment="Center" Margin="24,0,0,0">
+                        <TextBlock Text="Reclaimable Space" FontSize="{StaticResource FontSizeMedium}" Foreground="{DynamicResource TextSecondaryBrush}"/>
+                        <TextBlock Text="{Binding ReclaimableFormatted}" FontSize="36" FontWeight="Bold" Foreground="{DynamicResource TextPrimaryBrush}"/>
+                        <TextBlock Text="{Binding IssuesFound, StringFormat='{}{0} items found'}" FontSize="{StaticResource FontSizeSmall}" Foreground="{DynamicResource TextSecondaryBrush}" Margin="0,4,0,0"/>
+                    </StackPanel>
+                </Grid>
+            </Border>
+
+            <!-- Storage Pressure Bar -->
+            <Border Style="{StaticResource CardStyle}" Padding="{StaticResource SpacingLg}" Margin="0,0,0,24" Visibility="{Binding StoragePressurePercent, Converter={StaticResource GreaterThanZeroToVisibilityConverter}}">
+                <StackPanel>
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="Auto"/>
+                        </Grid.ColumnDefinitions>
+                        <TextBlock Grid.Column="0" Text="Storage Pressure" FontSize="{StaticResource FontSizeMedium}" FontWeight="SemiBold" Foreground="{DynamicResource TextPrimaryBrush}" VerticalAlignment="Center"/>
+                        <TextBlock Grid.Column="2" Text="{Binding StoragePressurePercent, StringFormat='{}{0:F0}% used'}" FontSize="{StaticResource FontSizeMedium}" FontWeight="SemiBold" Foreground="{DynamicResource TextPrimaryBrush}" VerticalAlignment="Center"/>
+                    </Grid>
+                    <ProgressBar Grid.ColumnSpan="3" Height="8" Value="{Binding StoragePressurePercent}" Maximum="100" Margin="0,8,0,0" Background="{DynamicResource BorderBrush}" Foreground="{DynamicResource PrimaryBrush}" BorderThickness="0"/>
+                </StackPanel>
+            </Border>
+
+            <!-- Reclaimable Breakdown (Horizontal Bar Chart) -->
+            <Border Style="{StaticResource CardStyle}" Padding="{StaticResource SpacingLg}" Margin="0,0,0,24" Visibility="{Binding ReclaimableBreakdown.Count, Converter={StaticResource GreaterThanZeroToVisibilityConverter}}">
+                <StackPanel>
+                    <TextBlock Text="Reclaimable Breakdown" FontSize="{StaticResource FontSizeMedium}" FontWeight="SemiBold" Foreground="{DynamicResource TextPrimaryBrush}" Margin="0,0,0,12"/>
+                    <ItemsControl ItemsSource="{Binding ReclaimableBreakdown}">
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate>
+                                <StackPanel Margin="0,4">
+                                    <Grid>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="Auto"/>
+                                            <ColumnDefinition Width="*"/>
+                                            <ColumnDefinition Width="Auto"/>
+                                        </Grid.ColumnDefinitions>
+                                        <TextBlock Grid.Column="0" Text="{Binding DisplayName}" FontSize="{StaticResource FontSizeSmall}" Foreground="{DynamicResource TextSecondaryBrush}" VerticalAlignment="Center" Width="140"/>
+                                        <Border Grid.Column="1" Height="20" Margin="12,0" Width="{Binding PercentOfTotal, Converter={StaticResource PercentToWidthConverter}, ConverterParameter=300}">
+                                            <Border.Style>
+                                                <Style TargetType="Border" BasedOn="{StaticResource CategoryBarStyle}">
+                                                    <Style.Triggers>
+                                                        <DataTrigger Binding="{Binding ColorKey}" Value="Warning">
+                                                            <Setter Property="Background" Value="{StaticResource CatWarningBrush}"/>
+                                                        </DataTrigger>
+                                                        <DataTrigger Binding="{Binding ColorKey}" Value="Info">
+                                                            <Setter Property="Background" Value="{StaticResource CatInfoBrush}"/>
+                                                        </DataTrigger>
+                                                        <DataTrigger Binding="{Binding ColorKey}" Value="Primary">
+                                                            <Setter Property="Background" Value="{StaticResource CatPrimaryBrush}"/>
+                                                        </DataTrigger>
+                                                        <DataTrigger Binding="{Binding ColorKey}" Value="Success">
+                                                            <Setter Property="Background" Value="{StaticResource CatSuccessBrush}"/>
+                                                        </DataTrigger>
+                                                        <DataTrigger Binding="{Binding ColorKey}" Value="Error">
+                                                            <Setter Property="Background" Value="{StaticResource CatErrorBrush}"/>
+                                                        </DataTrigger>
+                                                        <DataTrigger Binding="{Binding ColorKey}" Value="Secondary">
+                                                            <Setter Property="Background" Value="{StaticResource CatSecondaryBrush}"/>
+                                                        </DataTrigger>
+                                                    </Style.Triggers>
+                                                </Style>
+                                            </Border.Style>
+                                            <TextBlock Text="{Binding SizeFormatted}" FontSize="10" Foreground="White" HorizontalAlignment="Right" VerticalAlignment="Center" Margin="0,0,8,0" Visibility="{Binding PercentOfTotal, Converter={StaticResource GreaterThanFiveToVisibilityConverter}}"/>
+                                        </Border>
+                                        <TextBlock Grid.Column="2" Text="{Binding SizeFormatted}" FontSize="{StaticResource FontSizeSmall}" FontWeight="Medium" Foreground="{DynamicResource TextPrimaryBrush}" VerticalAlignment="Center" Margin="12,0,0,0" MinWidth="80" TextAlignment="Right"/>
+                                    </Grid>
+                                </StackPanel>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+                </StackPanel>
+            </Border>
+
+            <!-- System Info Block (Single compact block per #27) -->
+            <Border Style="{StaticResource CardStyle}" Padding="{StaticResource SpacingLg}" Margin="0,0,0,24" Visibility="{Binding SystemInfo.OSVersion, Converter={StaticResource StringNotEmptyToVisibilityConverter}}">
+                <StackPanel>
+                    <TextBlock Text="System Information" FontSize="{StaticResource FontSizeMedium}" FontWeight="SemiBold" Foreground="{DynamicResource TextPrimaryBrush}" Margin="0,0,0,12"/>
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                        </Grid.RowDefinitions>
+
+                        <!-- OS -->
+                        <Path Grid.Row="0" Grid.Column="0" Data="{x:Static design:Icons.Monitor}" Fill="{DynamicResource TextSecondaryBrush}" Width="16" Height="16" Stretch="Uniform" VerticalAlignment="Center" Margin="0,0,8,8"/>
+                        <StackPanel Grid.Row="0" Grid.Column="1" Margin="0,0,0,8">
+                            <TextBlock Text="OS" FontSize="{StaticResource FontSizeSmall}" Foreground="{DynamicResource TextDisabledBrush}"/>
+                            <TextBlock Text="{Binding SystemInfo.OSVersion}" FontSize="{StaticResource FontSizeSmall}" FontWeight="Medium" Foreground="{DynamicResource TextPrimaryBrush}"/>
+                        </StackPanel>
+
+                        <!-- CPU -->
+                        <Path Grid.Row="0" Grid.Column="2" Data="{x:Static design:Icons.Cpu}" Fill="{DynamicResource TextSecondaryBrush}" Width="16" Height="16" Stretch="Uniform" VerticalAlignment="Center" Margin="0,0,8,8"/>
+                        <StackPanel Grid.Row="0" Grid.Column="3" Margin="0,0,0,8">
+                            <TextBlock Text="CPU" FontSize="{StaticResource FontSizeSmall}" Foreground="{DynamicResource TextDisabledBrush}"/>
+                            <TextBlock Text="{Binding SystemInfo.OSArchitecture}" FontSize="{StaticResource FontSizeSmall}" FontWeight="Medium" Foreground="{DynamicResource TextPrimaryBrush}"/>
+                        </StackPanel>
+
+                        <!-- RAM -->
+                        <Path Grid.Row="1" Grid.Column="0" Data="{x:Static design:Icons.Memory}" Fill="{DynamicResource TextSecondaryBrush}" Width="16" Height="16" Stretch="Uniform" VerticalAlignment="Center" Margin="0,0,8,0"/>
+                        <StackPanel Grid.Row="1" Grid.Column="1" Margin="0,0,0,0">
+                            <TextBlock Text="RAM" FontSize="{StaticResource FontSizeSmall}" Foreground="{DynamicResource TextDisabledBrush}"/>
+                            <TextBlock Text="{Binding SystemInfo.TotalPhysicalMemory, StringFormat='{}{0} GB'}" FontSize="{StaticResource FontSizeSmall}" FontWeight="Medium" Foreground="{DynamicResource TextPrimaryBrush}"/>
+                        </StackPanel>
+
+                        <!-- User -->
+                        <Path Grid.Row="1" Grid.Column="2" Data="{x:Static design:Icons.Windows}" Fill="{DynamicResource TextSecondaryBrush}" Width="16" Height="16" Stretch="Uniform" VerticalAlignment="Center" Margin="0,0,8,0"/>
+                        <StackPanel Grid.Row="1" Grid.Column="3" Margin="0,0,0,0">
+                            <TextBlock Text="User" FontSize="{StaticResource FontSizeSmall}" Foreground="{DynamicResource TextDisabledBrush}"/>
+                            <TextBlock Text="{Binding SystemInfo.CurrentUser}" FontSize="{StaticResource FontSizeSmall}" FontWeight="Medium" Foreground="{DynamicResource TextPrimaryBrush}"/>
+                        </StackPanel>
+                    </Grid>
+                </StackPanel>
+            </Border>
+
+            <!-- Categories List (Collapsible) -->
+            <Border Style="{StaticResource CardStyle}" Padding="{StaticResource SpacingLg}" Visibility="{Binding Categories.Count, Converter={StaticResource GreaterThanZeroToVisibilityConverter}}">
+                <StackPanel>
+                    <TextBlock Text="Categories" FontSize="{StaticResource FontSizeMedium}" FontWeight="SemiBold" Foreground="{DynamicResource TextPrimaryBrush}" Margin="0,0,0,12"/>
+                    <ItemsControl ItemsSource="{Binding Categories}">
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate>
+                                <Border Style="{StaticResource ListItemStyle}" Margin="0,2" Padding="{StaticResource SpacingMd}">
+                                    <Grid>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="Auto"/>
+                                            <ColumnDefinition Width="*"/>
+                                            <ColumnDefinition Width="Auto"/>
+                                            <ColumnDefinition Width="Auto"/>
+                                        </Grid.ColumnDefinitions>
+
+                                        <Path Grid.Column="0" Data="{Binding Category, Converter={StaticResource CategoryToIconConverter}}" Fill="{DynamicResource TextSecondaryBrush}" Width="18" Height="18" Stretch="Uniform" VerticalAlignment="Center" Margin="0,0,12,0"/>
+                                        <StackPanel Grid.Column="1" VerticalAlignment="Center">
+                                            <TextBlock Text="{Binding Name}" FontSize="{StaticResource FontSizeMedium}" FontWeight="Medium" Foreground="{DynamicResource TextPrimaryBrush}"/>
+                                            <TextBlock Text="{Binding ItemCount, StringFormat='{}{0} items'}" FontSize="{StaticResource FontSizeSmall}" Foreground="{DynamicResource TextSecondaryBrush}"/>
+                                        </StackPanel>
+                                        <TextBlock Grid.Column="2" Text="{Binding SizeFormatted}" FontSize="{StaticResource FontSizeMedium}" FontWeight="SemiBold" Foreground="{DynamicResource TextPrimaryBrush}" VerticalAlignment="Center" Margin="16,0"/>
+                                        <Border Grid.Column="3" Padding="6,2" CornerRadius="4" Background="{Binding RiskLevel, Converter={StaticResource RiskLevelToBrushConverter}}" Margin="16,0,0,0">
+                                            <TextBlock Text="{Binding RiskLevel}" FontSize="10" FontWeight="Bold" Foreground="White" VerticalAlignment="Center"/>
+                                        </Border>
+                                    </Grid>
+                                </Border>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+                </StackPanel>
+            </Border>
+
+            <!-- Last Scan Time -->
+            <TextBlock Text="{Binding LastScanTime, StringFormat='{}Last scan: {0}'}" FontSize="{StaticResource FontSizeSmall}" Foreground="{DynamicResource TextDisabledBrush}" HorizontalAlignment="Right" Margin="0,24,0,0"/>
+        </StackPanel>
+    </ScrollViewer>
+</UserControl>

@@ -1,0 +1,248 @@
+﻿<UserControl x:Class="WinCleaner.Views.DiagnosticsView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:vm="clr-namespace:WinCleaner.ViewModels"
+             xmlns:design="clr-namespace:WinCleaner.Design"
+             mc:Ignorable="d"
+             d:DataContext="{d:DesignInstance Type=vm:DiagnosticsViewModel, IsDesignTimeCreatable=False}">
+
+    <ScrollViewer VerticalScrollBarVisibility="Auto" Padding="{StaticResource SpacingLg}">
+        <StackPanel>
+
+            <!-- Header -->
+            <Border Style="{StaticResource CardStyle}" Padding="{StaticResource SpacingLg}" Margin="0,0,0,24">
+                <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                    <Border Width="32" Height="32" CornerRadius="{StaticResource RadiusMd}" Background="{DynamicResource PrimaryBrush}">
+                        <Path Data="{x:Static design:Icons.Info}" Fill="{DynamicResource TextOnPrimaryBrush}" Width="16" Height="16" Stretch="Uniform" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                    </Border>
+                    <StackPanel Margin="12,0,0,0" VerticalAlignment="Center">
+                        <TextBlock Text="Diagnostics" FontSize="{StaticResource FontSizeXLarge}" FontWeight="Bold" Foreground="{DynamicResource TextPrimaryBrush}"/>
+                        <TextBlock Text="Logs, crash reports &amp; health" FontSize="{StaticResource FontSizeMedium}" Foreground="{DynamicResource TextSecondaryBrush}"/>
+                    </StackPanel>
+                </StackPanel>
+            </Border>
+
+            <!-- Health Status -->
+            <Border Style="{StaticResource CardStyle}" Padding="{StaticResource SpacingLg}" Margin="0,0,0,24" Visibility="{Binding HealthStatus, Converter={StaticResource NotNullToVisibilityConverter}}">
+                <StackPanel>
+                    <TextBlock Text="Application Health" FontSize="{StaticResource FontSizeMedium}" FontWeight="SemiBold" Foreground="{DynamicResource TextPrimaryBrush}" Margin="0,0,0,12"/>
+
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+
+                        <!-- Overall Status -->
+                        <Border Grid.Column="0" Grid.ColumnSpan="2" Style="{StaticResource CardStyle}" Padding="16,12" Margin="0,0,16,0" Background="{Binding HealthStatus.OverallStatus, Converter={StaticResource HealthStatusToBrushConverter}}">
+                            <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                                <Path Data="{Binding HealthStatus.OverallStatus, Converter={StaticResource HealthStatusToIconConverter}}" Fill="White" Width="24" Height="24" Stretch="Uniform" Margin="0,0,8,0" VerticalAlignment="Center"/>
+                                <StackPanel VerticalAlignment="Center">
+                                    <TextBlock Text="Overall Health" FontSize="{StaticResource FontSizeSmall}" Foreground="White" Opacity="0.8"/>
+                                    <TextBlock Text="{Binding HealthStatus.OverallStatus}" FontSize="{StaticResource FontSizeLarge}" FontWeight="Bold" Foreground="White"/>
+                                </StackPanel>
+                            </StackPanel>
+                        </Border>
+
+                        <!-- Memory -->
+                        <Border Grid.Column="2" Grid.ColumnSpan="2" Style="{StaticResource CardStyle}" Padding="16,12" Margin="8,0,16,0">
+                            <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                                <Path Data="{x:Static design:Icons.Memory}" Fill="{DynamicResource PrimaryBrush}" Width="24" Height="24" Stretch="Uniform" Margin="0,0,8,0" VerticalAlignment="Center"/>
+                                <StackPanel VerticalAlignment="Center">
+                                    <TextBlock Text="Memory" FontSize="{StaticResource FontSizeSmall}" Foreground="{DynamicResource TextDisabledBrush}"/>
+                                    <TextBlock Text="{Binding HealthStatus.MemoryUsagePercent, StringFormat='{}{0:F1}% used'}" FontSize="{StaticResource FontSizeMedium}" FontWeight="SemiBold" Foreground="{DynamicResource TextPrimaryBrush}"/>
+                                </StackPanel>
+                            </StackPanel>
+                        </Border>
+
+                        <!-- Disk -->
+                        <Border Grid.Column="4" Grid.ColumnSpan="2" Style="{StaticResource CardStyle}" Padding="16,12">
+                            <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                                <Path Data="{x:Static design:Icons.Drive}" Fill="{DynamicResource WarningBrush}" Width="24" Height="24" Stretch="Uniform" Margin="0,0,8,0" VerticalAlignment="Center"/>
+                                <StackPanel VerticalAlignment="Center">
+                                    <TextBlock Text="Disk" FontSize="{StaticResource FontSizeSmall}" Foreground="{DynamicResource TextDisabledBrush}"/>
+                                    <TextBlock Text="{Binding HealthStatus.DiskUsagePercent, StringFormat='{}{0:F1}% used'}" FontSize="{StaticResource FontSizeMedium}" FontWeight="SemiBold" Foreground="{DynamicResource TextPrimaryBrush}"/>
+                                </StackPanel>
+                            </StackPanel>
+                        </Border>
+                    </Grid>
+                </StackPanel>
+            </Border>
+
+            <!-- Snapshot Info -->
+            <Border Style="{StaticResource CardStyle}" Padding="{StaticResource SpacingLg}" Margin="0,0,0,24" Visibility="{Binding Snapshot, Converter={StaticResource NotNullToVisibilityConverter}}">
+                <StackPanel>
+                    <TextBlock Text="System Snapshot" FontSize="{StaticResource FontSizeMedium}" FontWeight="SemiBold" Foreground="{DynamicResource TextPrimaryBrush}" Margin="0,0,0,12"/>
+
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                        </Grid.RowDefinitions>
+
+                        <TextBlock Grid.Row="0" Grid.Column="0" Text="App Version:" FontSize="{StaticResource FontSizeSmall}" Foreground="{DynamicResource TextDisabledBrush}" VerticalAlignment="Center"/>
+                        <TextBlock Grid.Row="0" Grid.Column="1" Text="{Binding Snapshot.App.Version}" FontSize="{StaticResource FontSizeSmall}" FontWeight="Medium" Foreground="{DynamicResource TextPrimaryBrush}" Margin="8,0,0,4"/>
+
+                        <TextBlock Grid.Row="0" Grid.Column="2" Text="Build Date:" FontSize="{StaticResource FontSizeSmall}" Foreground="{DynamicResource TextDisabledBrush}" VerticalAlignment="Center" Margin="24,0,0,4"/>
+                        <TextBlock Grid.Row="0" Grid.Column="3" Text="{Binding Snapshot.App.BuildDate}" FontSize="{StaticResource FontSizeSmall}" FontWeight="Medium" Foreground="{DynamicResource TextPrimaryBrush}" Margin="0,0,0,4"/>
+
+                        <TextBlock Grid.Row="1" Grid.Column="0" Text="OS:" FontSize="{StaticResource FontSizeSmall}" Foreground="{DynamicResource TextDisabledBrush}" VerticalAlignment="Center"/>
+                        <TextBlock Grid.Row="1" Grid.Column="1" Text="{Binding Snapshot.System.OSVersion}" FontSize="{StaticResource FontSizeSmall}" FontWeight="Medium" Foreground="{DynamicResource TextPrimaryBrush}" Margin="8,0,0,4"/>
+
+                        <TextBlock Grid.Row="1" Grid.Column="2" Text=".NET Version:" FontSize="{StaticResource FontSizeSmall}" Foreground="{DynamicResource TextDisabledBrush}" VerticalAlignment="Center" Margin="24,0,0,4"/>
+                        <TextBlock Grid.Row="1" Grid.Column="3" Text="{Binding Snapshot.Runtime.DotNetVersion}" FontSize="{StaticResource FontSizeSmall}" FontWeight="Medium" Foreground="{DynamicResource TextPrimaryBrush}" Margin="0,0,0,4"/>
+
+                        <TextBlock Grid.Row="2" Grid.Column="0" Text="Memory:" FontSize="{StaticResource FontSizeSmall}" Foreground="{DynamicResource TextDisabledBrush}" VerticalAlignment="Center"/>
+                        <TextBlock Grid.Row="1" Grid.Column="1" Text="{Binding Snapshot.Runtime.WorkingSetMemory, Converter={StaticResource BytesToStringConverter}}" FontSize="{StaticResource FontSizeSmall}" FontWeight="Medium" Foreground="{DynamicResource TextPrimaryBrush}" Margin="8,0,0,4"/>
+
+                        <TextBlock Grid.Row="2" Grid.Column="0" Text="Threads:" FontSize="{StaticResource FontSizeSmall}" Foreground="{DynamicResource TextDisabledBrush}" VerticalAlignment="Center" Margin="24,0,0,4"/>
+                        <TextBlock Grid.Row="2" Grid.Column="3" Text="{Binding Snapshot.Runtime.ThreadCount}" FontSize="{StaticResource FontSizeSmall}" FontWeight="Medium" Foreground="{DynamicResource TextPrimaryBrush}" Margin="0,0,0,4"/>
+                    </Grid>
+                </StackPanel>
+            </Border>
+
+            <!-- Recent Logs -->
+            <Border Style="{StaticResource CardStyle}" Padding="{StaticResource SpacingLg}" Margin="0,0,0,24" Visibility="{Binding RecentLogs.Count, Converter={StaticResource GreaterThanZeroToVisibilityConverter}}">
+                <StackPanel>
+                    <Grid Margin="0,0,0,12">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="Auto"/>
+                        </Grid.ColumnDefinitions>
+                        <TextBlock Grid.Column="0" Text="Recent Logs" FontSize="{StaticResource FontSizeMedium}" FontWeight="SemiBold" Foreground="{DynamicResource TextPrimaryBrush}" VerticalAlignment="Center"/>
+                        <Button Grid.Column="2" Style="{StaticResource SecondaryButtonStyle}" Command="{Binding ClearLogsCommand}" Padding="12,6">
+                            <StackPanel Orientation="Horizontal">
+                                <Path Data="{x:Static design:Icons.Trash}" Fill="{DynamicResource TextPrimaryBrush}" Width="14" Height="14" Stretch="Uniform" Margin="0,0,4,0" VerticalAlignment="Center"/>
+                                <TextBlock Text="Clear" VerticalAlignment="Center" FontSize="{StaticResource FontSizeSmall}" FontWeight="SemiBold"/>
+                            </StackPanel>
+                        </Button>
+                    </Grid>
+
+                    <ListView ItemsSource="{Binding RecentLogs}" MaxHeight="300" Background="Transparent" BorderThickness="0">
+                        <ListView.ItemContainerStyle>
+                            <Style TargetType="ListViewItem">
+                                <Setter Property="Padding" Value="4"/>
+                                <Setter Property="Margin" Value="0,1"/>
+                                <Setter Property="Template">
+                                    <Setter.Value>
+                                        <ControlTemplate TargetType="ListViewItem">
+                                            <Border x:Name="border" Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}" Padding="{TemplateBinding Padding}" SnapsToDevicePixels="True">
+                                                <ContentPresenter HorizontalAlignment="Stretch" VerticalAlignment="Center" RecognizesAccessKey="True"/>
+                                            </Border>
+                                            <ControlTemplate.Triggers>
+                                                <Trigger Property="IsMouseOver" Value="True">
+                                                    <Setter TargetName="border" Property="Background" Value="{StaticResource HoverBrush}"/>
+                                                </Trigger>
+                                                <Trigger Property="IsSelected" Value="True">
+                                                    <Setter TargetName="border" Property="Background" Value="{StaticResource PrimaryLightBrush}"/>
+                                                </Trigger>
+                                            </ControlTemplate.Triggers>
+                                        </ControlTemplate>
+                                    </Setter.Value>
+                                </Setter>
+                            </Style>
+                        </ListView.ItemContainerStyle>
+                        <ListView.ItemTemplate>
+                            <DataTemplate>
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="Auto"/>
+                                        <ColumnDefinition Width="Auto"/>
+                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="Auto"/>
+                                    </Grid.ColumnDefinitions>
+                                    <Path Grid.Column="0" Data="{Binding Level, Converter={StaticResource LogLevelToIconConverter}}" Fill="{Binding Level, Converter={StaticResource LogLevelToBrushConverter}}" Width="14" Height="14" Stretch="Uniform" VerticalAlignment="Center" Margin="0,0,8,0"/>
+                                    <TextBlock Grid.Column="1" Text="{Binding FormattedTime}" FontSize="{StaticResource FontSizeSmall}" Foreground="{DynamicResource TextDisabledBrush}" VerticalAlignment="Center" Margin="0,0,8,0"/>
+                                    <TextBlock Grid.Column="2" Text="{Binding Message}" FontSize="{StaticResource FontSizeSmall}" Foreground="{DynamicResource TextPrimaryBrush}" VerticalAlignment="Center" TextWrapping="Wrap"/>
+                                    <TextBlock Grid.Column="3" Text="{Binding Source}" FontSize="{StaticResource FontSizeSmall}" FontWeight="Medium" Foreground="{DynamicResource PrimaryBrush}" VerticalAlignment="Center" Margin="12,0,0,0"/>
+                                </Grid>
+                            </DataTemplate>
+                        </ListView.ItemTemplate>
+                    </ListView>
+                </StackPanel>
+            </Border>
+
+            <!-- Crash Reports -->
+            <Border Style="{StaticResource CardStyle}" Padding="{StaticResource SpacingLg}" Margin="0,0,0,24" Visibility="{Binding CrashReports.Count, Converter={StaticResource GreaterThanZeroToVisibilityConverter}}">
+                <StackPanel>
+                    <TextBlock Text="Crash Reports" FontSize="{StaticResource FontSizeMedium}" FontWeight="SemiBold" Foreground="{DynamicResource TextPrimaryBrush}" Margin="0,0,0,12"/>
+                    <ItemsControl ItemsSource="{Binding CrashReports}">
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate>
+                                <Border Style="{StaticResource ListItemStyle}" Margin="0,4" Padding="{StaticResource SpacingMd}" Background="{DynamicResource ErrorBrush}" Opacity="0.1" BorderBrush="{DynamicResource ErrorBrush}" BorderThickness="1">
+                                    <StackPanel>
+                                        <Grid>
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="Auto"/>
+                                                <ColumnDefinition Width="*"/>
+                                                <ColumnDefinition Width="Auto"/>
+                                            </Grid.ColumnDefinitions>
+                                            <Path Grid.Column="0" Data="{x:Static design:Icons.AlertTriangle}" Fill="{DynamicResource ErrorBrush}" Width="16" Height="16" Stretch="Uniform" VerticalAlignment="Center" Margin="0,0,8,0"/>
+                                            <StackPanel Grid.Column="1" VerticalAlignment="Center">
+                                                <TextBlock Text="{Binding ExceptionType}" FontSize="{StaticResource FontSizeSmall}" FontWeight="Bold" Foreground="{DynamicResource ErrorBrush}"/>
+                                                <TextBlock Text="{Binding Message}" FontSize="{StaticResource FontSizeSmall}" Foreground="{DynamicResource TextSecondaryBrush}" Margin="0,2,0,0" TextTrimming="CharacterEllipsis"/>
+                                            </StackPanel>
+                                            <TextBlock Grid.Column="2" Text="{Binding FormattedTime}" FontSize="{StaticResource FontSizeSmall}" Foreground="{DynamicResource TextDisabledBrush}" VerticalAlignment="Center"/>
+                                        </Grid>
+                                        <TextBlock Text="{Binding StackTrace}" FontSize="10" Foreground="{DynamicResource TextSecondaryBrush}" Margin="0,8,0,0" TextWrapping="Wrap" Visibility="{Binding StackTrace, Converter={StaticResource StringNotEmptyToVisibilityConverter}}"/>
+                                    </StackPanel>
+                                </Border>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+                </StackPanel>
+            </Border>
+
+            <!-- Actions -->
+            <Border Style="{StaticResource CardStyle}" Padding="{StaticResource SpacingLg}" Margin="0,24,0,0">
+                <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+                    <Button Style="{StaticResource SecondaryButtonStyle}" Command="{Binding OpenLogFolderCommand}" Padding="16,8" Margin="0,0,8,0">
+                        <StackPanel Orientation="Horizontal">
+                            <Path Data="{x:Static design:Icons.Folder}" Fill="{DynamicResource TextPrimaryBrush}" Width="16" Height="16" Stretch="Uniform" Margin="0,0,8,0" VerticalAlignment="Center"/>
+                            <TextBlock Text="Open Log Folder" VerticalAlignment="Center" FontWeight="SemiBold"/>
+                        </StackPanel>
+                    </Button>
+                    <Button Style="{StaticResource SecondaryButtonStyle}" Command="{Binding OpenCrashFolderCommand}" Padding="16,8" Margin="0,0,8,0">
+                        <StackPanel Orientation="Horizontal">
+                            <Path Data="{x:Static design:Icons.File}" Fill="{DynamicResource TextPrimaryBrush}" Width="16" Height="16" Stretch="Uniform" Margin="0,0,8,0" VerticalAlignment="Center"/>
+                            <TextBlock Text="Open Crash Folder" VerticalAlignment="Center" FontWeight="SemiBold"/>
+                        </StackPanel>
+                    </Button>
+                    <Button Style="{StaticResource SecondaryButtonStyle}" Command="{Binding ExportDiagnosticsCommand}" Padding="16,8" Margin="0,0,8,0">
+                        <StackPanel Orientation="Horizontal">
+                            <Path Data="{x:Static design:Icons.Download}" Fill="{DynamicResource TextPrimaryBrush}" Width="16" Height="16" Stretch="Uniform" Margin="0,0,8,0" VerticalAlignment="Center"/>
+                            <TextBlock Text="Export Diagnostics" VerticalAlignment="Center" FontWeight="SemiBold"/>
+                        </StackPanel>
+                    </Button>
+                    <Button Style="{StaticResource SecondaryButtonStyle}" Command="{Binding ExportLogsCommand}" Padding="16,8" Margin="0,0,8,0">
+                        <StackPanel Orientation="Horizontal">
+                            <Path Data="{x:Static design:Icons.Download}" Fill="{DynamicResource TextPrimaryBrush}" Width="16" Height="16" Stretch="Uniform" Margin="0,0,8,0" VerticalAlignment="Center"/>
+                            <TextBlock Text="Export Logs" VerticalAlignment="Center" FontWeight="SemiBold"/>
+                        </StackPanel>
+                    </Button>
+                    <Button Style="{StaticResource PrimaryButtonStyle}" Command="{Binding ExportDiagnosticsCommand}" Padding="24,12" MinWidth="160">
+                        <StackPanel Orientation="Horizontal">
+                            <Path Data="{x:Static design:Icons.Check}" Fill="{DynamicResource TextOnPrimaryBrush}" Width="16" Height="16" Stretch="Uniform" Margin="0,0,8,0" VerticalAlignment="Center"/>
+                            <TextBlock Text="Export Full Diagnostics" VerticalAlignment="Center" FontWeight="SemiBold"/>
+                        </StackPanel>
+                    </Button>
+                </StackPanel>
+            </Border>
+
+        </StackPanel>
+    </ScrollViewer>
+</UserControl>

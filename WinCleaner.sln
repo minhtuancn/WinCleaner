@@ -1,0 +1,53 @@
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.0.32212.263
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WinCleaner.Core", "src\WinCleaner.Core\WinCleaner.Core.csproj", "{C8D3E9A1-5B4F-4A7D-9E2F-1A3B4C5D6E7F}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WinCleaner.Infrastructure.Windows", "src\WinCleaner.Infrastructure.Windows\WinCleaner.Infrastructure.Windows.csproj", "{D9E4F0B2-6C5A-4B8E-9F3A-2B4C5D6E7F80}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WinCleaner.App", "src\WinCleaner.App\WinCleaner.App.csproj", "{E0F5A1C3-7D6B-4C9F-A0E1-3C5D6E7F8091}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WinCleaner.Cli", "src\WinCleaner.Cli\WinCleaner.Cli.csproj", "{F1A6B2D4-8E7C-4D0A-B1F2-4D6E7F8091A2}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WinCleaner.Tests.Unit", "tests\WinCleaner.Tests.Unit\WinCleaner.Tests.Unit.csproj", "{A2B3C4D5-9E8F-4A0B-C1D2-E3F4A5B6C7D8}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WinCleaner.Tests.Integration", "tests\WinCleaner.Tests.Integration\WinCleaner.Tests.Integration.csproj", "{B3C4D5E6-A9F0-4B1C-D2E3-F4A5B6C7D8E9}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{C8D3E9A1-5B4F-4A7D-9E2F-1A3B4C5D6E7F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C8D3E9A1-5B4F-4A7D-9E2F-1A3B4C5D6E7F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C8D3E9A1-5B4F-4A7D-9E2F-1A3B4C5D6E7F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C8D3E9A1-5B4F-4A7D-9E2F-1A3B4C5D6E7F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D9E4F0B2-6C5A-4B8E-9F3A-2B4C5D6E7F80}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D9E4F0B2-6C5A-4B8E-9F3A-2B4C5D6E7F80}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D9E4F0B2-6C5A-4B8E-9F3A-2B4C5D6E7F80}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D9E4F0B2-6C5A-4B8E-9F3A-2B4C5D6E7F80}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E0F5A1C3-7D6B-4C9F-A0E1-3C5D6E7F8091}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E0F5A1C3-7D6B-4C9F-A0E1-3C5D6E7F8091}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E0F5A1C3-7D6B-4C9F-A0E1-3C5D6E7F8091}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E0F5A1C3-7D6B-4C9F-A0E1-3C5D6E7F8091}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F1A6B2D4-8E7C-4D0A-B1F2-4D6E7F8091A2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F1A6B2D4-8E7C-4D0A-B1F2-4D6E7F8091A2}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F1A6B2D4-8E7C-4D0A-B1F2-4D6E7F8091A2}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F1A6B2D4-8E7C-4D0A-B1F2-4D6E7F8091A2}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A2B3C4D5-9E8F-4A0B-C1D2-E3F4A5B6C7D8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A2B3C4D5-9E8F-4A0B-C1D2-E3F4A5B6C7D8}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A2B3C4D5-9E8F-4A0B-C1D2-E3F4A5B6C7D8}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A2B3C4D5-9E8F-4A0B-C1D2-E3F4A5B6C7D8}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B3C4D5E6-A9F0-4B1C-D2E3-F4A5B6C7D8E9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B3C4D5E6-A9F0-4B1C-D2E3-F4A5B6C7D8E9}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B3C4D5E6-A9F0-4B1C-D2E3-F4A5B6C7D8E9}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B3C4D5E6-A9F0-4B1C-D2E3-F4A5B6C7D8E9}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+	EndGlobalSection
+EndGlobal

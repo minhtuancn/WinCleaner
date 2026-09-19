@@ -1,0 +1,230 @@
+﻿<UserControl x:Class="WinCleaner.Views.StorageView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:vm="clr-namespace:WinCleaner.ViewModels"
+             xmlns:design="clr-namespace:WinCleaner.Design"
+             mc:Ignorable="d"
+             d:DataContext="{d:DesignInstance Type=vm:StorageViewModel, IsDesignTimeCreatable=False}">
+
+    <ScrollViewer VerticalScrollBarVisibility="Auto" Padding="{StaticResource SpacingLg}">
+        <StackPanel>
+
+            <!-- Header -->
+            <Border Style="{StaticResource CardStyle}" Padding="{StaticResource SpacingLg}" Margin="0,0,0,24">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+
+                    <!-- Title -->
+                    <StackPanel Grid.Column="0" VerticalAlignment="Center">
+                        <TextBlock Text="Storage" FontSize="{StaticResource FontSizeXLarge}" FontWeight="Bold" Foreground="{DynamicResource TextPrimaryBrush}"/>
+                        <TextBlock Text="Disk usage analysis &amp; large files" FontSize="{StaticResource FontSizeMedium}" Foreground="{DynamicResource TextSecondaryBrush}" Margin="0,4,0,0"/>
+                    </StackPanel>
+
+                    <!-- System Drive Info (center) -->
+                    <Border Grid.Column="1" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="24,0">
+                        <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                            <Path Data="{x:Static design:Icons.Drive}" Fill="{DynamicResource PrimaryBrush}" Width="20" Height="20" Stretch="Uniform" VerticalAlignment="Center" Margin="0,0,12,0"/>
+                            <StackPanel VerticalAlignment="Center">
+                                <TextBlock Text="{Binding SystemDriveInfo}" FontSize="{StaticResource FontSizeMedium}" FontWeight="SemiBold" Foreground="{DynamicResource TextPrimaryBrush}"/>
+                                <TextBlock Text="{Binding DriveSummary}" FontSize="{StaticResource FontSizeSmall}" Foreground="{DynamicResource TextSecondaryBrush}"/>
+                            </StackPanel>
+                        </StackPanel>
+                    </Border>
+
+                    <!-- Primary Action (right) -->
+                    <Button Grid.Column="2" 
+                            Style="{StaticResource PrimaryButtonStyle}"
+                            Command="{Binding LoadAsyncCommand}"
+                            IsEnabled="{Binding IsAnalyzing, Converter={StaticResource InverseBoolConverter}}"
+                            Padding="24,12"
+                            MinWidth="160">
+                        <StackPanel Orientation="Horizontal">
+                            <Path Data="{x:Static design:Icons.Search}" Fill="{DynamicResource TextOnPrimaryBrush}" Width="16" Height="16" Stretch="Uniform" VerticalAlignment="Center" Margin="0,0,8,0"/>
+                            <TextBlock Text="{Binding IsAnalyzing, Converter={StaticResource BoolToTextConverter}, ConverterParameter='Analyze|Analyzing...'}" VerticalAlignment="Center" FontWeight="SemiBold"/>
+                        </StackPanel>
+                    </Button>
+                </Grid>
+            </Border>
+
+            <!-- Drive Summary -->
+            <Border Style="{StaticResource CardStyle}" Padding="{StaticResource SpacingLg}" Margin="0,0,0,24" Visibility="{Binding SelectedDrive, Converter={StaticResource NotNullToVisibilityConverter}}">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+
+                    <Border Grid.Column="0" Width="80" Height="80" CornerRadius="40" Background="{DynamicResource PrimaryLightBrush}">
+                        <Path Data="{x:Static design:Icons.Drive}" Fill="{DynamicResource PrimaryBrush}" Width="32" Height="32" Stretch="Uniform" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                    </Border>
+
+                    <StackPanel Grid.Column="1" VerticalAlignment="Center" Margin="24,0,0,0">
+                        <TextBlock Text="{Binding SelectedDrive.Name}" FontSize="{StaticResource FontSizeLarge}" FontWeight="SemiBold" Foreground="{DynamicResource TextPrimaryBrush}"/>
+                        <TextBlock Text="{Binding SelectedDrive.Label}" FontSize="{StaticResource FontSizeMedium}" Foreground="{DynamicResource TextSecondaryBrush}" Margin="0,4,0,0"/>
+                        <TextBlock FontSize="{StaticResource FontSizeSmall}" Foreground="{DynamicResource TextSecondaryBrush}" Margin="0,4,0,0">
+                            <Run Text="{Binding SelectedDrive.TotalSizeFormatted}"/>
+                            <Run Text=" •"/>
+                            <Run Text="{Binding SelectedDrive.UsedSpaceFormatted}"/>
+                            <Run Text=" used •"/>
+                            <Run Text="{Binding SelectedDrive.FreeSpaceFormatted}"/>
+                            <Run Text=" free"/>
+                        </TextBlock>
+                        <ProgressBar Height="8" Value="{Binding SelectedDrive.UsedPercent}" Maximum="100" Margin="0,8,0,0" Background="{DynamicResource BorderBrush}" Foreground="{Binding SelectedDrive.UsedPercent, Converter={StaticResource DriveUsageToBrushConverter}}" BorderThickness="0"/>
+                    </StackPanel>
+                </Grid>
+            </Border>
+
+            <!-- All Drives Grid -->
+            <Border Style="{StaticResource CardStyle}" Padding="{StaticResource SpacingLg}" Margin="0,0,0,24" Visibility="{Binding Drives.Count, Converter={StaticResource GreaterThanZeroToVisibilityConverter}}">
+                <StackPanel>
+                    <TextBlock Text="All Drives" FontSize="{StaticResource FontSizeMedium}" FontWeight="SemiBold" Foreground="{DynamicResource TextPrimaryBrush}" Margin="0,0,0,12"/>
+                    <ItemsControl ItemsSource="{Binding Drives}">
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate>
+                                <Border Style="{StaticResource DriveInfoCardCompact}" Margin="0,4">
+                                    <Grid>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="Auto"/>
+                                            <ColumnDefinition Width="*"/>
+                                            <ColumnDefinition Width="Auto"/>
+                                        </Grid.ColumnDefinitions>
+
+                                        <Path Grid.Column="0" Data="{Binding IsSystemDrive, Converter={StaticResource BoolToIconConverter}, ConverterParameter=Drive}" Fill="{DynamicResource PrimaryBrush}" Width="20" Height="20" Stretch="Uniform" VerticalAlignment="Center" Margin="0,0,12,0"/>
+                                        <StackPanel Grid.Column="1" VerticalAlignment="Center">
+                                            <TextBlock Text="{Binding Name}" FontSize="{StaticResource FontSizeMedium}" FontWeight="SemiBold" Foreground="{DynamicResource TextPrimaryBrush}"/>
+                                            <TextBlock Text="{Binding TotalSizeFormatted}" FontSize="{StaticResource FontSizeSmall}" Foreground="{DynamicResource TextSecondaryBrush}"/>
+                                        </StackPanel>
+                                        <StackPanel Grid.Column="2" VerticalAlignment="Center" Orientation="Horizontal">
+                                            <ProgressBar Width="100" Height="6" Value="{Binding UsedPercent}" Maximum="100" VerticalAlignment="Center" Margin="0,0,12,0" Background="{DynamicResource BorderBrush}" Foreground="{Binding UsedPercent, Converter={StaticResource DriveUsageToBrushConverter}}" BorderThickness="0"/>
+                                            <TextBlock Text="{Binding UsedPercent, StringFormat='{}{0:F0}% used'}" FontSize="{StaticResource FontSizeSmall}" FontWeight="SemiBold" Foreground="{DynamicResource TextPrimaryBrush}" VerticalAlignment="Center" Margin="0,0,8,0"/>
+                                        </StackPanel>
+                                    </Grid>
+                                </Border>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+                </StackPanel>
+            </Border>
+
+            <!-- Analysis Results -->
+            <Border Style="{StaticResource CardStyle}" Padding="{StaticResource SpacingLg}" Margin="0,0,0,24" Visibility="{Binding FolderTree.Count, Converter={StaticResource GreaterThanZeroToVisibilityConverter}}">
+                <StackPanel>
+                    <TextBlock Text="Folder Tree" FontSize="{StaticResource FontSizeMedium}" FontWeight="SemiBold" Foreground="{DynamicResource TextPrimaryBrush}" Margin="0,0,0,12"/>
+                    <TreeView ItemsSource="{Binding FolderTree}" Background="Transparent" BorderThickness="0">
+                        <TreeView.ItemContainerStyle>
+                            <Style TargetType="TreeViewItem">
+                                <Setter Property="IsExpanded" Value="{Binding IsExpanded, Mode=TwoWay}"/>
+                                <Setter Property="Padding" Value="4"/>
+                                <Setter Property="Margin" Value="0,1"/>
+                                <Setter Property="Template">
+                                    <Setter.Value>
+                                        <ControlTemplate TargetType="TreeViewItem">
+                                            <Border x:Name="border" Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}" Padding="{TemplateBinding Padding}" SnapsToDevicePixels="True">
+                                                <Grid>
+                                                    <Grid.ColumnDefinitions>
+                                                        <ColumnDefinition Width="Auto"/>
+                                                        <ColumnDefinition Width="*"/>
+                                                        <ColumnDefinition Width="Auto"/>
+                                                    </Grid.ColumnDefinitions>
+                                                    <Expander x:Name="expander" Grid.Column="0" IsExpanded="{Binding IsExpanded, RelativeSource={RelativeSource TemplatedParent}, Mode=TwoWay}" VerticalAlignment="Center"/>
+                                                    <ContentPresenter Grid.Column="1" HorizontalAlignment="Center" VerticalAlignment="Center" RecognizesAccessKey="True"/>
+                                                </Grid>
+                                            </Border>
+                                            <ControlTemplate.Triggers>
+                                                <Trigger Property="IsExpanded" Value="True">
+                                                    <Setter TargetName="expander" Property="LayoutTransform">
+                                                        <Setter.Value>
+                                                            <RotateTransform Angle="90"/>
+                                                        </Setter.Value>
+                                                    </Setter>
+                                                </Trigger>
+                                                <Trigger Property="IsMouseOver" Value="True">
+                                                    <Setter TargetName="border" Property="Background" Value="{StaticResource HoverBrush}"/>
+                                                </Trigger>
+                                            </ControlTemplate.Triggers>
+                                        </ControlTemplate>
+                                    </Setter.Value>
+                                </Setter>
+                            </Style>
+                        </TreeView.ItemContainerStyle>
+                        <TreeView.ItemTemplate>
+                            <HierarchicalDataTemplate ItemsSource="{Binding Children}">
+                                <StackPanel Orientation="Horizontal">
+                                    <Path Data="{Binding SafetyLevel, Converter={StaticResource SafetyLevelToIconConverter}}" Fill="{Binding SafetyLevel, Converter={StaticResource SafetyLevelToBrushConverter}}" Width="14" Height="14" Stretch="Uniform" VerticalAlignment="Center" Margin="0,0,6,0"/>
+                                    <TextBlock Text="{Binding Name}" FontSize="{StaticResource FontSizeSmall}" Foreground="{DynamicResource TextPrimaryBrush}" VerticalAlignment="Center"/>
+                                    <TextBlock Text="{Binding SizeFormatted}" FontSize="{StaticResource FontSizeSmall}" FontWeight="Medium" Foreground="{DynamicResource TextPrimaryBrush}" Margin="12,0,0,0" VerticalAlignment="Center"/>
+                                </StackPanel>
+                            </HierarchicalDataTemplate>
+                        </TreeView.ItemTemplate>
+                    </TreeView>
+                </StackPanel>
+            </Border>
+
+            <!-- Large Files -->
+            <Border Style="{StaticResource CardStyle}" Padding="{StaticResource SpacingLg}" Margin="0,0,0,24" Visibility="{Binding LargeFiles.Count, Converter={StaticResource GreaterThanZeroToVisibilityConverter}}">
+                <StackPanel>
+                    <TextBlock Text="Largest Files" FontSize="{StaticResource FontSizeMedium}" FontWeight="SemiBold" Foreground="{DynamicResource TextPrimaryBrush}" Margin="0,0,0,12"/>
+                    <ItemsControl ItemsSource="{Binding LargeFiles}">
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate>
+                                <Border Style="{StaticResource ListItemStyle}" Margin="0,2" Padding="{StaticResource SpacingMd}">
+                                    <Grid>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="Auto"/>
+                                            <ColumnDefinition Width="*"/>
+                                            <ColumnDefinition Width="Auto"/>
+                                            <ColumnDefinition Width="Auto"/>
+                                        </Grid.ColumnDefinitions>
+
+                                        <Path Grid.Column="0" Data="{x:Static design:Icons.File}" Fill="{DynamicResource TextSecondaryBrush}" Width="18" Height="18" Stretch="Uniform" VerticalAlignment="Center" Margin="0,0,12,0"/>
+                                        <StackPanel Grid.Column="1" VerticalAlignment="Center">
+                            <TextBlock Text="{Binding Name}" FontSize="{StaticResource FontSizeMedium}" FontWeight="Medium" Foreground="{DynamicResource TextPrimaryBrush}"/>
+                            <TextBlock Text="{Binding Path}" FontSize="{StaticResource FontSizeSmall}" Foreground="{DynamicResource TextSecondaryBrush}"/>
+                        </StackPanel>
+                                        <TextBlock Grid.Column="2" Text="{Binding SizeFormatted}" FontSize="{StaticResource FontSizeMedium}" FontWeight="SemiBold" Foreground="{DynamicResource TextPrimaryBrush}" VerticalAlignment="Center" Margin="16,0"/>
+                                        <TextBlock Grid.Column="3" Text="{Binding Modified, StringFormat='{}Modified: {0:yyyy-MM-dd}'}" FontSize="{StaticResource FontSizeSmall}" Foreground="{DynamicResource TextSecondaryBrush}" VerticalAlignment="Center" Margin="16,0,0,0"/>
+                                    </Grid>
+                                </Border>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+                </StackPanel>
+            </Border>
+
+            <!-- File Types -->
+            <Border Style="{StaticResource CardStyle}" Padding="{StaticResource SpacingLg}" Visibility="{Binding FileTypes.Count, Converter={StaticResource GreaterThanZeroToVisibilityConverter}}">
+                <StackPanel>
+                    <TextBlock Text="File Types" FontSize="{StaticResource FontSizeMedium}" FontWeight="SemiBold" Foreground="{DynamicResource TextPrimaryBrush}" Margin="0,0,0,12"/>
+                    <ItemsControl ItemsSource="{Binding FileTypes}">
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate>
+                                <Border Style="{StaticResource ListItemStyle}" Margin="0,2" Padding="{StaticResource SpacingMd}">
+                                    <Grid>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="Auto"/>
+                                            <ColumnDefinition Width="*"/>
+                                            <ColumnDefinition Width="Auto"/>
+                                        </Grid.ColumnDefinitions>
+                                        <Path Grid.Column="0" Data="{x:Static design:Icons.File}" Fill="{DynamicResource TextSecondaryBrush}" Width="18" Height="18" Stretch="Uniform" VerticalAlignment="Center" Margin="0,0,12,0"/>
+                                        <StackPanel Grid.Column="1" VerticalAlignment="Center">
+                                            <TextBlock Text="{Binding Category}" FontSize="{StaticResource FontSizeMedium}" FontWeight="Medium" Foreground="{DynamicResource TextPrimaryBrush}"/>
+                                            <TextBlock Text="{Binding Count, StringFormat='{}{0} files'}" FontSize="{StaticResource FontSizeSmall}" Foreground="{DynamicResource TextSecondaryBrush}"/>
+                                        </StackPanel>
+                                        <TextBlock Grid.Column="2" Text="{Binding SizeFormatted}" FontSize="{StaticResource FontSizeMedium}" FontWeight="SemiBold" Foreground="{DynamicResource TextPrimaryBrush}" VerticalAlignment="Center" Margin="16,0"/>
+                                    </Grid>
+                                </Border>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+                </StackPanel>
+            </Border>
+
+        </StackPanel>
+    </ScrollViewer>
+</UserControl>

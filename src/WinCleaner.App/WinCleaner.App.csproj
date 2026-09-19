@@ -1,0 +1,30 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net8.0-windows</TargetFramework>
+    <UseWPF>true</UseWPF>
+    <AssemblyName>WinCleaner</AssemblyName>
+    <RootNamespace>WinCleaner</RootNamespace>
+    <ApplicationManifest>app.manifest</ApplicationManifest>
+    <Version>1.0.0</Version>
+    <Authors>WinCleaner Team</Authors>
+    <Description>Professional System Cleaner for Windows - Multi-drive, Multi-user, Multi-OS support</Description>
+    <Copyright>Copyright © 2026</Copyright>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <LangVersion>latest</LangVersion>
+    <ApplicationHighDpiMode>PerMonitorV2</ApplicationHighDpiMode>
+    <WarningsNotAsErrors>CS1591;CS1998;CS8600;CS8601;CS8603;CS8604;CS8618;CA1416;VSTHRD200;VSTHRD103</WarningsNotAsErrors>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\WinCleaner.Core\WinCleaner.Core.csproj" />
+    <ProjectReference Include="..\WinCleaner.Infrastructure.Windows\WinCleaner.Infrastructure.Windows.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Update="appsettings.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+</Project>
