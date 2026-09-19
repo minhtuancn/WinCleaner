@@ -7,6 +7,7 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using WinCleaner.Models;
 using WinCleaner.Services;
+using WinCleaner.Core.Services;
 using WinCleaner.ViewModels;
 using WinCleaner.Views;
 
@@ -35,6 +36,9 @@ namespace WinCleaner
 
             // Wire WPF dispatcher crash handling
             _host.Services.GetRequiredService<WpfCrashHandler>().Register();
+
+            // Initialize Resource Service (loads localized strings)
+            await _host.Services.GetRequiredService<IResourceService>().InitializeAsync();
             
             // Check for updates on startup
             if (_host.Services.GetRequiredService<IThemeConfigurationStore>().Settings.AutoCheckUpdates)
@@ -119,6 +123,9 @@ namespace WinCleaner
                     services.AddSingleton<ICookieService, CookieService>();
                     services.AddSingleton<ITaskSchedulerService, TaskSchedulerService>();
                     services.AddSingleton<IAiExplainer, AiExplainer>();
+
+                    // Localization / Resource Service
+                    services.AddSingleton<IResourceService, ResourceService>();
 
                     // Resilience / Production Services (Issue #21)
                     services.AddSingleton<IStructuredLogger, StructuredLogger>();

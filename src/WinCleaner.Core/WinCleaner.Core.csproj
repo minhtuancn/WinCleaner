@@ -31,4 +31,10 @@
       <_Parameter1>WinCleaner.Tests.Integration</_Parameter1>
     </AssemblyAttribute>
   </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Include="Resources\Resources.*.json">
+      <WithCulture>false</WithCulture>
+    </EmbeddedResource>
+  </ItemGroup>
 </Project>
