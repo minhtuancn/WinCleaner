@@ -1,0 +1,38 @@
+# WinCleaner Code Owners
+# These users/groups will be requested for review when matching files are modified
+
+# Global owners
+* @minhtuancn
+
+# Core library
+/src/WinCleaner.Core/ @minhtuancn
+
+# Windows infrastructure
+/src/WinCleaner.Infrastructure.Windows/ @minhtuancn
+
+# WPF Application
+/src/WinCleaner.App/ @minhtuancn
+
+# CLI
+/src/WinCleaner.Cli/ @minhtuancn
+
+# Inspector (Blazor WASM)
+/src/WinCleaner.Inspector/ @minhtuancn
+
+# Tests
+/tests/ @minhtuancn
+
+# Documentation
+/docs/ @minhtuancn
+/README.md @minhtuancn
+
+# CI/CD
+/.github/workflows/ @minhtuancn
+/.github/dependabot.yml @minhtuancn
+
+# Build configuration
+/Directory.Build.props @minhtuancn
+/Directory.Packages.props @minhtuancn
+/Version.props @minhtuancn
+/version.json @minhtuancn
+/global.json @minhtuancn

@@ -1,288 +1,198 @@
-# Hướng dẫn đóng góp
+# Contributing to WinCleaner
 
-Cảm ơn bạn đã quan tâm đóng góp cho **WinCleaner**! Mọi đóng góp đều được chào đón, từ sửa lỗi typo đến tính năng mới.
-
-## 📋 Mục lục
-- [Code of Conduct](#code-of-conduct)
-- [Cách báo cáo lỗi](#cách-báo-cáo-lỗi)
-- [Đề xuất tính năng](#đề-xuất-tính-năng)
-- [Quy trình Pull Request](#quy-trình-pull-request)
-- [Coding Standards](#coding-standards)
-- [Testing](#testing)
-- [Documentation](#documentation)
+Thank you for your interest in contributing to WinCleaner! This document provides guidelines and instructions for contributing.
 
 ## Code of Conduct
-Dự án này tuân thủ [Code of Conduct](CODE_OF_CONDUCT.md). Bằng cách tham gia, bạn đồng ý tuân thủ các quy tắc này.
 
-## Cách báo cáo lỗi
+By participating in this project, you agree to abide by our [Code of Conduct](CODE_OF_CONDUCT.md).
 
-### Trước khi báo cáo
-1. Kiểm tra [Issues](https://github.com/minhtuancn/WinCleaner/issues) xem lỗi đã được báo cáo chưa
-2. Cập nhật lên phiên bản mới nhất
-3. Chạy với Dry-run mode để xác nhận
+## Getting Started
 
-### Template Bug Report
-Sử dụng [Bug Report Template](.github/ISSUE_TEMPLATE/bug_report.yml) bao gồm:
-- **Mô tả lỗi**: Rõ ràng, ngắn gọn
-- **Bước tái hiện**: Step-by-step
-- **Kết quả mong đợi vs thực tế**
-- **Screenshots/Logs**: Console log error
-- **Environment**: Windows version, .NET version, WinCleaner version
-- **Profile đang dùng**: Safe/Deep/Custom/Nuclear
+### Prerequisites
 
-## Đề xuất tính năng
-Sử dụng [Feature Request Template](.github/ISSUE_TEMPLATE/feature_request.yml):
-- **Vấn đề**: Tính năng giải quyết vấn đề gì?
-- **Giải pháp đề xuất**: Mô tả chi tiết
-- **Alternatives**: Các giải pháp khác đã xem xét
-- **Use cases**: Ai sẽ sử dụng, khi nào
+- .NET 8 SDK
+- Windows 10/11 (for WPF development)
+- Visual Studio 2022 or VS Code with C# Dev Kit
+- Git
 
-## Quy trình Pull Request
+### Development Setup
 
-### 1. Fork & Clone
-```bash
-git clone https://github.com/YOUR_USERNAME/WinCleaner.git
-cd WinCleaner
-git remote add upstream https://github.com/minhtuancn/WinCleaner.git
+1. Fork the repository
+2. Clone your fork:
+   ```bash
+   git clone https://github.com/YOUR_USERNAME/WinCleaner.git
+   cd WinCleaner
+   ```
+3. Add upstream remote:
+   ```bash
+   git remote add upstream https://github.com/minhtuancn/WinCleaner.git
+   ```
+4. Restore dependencies:
+   ```bash
+   dotnet restore WinCleaner.sln
+   ```
+5. Build:
+   ```bash
+   dotnet build WinCleaner.sln --configuration Release
+   ```
+6. Run tests:
+   ```bash
+   dotnet test WinCleaner.sln --configuration Release
+   ```
+
+## Development Workflow
+
+### Branch Naming
+
+- Feature: `feat/issue-XX-description`
+- Bug fix: `fix/issue-XX-description`
+- Documentation: `docs/issue-XX-description`
+- Refactor: `refactor/issue-XX-description`
+- Chore: `chore/issue-XX-description`
+
+### Commit Messages
+
+Follow [Conventional Commits](https://www.conventionalcommits.org/):
+
+```
+<type>(<scope>): <description>
+
+[optional body]
+
+[optional footer]
 ```
 
-### 2. Tạo Branch
-```bash
-# Feature
-git checkout -b feature/ten-tinh-nang
+Types:
+- `feat`: New feature
+- `fix`: Bug fix
+- `docs`: Documentation changes
+- `style`: Code style changes (formatting, etc.)
+- `refactor`: Code refactoring
+- `test`: Adding/updating tests
+- `chore`: Maintenance tasks
+- `perf`: Performance improvements
+- `ci`: CI/CD changes
 
-# Bug fix
-git checkout -b fix/ten-loi
+Example:
+```
+feat(core): add FileKey/RegKey support to Winapp2 parser
 
-# Docs
-git checkout -b docs/ten-cap-nhat
+- Add FileKeyEntry and RegKeyEntry models
+- Update parser to handle FileKey1-5 and RegKey1-5
+- Add unit tests for new parser functionality
+
+Closes #5
 ```
 
-### 3. Phát triển
-```bash
-# Build & test
-dotnet build -c Release
-dotnet test
+### Pull Request Process
 
-# Chạy app
-cd WinCleaner/WinCleaner
-dotnet run
-```
-
-### 4. Commit Convention
-Sử dụng [Conventional Commits](https://www.conventionalcommits.org/):
-
-```bash
-# Format
-<type>(<scope>): <mô tả>
-
-# Types
-feat:     Tính năng mới
-fix:      Sửa lỗi
-docs:     Chỉ cập nhật docs
-style:    Format code (không thay đổi logic)
-refactor: Refactor code
-perf:     Cải thiện performance
-test:     Thêm/sửa test
-chore:    Build, deps, tooling
-ci:       CI/CD changes
-
-# Examples
-feat(scanner): add support for Bun cache
-fix(cleaner): handle read-only files correctly
-docs(readme): update installation guide
-refactor(models): extract converters to separate file
-```
-
-### 5. Push & PR
-```bash
-git push origin feature/ten-tinh-nang
-# Tạo PR trên GitHub
-```
-
-### 6. PR Requirements
-- [ ] Pass all CI checks
-- [ ] Code follow coding standards
-- [ ] Tests added/updated (nếu applicable)
-- [ ] Docs updated (README, CHANGELOG, XML comments)
-- [ ] No breaking changes (hoặc document breaking changes)
-- [ ] Linked issue (Fixes #123)
+1. Ensure your branch is up to date with `main`:
+   ```bash
+   git fetch upstream
+   git rebase upstream/main
+   ```
+2. Run full test suite:
+   ```bash
+   dotnet build WinCleaner.sln --configuration Release --no-restore
+   dotnet test WinCleaner.sln --configuration Release --no-build
+   ```
+3. Push your branch:
+   ```bash
+   git push origin your-branch-name
+   ```
+4. Create a Pull Request targeting `main`
+5. Fill out the PR template completely
+6. Wait for CI checks to pass
+7. Address review comments
+8. PR will be squash-merged after approval
 
 ## Coding Standards
 
-### C# (.NET 8)
-```csharp
-// ✅ Good
-public async Task<CleanResult> CleanAsync(
-    List<CleanCategoryGroup> groups,
-    IProgress<string> progress,
-    CancellationToken cancellationToken = default)
-{
-    // Implementation
-}
+### C# Style
 
-// ❌ Bad
-public async Task CleanAsync(List<CleanCategoryGroup> groups) { }
+- Follow [Microsoft C# Coding Conventions](https://docs.microsoft.com/en-us/dotnet/csharp/fundamentals/coding-style/coding-conventions)
+- Use `var` for obvious types
+- Prefer expression-bodied members for simple properties/methods
+- Use nullable reference types (`#nullable enable`)
+- Treat warnings as errors (configured in `Directory.Build.props`)
+
+### Architecture
+
+- Follow Clean Architecture principles
+- Use Dependency Injection (DI) for all services
+- Keep Core library platform-agnostic (net8.0)
+- Windows-specific code in `WinCleaner.Infrastructure.Windows`
+- UI in `WinCleaner.App` (WPF, net8.0-windows)
+- CLI in `WinCleaner.Cli` (net8.0)
+
+### Testing
+
+- Write unit tests for all new functionality
+- Target: ≥90% code coverage
+- Use xUnit, Moq, FluentAssertions
+- Place tests in `tests/WinCleaner.Tests.Unit`
+- Integration tests in `tests/WinCleaner.Tests.Integration`
+
+### Documentation
+
+- Update `README.md` for user-facing changes
+- Update `docs/architecture/feature-matrix.md` for feature changes
+- Add XML documentation for public APIs
+- Update `CHANGELOG.md` (maintained by maintainers)
+
+## Project Structure
+
+```
+WinCleaner/
+├── src/
+│   ├── WinCleaner.Core/                 # Domain models, services, parser (net8.0)
+│   ├── WinCleaner.Infrastructure.Windows/ # WPF converters, ThemeService (net8.0-windows)
+│   ├── WinCleaner.App/                  # WPF Application (net8.0-windows)
+│   ├── WinCleaner.Cli/                  # CLI Application (net8.0)
+│   └── WinCleaner.Inspector/            # Blazor WASM Inspector (net8.0)
+├── tests/
+│   ├── WinCleaner.Tests.Unit/           # Unit tests
+│   └── WinCleaner.Tests.Integration/    # Integration tests
+├── docs/
+│   └── architecture/                    # Architecture docs
+├── .github/
+│   ├── workflows/                       # CI/CD pipelines
+│   └── dependabot.yml                   # Dependabot config
+├── WinCleaner.sln
+├── Directory.Build.props
+├── Directory.Packages.props
+├── Version.props
+├── version.json
+├── global.json
+├── .editorconfig
+├── renovate.json
+├── CODEOWNERS
+├── SECURITY.md
+├── CONTRIBUTING.md
+├── CHANGELOG.md
+└── ROADMAP.md
 ```
 
-### Naming Conventions
-| Element | Convention | Example |
-|---------|------------|---------|
-| Namespace | PascalCase | `WinCleaner.Services` |
-| Class/Interface | PascalCase | `ISystemScanner`, `SystemScanner` |
-| Method | PascalCase | `GetDrivesAsync()` |
-| Property | PascalCase | `TotalSize` |
-| Parameter | camelCase | `cancellationToken` |
-| Local variable | camelCase | `totalSize` |
-| Constant | UPPER_SNAKE_CASE | `MAX_RETRY_COUNT` |
-| Private field | _camelCase | `_scanner` |
+## Reporting Issues
 
-### Async/Await
-- Luôn dùng `Async` suffix cho async methods
-- Dùng `CancellationToken` cho long-running operations
-- Tránh `async void` (trừ event handlers)
-- Dùng `ConfigureAwait(false)` cho library code
+Before creating an issue, please:
+1. Search existing issues
+2. Check if it's already fixed in `main`
+3. Use the appropriate issue template
 
-### Nullable Reference Types
-```csharp
-// Enable in .csproj: <Nullable>enable</Nullable>
+## Feature Requests
 
-// ✅ Good
-public string? OptionalProperty { get; set; }
-public string RequiredProperty { get; set; } = "";
+Feature requests are welcome! Please:
+1. Check the [Roadmap](ROADMAP.md)
+2. Search existing issues
+3. Create a feature request issue with the template
 
-// ✅ Good - null check
-if (item.CleanAction is not null)
-{
-    await item.CleanAction(item, progress);
-}
-```
+## License
 
-### Error Handling
-```csharp
-// ✅ Good - specific exceptions
-try
-{
-    await DeletePathAsync(item, progress);
-}
-catch (UnauthorizedAccessException ex)
-{
-    Log(logProgress, LogLevel.Error, $"Access denied: {item.Path}", "Cleaner");
-    return false;
-}
-catch (IOException ex) when (ex.HResult == 0x80070020) // FILE_IN_USE
-{
-    Log(logProgress, LogLevel.Warning, $"File in use: {item.Path}", "Cleaner");
-    return false;
-}
-catch (Exception ex)
-{
-    Log(logProgress, LogLevel.Error, $"Unexpected error: {ex.Message}", "Cleaner");
-    return false;
-}
-```
+By contributing, you agree that your contributions will be licensed under the project's [MIT License](LICENSE).
 
-### Logging
-```csharp
-// Levels
-LogDebug("Chi tiết debug")      // Chỉ dev
-LogInfo("Thông tin chung")       // User sees
-LogSuccess("Thành công")         // Green
-LogWarning("Cảnh báo")           // Yellow
-LogError("Lỗi")                  // Red
-```
+## Questions?
 
-### XAML
-- Sử dụng `StaticResource` cho styles/resources
-- `DynamicResource` cho theme-aware resources
-- `x:Bind` (compiled binding) thay vì `Binding` khi có thể
-- VirtualizingStackPanel cho Lists lớn
-
-## Testing
-
-### Unit Tests
-```bash
-# Chạy tests
-dotnet test --logger "console;verbosity=detailed"
-
-# Coverage
-dotnet test --collect:"XPlat Code Coverage"
-```
-
-### Test Structure
-```
-Tests/
-├── WinCleaner.Tests/
-│   ├── Services/
-│   │   ├── SystemScannerTests.cs
-│   │   └── CleanerServiceTests.cs
-│   ├── Models/
-│   │   └── CleanModelsTests.cs
-│   └── ViewModels/
-│       └── MainViewModelTests.cs
-```
-
-### Test Naming
-```csharp
-[Fact]
-public async Task CleanAsync_WithDryRunMode_ShouldNotDeleteFiles()
-
-[Theory]
-[InlineData(CleanProfile.Safe, 10)]
-[InlineData(CleanProfile.Deep, 25)]
-public void GetItemsForProfile_ShouldReturnCorrectCount(CleanProfile profile, int expectedCount)
-```
-
-## Documentation
-
-### XML Comments
-```csharp
-/// <summary>
-/// Quét hệ thống tìm các mục có thể dọn dẹp theo profile được chỉ định.
-/// </summary>
-/// <param name="profile">Profile dọn dẹp (Safe/Deep/Custom/Nuclear)</param>
-/// <param name="progress">Progress reporter cho UI updates</param>
-/// <param name="cancellationToken">Token để hủy tác vụ</param>
-/// <returns>Danh sách các category group đã quét với size tính toán</returns>
-/// <exception cref="OperationCanceledException">Khi tác vụ bị hủy</exception>
-public async Task<List<CleanCategoryGroup>> ScanAsync(
-    CleanProfile profile,
-    IProgress<string>? progress = null,
-    CancellationToken cancellationToken = default)
-```
-
-### README Updates
-- Cập nhật tính năng mới
-- Screenshots mới (nếu UI thay đổi)
-- Version badge
-
-### CHANGELOG
-Tự động cập nhật qua Release notes hoặc manual:
-```markdown
-## [1.1.0] - 2026-01-15
-### Added
-- Support for Bun cache cleaning
-- New "Export Log" feature
-
-### Fixed
-- Handle read-only files in DriverStore
-- Memory leak in long-running scans
-
-### Changed
-- Updated to .NET 8.0.4
-```
-
-## 🏷️ Versioning
-Sử dụng [Semantic Versioning](https://semver.org/):
-- **MAJOR**: Breaking changes
-- **MINOR**: New features (backward compatible)
-- **PATCH**: Bug fixes (backward compatible)
-
-## 📞 Liên hệ
-- **Maintainer**: Minh Tuấn (@minhtuancn)
-- **Discussion**: [GitHub Discussions](https://github.com/minhtuancn/WinCleaner/discussions)
-- **Security**: [SECURITY.md](SECURITY.md)
-
----
-
-**Cảm ơn bạn đã đóng góp! 🎉**
+- Open a discussion on GitHub
+- Check existing documentation in `docs/`
+- Review the [Architecture Decision Records](docs/architecture/adr/)

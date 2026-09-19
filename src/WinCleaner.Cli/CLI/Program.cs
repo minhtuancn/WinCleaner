@@ -15,9 +15,14 @@ namespace WinCleaner.CLI
 {
     public class Program
     {
+        private static readonly Option<bool> SilentOption = new(
+            aliases: new[] { "--silent", "-s" },
+            description: "Suppress all output except errors",
+            getDefaultValue: () => false);
+
         public static async Task<int> Main(string[] args)
         {
-var rootCommand = new RootCommand("WinCleaner CLI - Professional System Cleaner for Windows")
+            var rootCommand = new RootCommand("WinCleaner CLI - Professional System Cleaner for Windows")
             {
                 CreateScanCommand(),
                 CreateCleanCommand(),
@@ -31,6 +36,8 @@ var rootCommand = new RootCommand("WinCleaner CLI - Professional System Cleaner 
                 CreateThemeCommand(),
                 CreateVersionCommand()
             };
+
+            rootCommand.AddGlobalOption(SilentOption);
 
             return await rootCommand.InvokeAsync(args);
         }
@@ -84,8 +91,9 @@ var rootCommand = new RootCommand("WinCleaner CLI - Professional System Cleaner 
                 var output = context.ParseResult.GetValueForOption(outputOption);
                 var logPath = context.ParseResult.GetValueForOption(logOption);
                 var json = context.ParseResult.GetValueForOption(jsonOption);
+                var silent = context.ParseResult.GetValueForOption(SilentOption);
 
-                var exitCode = await RunScanAsync(profile, databases, dryRun, output, logPath, json);
+                var exitCode = await RunScanAsync(profile, databases, dryRun, output, logPath, json, silent);
                 context.ExitCode = exitCode;
             });
 
@@ -155,8 +163,9 @@ var rootCommand = new RootCommand("WinCleaner CLI - Professional System Cleaner 
                 var output = context.ParseResult.GetValueForOption(outputOption);
                 var logPath = context.ParseResult.GetValueForOption(logOption);
                 var json = context.ParseResult.GetValueForOption(jsonOption);
+                var silent = context.ParseResult.GetValueForOption(SilentOption);
 
-                var exitCode = await RunCleanAsync(profile, databases, dryRun, auto, shutdown, output, logPath);
+                var exitCode = await RunCleanAsync(profile, databases, dryRun, auto, shutdown, output, logPath, silent);
                 context.ExitCode = exitCode;
             });
 
@@ -1464,7 +1473,8 @@ var rootCommand = new RootCommand("WinCleaner CLI - Professional System Cleaner 
             bool dryRun,
             OutputFormat output,
             string? logPath,
-            bool json)
+            bool json,
+            bool silent)
         {
             try
             {
@@ -1479,11 +1489,14 @@ var rootCommand = new RootCommand("WinCleaner CLI - Professional System Cleaner 
                     dbs = dbs.Where(db => databases.Contains(db.Name.ToLowerInvariant())).ToList();
                 }
 
-                Console.WriteLine($"Scanning with profile: {profile}");
-                Console.WriteLine($"Databases: {string.Join(", ", dbs.Select(db => db.Name))}");
-                if (dryRun) Console.WriteLine("DRY RUN MODE - No files will be deleted");
+                if (!silent)
+                {
+                    Console.WriteLine($"Scanning with profile: {profile}");
+                    Console.WriteLine($"Databases: {string.Join(", ", dbs.Select(db => db.Name))}");
+                    if (dryRun) Console.WriteLine("DRY RUN MODE - No files will be deleted");
+                }
 
-                var progress = new Progress<string>(msg => Console.WriteLine($"[SCAN] {msg}"));
+                var progress = new Progress<string>(msg => { if (!silent) Console.WriteLine($"[SCAN] {msg}"); });
                 var groups = await host.Services.GetRequiredService<ISystemScanner>().ScanAsync(profile, progress);
 
                 var totalItems = groups.Sum(g => g.ItemCount);
@@ -1519,7 +1532,7 @@ var rootCommand = new RootCommand("WinCleaner CLI - Professional System Cleaner 
                     };
                     Console.WriteLine(System.Text.Json.JsonSerializer.Serialize(result, new System.Text.Json.JsonSerializerOptions { WriteIndented = true }));
                 }
-                else
+                else if (!silent)
                 {
                     Console.WriteLine($"\nScan Complete:");
                     Console.WriteLine($"  Total Items: {totalItems}");
@@ -1549,14 +1562,15 @@ var rootCommand = new RootCommand("WinCleaner CLI - Professional System Cleaner 
             }
         }
 
-        private static async Task<int> RunCleanAsync(
+private static async Task<int> RunCleanAsync(
             CleanProfile profile,
             string[] databases,
             bool dryRun,
             bool auto,
             bool shutdown,
             OutputFormat output,
-            string? logPath)
+            string? logPath,
+            bool silent)
         {
             try
             {
@@ -1573,39 +1587,46 @@ var rootCommand = new RootCommand("WinCleaner CLI - Professional System Cleaner 
 
                 cleaner.DryRunMode = dryRun;
 
-                Console.WriteLine($"Cleaning with profile: {profile}");
-                Console.WriteLine($"Databases: {string.Join(", ", dbs.Select(db => db.Name))}");
-                if (dryRun) Console.WriteLine("DRY RUN MODE - No files will be deleted");
-                if (!auto && !dryRun)
+                if (!silent)
                 {
-                    Console.Write("Continue? (y/N): ");
-                    var input = Console.ReadLine();
-                    if (!input?.Equals("y", StringComparison.OrdinalIgnoreCase) ?? true)
+                    Console.WriteLine($"Cleaning with profile: {profile}");
+                    Console.WriteLine($"Databases: {string.Join(", ", dbs.Select(db => db.Name))}");
+                    if (dryRun) Console.WriteLine("DRY RUN MODE - No files will be deleted");
+                    if (!auto && !dryRun)
                     {
-                        Console.WriteLine("Cancelled.");
-                        return 0;
+                        Console.Write("Continue? (y/N): ");
+                        var input = Console.ReadLine();
+                        if (!input?.Equals("y", StringComparison.OrdinalIgnoreCase) ?? true)
+                        {
+                            Console.WriteLine("Cancelled.");
+                            return 0;
+                        }
                     }
                 }
 
-                var progress = new Progress<string>(msg => Console.WriteLine($"[CLEAN] {msg}"));
-                var logProgress = new Progress<LogEntry>(entry => 
+                var progress = new Progress<string>(msg => { if (!silent) Console.WriteLine($"[CLEAN] {msg}"); });
+                var logProgress = new Progress<LogEntry>(entry =>
                 {
-                    Console.WriteLine($"[{entry.FormattedTime}] [{entry.Level}] {entry.Message}");
+                    if (!silent)
+                        Console.WriteLine($"[{entry.FormattedTime}] [{entry.Level}] {entry.Message}");
                 });
 
-                var groups = await host.Services.GetRequiredService<ISystemScanner>().ScanAsync(profile, new Progress<string>(msg => Console.WriteLine($"[SCAN] {msg}")));
+                var groups = await host.Services.GetRequiredService<ISystemScanner>().ScanAsync(profile, new Progress<string>(msg => { if (!silent) Console.WriteLine($"[SCAN] {msg}"); }));
                 var result = await cleaner.CleanAsync(groups, progress, logProgress);
 
-                Console.WriteLine($"\nClean Complete:");
-                Console.WriteLine($"  Items Cleaned: {result.CleanedItems}/{result.TotalItems}");
-                Console.WriteLine($"  Space Freed: {FormatBytes(result.TotalCleanedSize)}");
-                Console.WriteLine($"  Duration: {result.Duration:mm\\:ss\\.ff}");
-                if (result.FailedItems > 0)
-                    Console.WriteLine($"  Failed: {result.FailedItems}");
+                if (!silent)
+                {
+                    Console.WriteLine($"\nClean Complete:");
+                    Console.WriteLine($"  Items Cleaned: {result.CleanedItems}/{result.TotalItems}");
+                    Console.WriteLine($"  Space Freed: {FormatBytes(result.TotalCleanedSize)}");
+                    Console.WriteLine($"  Duration: {result.Duration:mm\\:ss\\.ff}");
+                    if (result.FailedItems > 0)
+                        Console.WriteLine($"  Failed: {result.FailedItems}");
+                }
 
                 if (shutdown && !dryRun)
                 {
-                    Console.WriteLine("Shutting down...");
+                    if (!silent) Console.WriteLine("Shutting down...");
                     System.Diagnostics.Process.Start("shutdown", "/s /t 0");
                 }
 

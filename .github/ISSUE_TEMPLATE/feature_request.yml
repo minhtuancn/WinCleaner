@@ -1,0 +1,79 @@
+name: Feature Request
+description: Suggest a new feature or enhancement
+title: "[Feature]: "
+labels: ["enhancement"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for suggesting a new feature! Please provide details below.
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem Statement
+      description: What problem does this feature solve? Is your feature request related to a problem?
+      placeholder: I'm frustrated when...
+    validations:
+      required: true
+  - type: textarea
+    id: solution
+    attributes:
+      label: Proposed Solution
+      description: Describe the solution you'd like
+      placeholder: I would like...
+    validations:
+      required: true
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternatives Considered
+      description: Describe any alternative solutions or features you've considered
+      placeholder: I also considered...
+  - type: dropdown
+    id: component
+    attributes:
+      label: Component
+      description: Which component would this feature affect?
+      options:
+        - Core (parser, services, models)
+        - Infrastructure.Windows (converters, theme)
+        - App (WPF UI, ViewModels, Views)
+        - CLI (command-line interface)
+        - Inspector (Blazor WASM)
+        - Tests
+        - Build/CI
+        - Installer
+        - Documentation
+      default: 0
+    validations:
+      required: true
+  - type: dropdown
+    id: priority
+    attributes:
+      label: Priority
+      description: How important is this feature?
+      options:
+        - P0 (Critical - blocks release)
+        - P1 (High - major feature)
+        - P2 (Medium - nice to have)
+        - P3 (Low - future consideration)
+      default: 1
+    validations:
+      required: true
+  - type: textarea
+    id: context
+    attributes:
+      label: Additional Context
+      description: Add any other context, mockups, or screenshots about the feature request here
+      placeholder: Additional context...
+  - type: checkboxes
+    id: checklist
+    attributes:
+      label: Checklist
+      options:
+        - label: I have searched existing issues and the roadmap
+          required: true
+        - label: This aligns with the project's goals and scope
+          required: true
+        - label: I'm willing to implement this feature (or help with implementation)
+          required: false

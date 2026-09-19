@@ -1,0 +1,39 @@
+version: 2
+updates:
+  - package-ecosystem: "nuget"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+      time: "09:00"
+    open-pull-requests-limit: 10
+    labels:
+      - "dependencies"
+      - "nuget"
+    groups:
+      dotnet-sdk:
+        patterns:
+          - "Microsoft.NET.*"
+          - "Microsoft.AspNetCore.*"
+          - "Microsoft.Extensions.*"
+      testing:
+        patterns:
+          - "xunit*"
+          - "Moq*"
+          - "FluentAssertions*"
+          - "coverlet*"
+      ui:
+        patterns:
+          - "CommunityToolkit.Mvvm*"
+          - "Microsoft.Web.WebView2*"
+          - "Microsoft.Xaml.Behaviors*"
+
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+      time: "09:00"
+    labels:
+      - "dependencies"
+      - "github-actions"

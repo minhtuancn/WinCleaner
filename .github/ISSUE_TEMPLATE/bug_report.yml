@@ -1,0 +1,106 @@
+name: Bug Report
+description: Report a bug or unexpected behavior
+title: "[Bug]: "
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for taking the time to report a bug! Please fill out the sections below.
+  - type: textarea
+    id: description
+    attributes:
+      label: Description
+      description: A clear and concise description of the bug
+      placeholder: When I do X, Y happens instead of Z
+    validations:
+      required: true
+  - type: textarea
+    id: reproduction
+    attributes:
+      label: Steps to Reproduce
+      description: Steps to reproduce the behavior
+      placeholder: |
+        1. Go to '...'
+        2. Click on '....'
+        3. Scroll down to '....'
+        4. See error
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected Behavior
+      description: What you expected to happen
+      placeholder: I expected...
+    validations:
+      required: true
+  - type: textarea
+    id: actual
+    attributes:
+      label: Actual Behavior
+      description: What actually happened
+      placeholder: Instead, ...
+    validations:
+      required: true
+  - type: dropdown
+    id: component
+    attributes:
+      label: Component
+      description: Which component is affected?
+      options:
+        - Core (parser, services, models)
+        - Infrastructure.Windows (converters, theme)
+        - App (WPF UI, ViewModels, Views)
+        - CLI (command-line interface)
+        - Inspector (Blazor WASM)
+        - Tests
+        - Build/CI
+        - Installer
+        - Documentation
+      default: 0
+    validations:
+      required: true
+  - type: dropdown
+    id: severity
+    attributes:
+      label: Severity
+      description: How severe is this bug?
+      options:
+        - Critical (data loss, security, crash)
+        - High (major feature broken)
+        - Medium (minor feature broken, workaround exists)
+        - Low (cosmetic, minor inconvenience)
+      default: 2
+    validations:
+      required: true
+  - type: textarea
+    id: environment
+    attributes:
+      label: Environment
+      description: Your environment details
+      placeholder: |
+        - OS: Windows 10/11 (version)
+        - .NET Version: 8.x
+        - WinCleaner Version: 2.0.0-beta.x
+        - Architecture: x64/ARM64
+    validations:
+      required: true
+  - type: textarea
+    id: logs
+    attributes:
+      label: Logs/Error Messages
+      description: Relevant logs, error messages, or stack traces
+      placeholder: Paste logs here...
+      render: text
+  - type: checkboxes
+    id: checklist
+    attributes:
+      label: Checklist
+      options:
+        - label: I have searched existing issues
+          required: true
+        - label: I can reproduce this on the latest main branch
+          required: true
+        - label: This is not a duplicate of an existing issue
+          required: true

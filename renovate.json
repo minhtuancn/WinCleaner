@@ -1,0 +1,40 @@
+{
+  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  "extends": [
+    "config:recommended",
+    ":dependencyDashboard",
+    ":prHourlyLimit2",
+    ":prConcurrentLimit2"
+  ],
+  "labels": ["dependencies", "renovate"],
+  "packageRules": [
+    {
+      "groupName": "Microsoft .NET packages",
+      "matchPackageNames": ["Microsoft.NET.*", "Microsoft.AspNetCore.*", "Microsoft.Extensions.*", "Microsoft.Win32.*", "Microsoft.Data.*", "Microsoft.VisualBasic*"],
+      "automerge": true,
+      "automergeType": "pr"
+    },
+    {
+      "groupName": "Testing packages",
+      "matchPackageNames": ["xunit*", "Moq*", "FluentAssertions*", "coverlet*"],
+      "automerge": true,
+      "automergeType": "pr"
+    },
+    {
+      "groupName": "UI packages",
+      "matchPackageNames": ["CommunityToolkit.Mvvm*", "Microsoft.Web.WebView2*", "Microsoft.Xaml.Behaviors*"],
+      "automerge": true,
+      "automergeType": "pr"
+    },
+    {
+      "matchUpdateTypes": ["major"],
+      "automerge": false
+    }
+  ],
+  "nuget": {
+    "fileMatch": ["**/*.csproj", "**/Directory.Packages.props", "**/Directory.Build.props"]
+  },
+  "github-actions": {
+    "fileMatch": [".github/workflows/*.yml"]
+  }
+}

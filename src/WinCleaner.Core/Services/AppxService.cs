@@ -24,6 +24,11 @@ namespace WinCleaner.Services
         Task<AppxDatabase> ParseWinappxAsync(string filePath);
         Task<List<AppxPackage>> GetSystemPackagesAsync();
         Task<AppxDatabase> GetBuiltinDatabaseAsync();
+        
+        // Enhanced: Cleanable categories for Store apps
+        Task<List<AppxCleanableItem>> GetCleanableItemsAsync(string packageFullName);
+        Task<List<AppxCleanableItem>> GetAllCleanableItemsAsync();
+        Task<bool> CleanAppxPackageAsync(string packageFullName, IEnumerable<string> categories);
     }
 
     [SupportedOSPlatform("windows")]
@@ -422,6 +427,250 @@ namespace WinCleaner.Services
                 AllowTrailingCommas = true,
                 ReadCommentHandling = JsonCommentHandling.Skip
             };
+        }
+
+        // Enhanced: Cleanable categories for Store apps
+        public async Task<List<AppxCleanableItem>> GetCleanableItemsAsync(string packageFullName)
+        {
+            var package = await GetPackageAsync(packageFullName);
+            if (package == null)
+                return new List<AppxCleanableItem>();
+
+            return GetCleanableItemsForPackage(package);
+        }
+
+        public async Task<List<AppxCleanableItem>> GetAllCleanableItemsAsync()
+        {
+            var packages = await GetAllPackagesAsync();
+            var allItems = new List<AppxCleanableItem>();
+
+            foreach (var package in packages)
+            {
+                var items = GetCleanableItemsForPackage(package);
+                allItems.AddRange(items);
+            }
+
+            return allItems;
+        }
+
+        public async Task<bool> CleanAppxPackageAsync(string packageFullName, IEnumerable<string> categories)
+        {
+            var package = await GetPackageAsync(packageFullName);
+            if (package == null)
+                return false;
+
+            var items = GetCleanableItemsForPackage(package);
+            var selectedCategories = categories.Select(c => Enum.Parse<AppxCleanableCategory>(c, true)).ToHashSet();
+            var itemsToClean = items.Where(i => selectedCategories.Contains(i.Category) || selectedCategories.Contains(AppxCleanableCategory.All)).ToList();
+
+            bool allSuccess = true;
+            foreach (var item in itemsToClean)
+            {
+                try
+                {
+                    if (Directory.Exists(item.Path))
+                    {
+                        var files = Directory.GetFiles(item.Path, item.Pattern, item.Recurse ? SearchOption.AllDirectories : SearchOption.TopDirectoryOnly);
+                        foreach (var file in files)
+                        {
+                            try
+                            {
+                                File.Delete(file);
+                            }
+                            catch { allSuccess = false; }
+                        }
+                    }
+                }
+                catch { allSuccess = false; }
+            }
+
+            return allSuccess;
+        }
+
+        private List<AppxCleanableItem> GetCleanableItemsForPackage(AppxPackage package)
+        {
+            var items = new List<AppxCleanableItem>();
+
+            if (string.IsNullOrEmpty(package.InstallLocation) || !Directory.Exists(package.InstallLocation))
+                return items;
+
+            var basePath = package.InstallLocation;
+
+            // Common cleanable paths for UWP apps
+            var cleanablePaths = new[]
+            {
+                new { Category = AppxCleanableCategory.Cache, RelativePath = @"AC\INetCache", Pattern = "*.*", Description = "Internet cache" },
+                new { Category = AppxCleanableCategory.Cache, RelativePath = @"AC\INetCookies", Pattern = "*.*", Description = "Internet cookies" },
+                new { Category = AppxCleanableCategory.Cache, RelativePath = @"AC\INetHistory", Pattern = "*.*", Description = "Internet history" },
+                new { Category = AppxCleanableCategory.TemporaryFiles, RelativePath = @"AC\Temp", Pattern = "*.*", Description = "Temporary files" },
+                new { Category = AppxCleanableCategory.TemporaryFiles, RelativePath = @"TempState", Pattern = "*.*", Description = "Temp state" },
+                new { Category = AppxCleanableCategory.Logs, RelativePath = @"AC\Microsoft\Windows\Logs", Pattern = "*.log", Description = "Application logs" },
+                new { Category = AppxCleanableCategory.Logs, RelativePath = @"AC\Microsoft\Windows\ErrorReports", Pattern = "*.wer", Description = "Error reports" },
+                new { Category = AppxCleanableCategory.Cookies, RelativePath = @"AC\Microsoft\Windows\Cookies", Pattern = "*.*", Description = "Cookies" },
+                new { Category = AppxCleanableCategory.LocalStorage, RelativePath = @"AC\Microsoft\Windows\WebCache", Pattern = "*.*", Description = "Local storage" },
+                new { Category = AppxCleanableCategory.IndexedDB, RelativePath = @"AC\Microsoft\Windows\IndexedDB", Pattern = "*.*", Description = "IndexedDB" },
+                new { Category = AppxCleanableCategory.CrashReports, RelativePath = @"AC\Microsoft\Windows\ErrorReporting", Pattern = "*.*", Description = "Crash reports" },
+                new { Category = AppxCleanableCategory.Telemetry, RelativePath = @"AC\Microsoft\Windows\Telemetry", Pattern = "*.*", Description = "Telemetry data" },
+            };
+
+            foreach (var cp in cleanablePaths)
+            {
+                var fullPath = Path.Combine(basePath, cp.RelativePath);
+                if (Directory.Exists(fullPath))
+                {
+                    try
+                    {
+                        var files = Directory.GetFiles(fullPath, cp.Pattern, SearchOption.AllDirectories);
+                        if (files.Length > 0)
+                        {
+                            long size = files.Sum(f => new FileInfo(f).Length);
+                            items.Add(new AppxCleanableItem
+                            {
+                                PackageFullName = package.FullName,
+                                PackageName = package.Name,
+                                Category = cp.Category,
+                                Path = fullPath,
+                                Pattern = cp.Pattern,
+                                Recurse = true,
+                                EstimatedSize = size,
+                                FileCount = files.Length,
+                                Description = cp.Description
+                            });
+                        }
+                    }
+                    catch { }
+                }
+            }
+
+            // Also check for package-specific known cache locations
+            AddPackageSpecificCleanableItems(package, items);
+
+            return items;
+        }
+
+        private void AddPackageSpecificCleanableItems(AppxPackage package, List<AppxCleanableItem> items)
+        {
+            var lowerName = package.Name.ToLowerInvariant();
+
+            // Browser-specific
+            if (lowerName.Contains("chrome") || lowerName.Contains("edge") || lowerName.Contains("brave") || lowerName.Contains("opera") || lowerName.Contains("vivaldi"))
+            {
+                var userDataPath = Path.Combine(package.InstallLocation, @"AC\Microsoft\Windows\LocalStorage");
+                if (Directory.Exists(userDataPath))
+                {
+                    try
+                    {
+                        var files = Directory.GetFiles(userDataPath, "*.ldb", SearchOption.AllDirectories);
+                        if (files.Length > 0)
+                        {
+                            long size = files.Sum(f => new FileInfo(f).Length);
+                            items.Add(new AppxCleanableItem
+                            {
+                                PackageFullName = package.FullName,
+                                PackageName = package.Name,
+                                Category = AppxCleanableCategory.LocalStorage,
+                                Path = userDataPath,
+                                Pattern = "*.ldb",
+                                Recurse = true,
+                                EstimatedSize = size,
+                                FileCount = files.Length,
+                                Description = "Browser LevelDB local storage"
+                            });
+                        }
+                    }
+                    catch { }
+                }
+            }
+
+            // Gaming apps (Xbox, etc.)
+            if (lowerName.Contains("xbox") || lowerName.Contains("gaming"))
+            {
+                var gameCachePath = Path.Combine(package.InstallLocation, @"AC\Temp");
+                if (Directory.Exists(gameCachePath))
+                {
+                    try
+                    {
+                        var files = Directory.GetFiles(gameCachePath, "*.*", SearchOption.AllDirectories);
+                        if (files.Length > 0)
+                        {
+                            long size = files.Sum(f => new FileInfo(f).Length);
+                            items.Add(new AppxCleanableItem
+                            {
+                                PackageFullName = package.FullName,
+                                PackageName = package.Name,
+                                Category = AppxCleanableCategory.TemporaryFiles,
+                                Path = gameCachePath,
+                                Pattern = "*.*",
+                                Recurse = true,
+                                EstimatedSize = size,
+                                FileCount = files.Length,
+                                Description = "Gaming cache"
+                            });
+                        }
+                    }
+                    catch { }
+                }
+            }
+
+            // Social apps
+            if (lowerName.Contains("discord") || lowerName.Contains("teams") || lowerName.Contains("skype"))
+            {
+                var logPath = Path.Combine(package.InstallLocation, @"AC\Microsoft\Windows\Logs");
+                if (Directory.Exists(logPath))
+                {
+                    try
+                    {
+                        var files = Directory.GetFiles(logPath, "*.log", SearchOption.AllDirectories);
+                        if (files.Length > 0)
+                        {
+                            long size = files.Sum(f => new FileInfo(f).Length);
+                            items.Add(new AppxCleanableItem
+                            {
+                                PackageFullName = package.FullName,
+                                PackageName = package.Name,
+                                Category = AppxCleanableCategory.Logs,
+                                Path = logPath,
+                                Pattern = "*.log",
+                                Recurse = true,
+                                EstimatedSize = size,
+                                FileCount = files.Length,
+                                Description = "Chat application logs"
+                            });
+                        }
+                    }
+                    catch { }
+                }
+            }
+
+            // Developer tools
+            if (lowerName.Contains("vscode") || lowerName.Contains("visualstudio") || lowerName.Contains("terminal"))
+            {
+                var cachePath = Path.Combine(package.InstallLocation, @"AC\Microsoft\Windows\Cache");
+                if (Directory.Exists(cachePath))
+                {
+                    try
+                    {
+                        var files = Directory.GetFiles(cachePath, "*.*", SearchOption.AllDirectories);
+                        if (files.Length > 0)
+                        {
+                            long size = files.Sum(f => new FileInfo(f).Length);
+                            items.Add(new AppxCleanableItem
+                            {
+                                PackageFullName = package.FullName,
+                                PackageName = package.Name,
+                                Category = AppxCleanableCategory.Cache,
+                                Path = cachePath,
+                                Pattern = "*.*",
+                                Recurse = true,
+                                EstimatedSize = size,
+                                FileCount = files.Length,
+                                Description = "Developer tool cache"
+                            });
+                        }
+                    }
+                    catch { }
+                }
+            }
         }
     }
 }
