@@ -20,7 +20,6 @@
   <ItemGroup>
     <ProjectReference Include="..\WinCleaner.Core\WinCleaner.Core.csproj" />
     <ProjectReference Include="..\WinCleaner.Infrastructure.Windows\WinCleaner.Infrastructure.Windows.csproj" />
-    <ProjectReference Include="..\WinCleaner.Inspector\WinCleaner.Inspector.csproj" />
     <PackageReference Include="Microsoft.Web.WebView2" Version="1.0.3124.44" />
   </ItemGroup>
 
@@ -29,13 +28,4 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
   </ItemGroup>
-
-  <Target Name="CopyInspectorWwwroot" AfterTargets="Build">
-    <ItemGroup>
-      <InspectorWwwrootFiles Include="$(MSBuildProjectDirectory)\..\WinCleaner.Inspector\wwwroot\**" />
-    </ItemGroup>
-    <Copy SourceFiles="@(InspectorWwwrootFiles)"
-          DestinationFolder="$(OutputPath)Inspector\wwwroot\%(RecursiveDir)"
-          SkipUnchangedFiles="true" />
-  </Target>
 </Project>
