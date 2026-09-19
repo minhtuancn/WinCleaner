@@ -6,7 +6,7 @@
 | **Winapp2 parser** with full `ExcludeKey`, `FileKey`, `RegKey` support | ✅ | Basic parser + ExcludeKey | 🔄 In‑progress | Parser reads ExcludeKey; need FileKey/RegKey enhancement |
 | **AI explainer** (`AiExplainer.cs`) – generates human‑readable description of a rule | ✅ | ✅ Implemented | ✅ Done | Local fallback + optional LLM endpoint |
 | **Cookie cleaning** (`CookieService.cs`) | ✅ | ✅ Implemented | ✅ Done | SQLite cookie DB scan (Chrome/Edge/Brave/Opera/Vivaldi) |
-| **Task Scheduler integration** (`TaskSchedulerService.cs`) | ✅ | ✅ Stub implemented | 🔄 In‑progress | Interface + DI; needs real TaskScheduler impl |
+| **Task Scheduler integration** (`TaskSchedulerService.cs`) | ✅ | ✅ Implemented | ✅ Done | Full Windows Task Scheduler integration with weekly triggers, task creation/deletion, enable/disable |
 | **AppX / Store apps cleaning** (`AppxService.cs`) | ✅ | Minimal | 🔄 In‑progress | Extend |
 | **Inspector UI** (Blazor WASM – `FluentCleaner.Inspector`) | ✅ | ❌ Disabled | 📋 Planned | Scaffolded but disabled (build issues); needs fix |
 | **Multi‑language JSON localisation** (13 languages) | ✅ | English only | 📋 Planned | Add localisation infra |
@@ -41,7 +41,7 @@
 ## Completed This Session
 - ✅ Fixed Inspector build issues (disabled temporarily due to Blazor WASM SDK issues)
 - ✅ Added `CookieService` with SQLite cookie DB scanning
-- ✅ Added `TaskSchedulerService` (stub) with DI registration
+- ✅ Added `TaskSchedulerService` with full Windows Task Scheduler integration
 - ✅ Added `AiExplainer` with local fallback + optional LLM
 - ✅ Added `IUpdateService` / `UpdateService` with GitHub Releases polling
 - ✅ Added Settings UI for auto-update (channel, auto-download, auto-install)
