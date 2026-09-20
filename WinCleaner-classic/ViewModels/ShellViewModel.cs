@@ -52,7 +52,7 @@ namespace WinCleaner.ViewModels
         public bool IsDarkTheme => _themeService.IsDarkThemeActive();
 
         [RelayCommand]
-        private void Navigate(string viewName)
+        public void Navigate(string viewName)
         {
             if (viewName == CurrentView?.GetType().Name.Replace("ViewModel", ""))
                 return;

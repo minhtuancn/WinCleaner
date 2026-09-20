@@ -77,7 +77,10 @@ namespace WinCleaner.Services
                 LastActiveTab = "Cleaner",
                 SplitterDistance = 1050,
                 LogScrollPosition = 0,
-                LastUpdated = DateTime.Now
+                LastUpdated = DateTime.Now,
+                SidebarWidth = 280,
+                SelectedNavItem = "Dashboard",
+                IsSidebarOpen = true
             };
         }
 
@@ -121,5 +124,8 @@ namespace WinCleaner.Services
         public double SplitterDistance { get; set; } = 1050;
         public double LogScrollPosition { get; set; } = 0;
         public DateTime LastUpdated { get; set; } = DateTime.Now;
+        public double SidebarWidth { get; set; } = 280;
+        public string SelectedNavItem { get; set; } = "Dashboard";
+        public bool IsSidebarOpen { get; set; } = true;
     }
 }

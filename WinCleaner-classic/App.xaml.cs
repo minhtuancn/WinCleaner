@@ -86,7 +86,8 @@ namespace WinCleaner
                     services.AddTransient<ShellWindow>(provider => 
                     {
                         var vm = provider.GetRequiredService<ShellViewModel>();
-                        return new ShellWindow { DataContext = vm };
+                        var windowStateService = provider.GetRequiredService<IWindowStateService>();
+                        return new ShellWindow(windowStateService) { DataContext = vm };
                     });
                 });
         }
