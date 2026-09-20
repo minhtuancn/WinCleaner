@@ -14,11 +14,11 @@ using WinCleaner.ViewModels;
 
 namespace WinCleaner.CLI
 {
-    public class Program
+    public static class Program
     {
-        public static async Task<int> Main(string[] args)
+        public static RootCommand CreateRootCommand()
         {
-var rootCommand = new RootCommand("WinCleaner CLI - Professional System Cleaner for Windows")
+            var rootCommand = new RootCommand("WinCleaner CLI - Professional System Cleaner for Windows")
             {
                 CreateScanCommand(),
                 CreateCleanCommand(),
@@ -33,7 +33,7 @@ var rootCommand = new RootCommand("WinCleaner CLI - Professional System Cleaner 
                 CreateVersionCommand()
             };
 
-            return await rootCommand.InvokeAsync(args);
+            return rootCommand;
         }
 
         private static Command CreateScanCommand()

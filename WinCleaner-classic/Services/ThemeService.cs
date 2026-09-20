@@ -351,7 +351,7 @@ namespace WinCleaner.Services
 
         private System.Windows.Media.Color GetDarkerColor(System.Windows.Media.Color color)
         {
-            var factor = 0.7;
+            const double factor = 0.7;
             return System.Windows.Media.Color.FromRgb(
                 (byte)(color.R * factor),
                 (byte)(color.G * factor),
@@ -360,7 +360,6 @@ namespace WinCleaner.Services
 
         private System.Windows.Media.Color GetLighterColor(System.Windows.Media.Color color)
         {
-            var factor = 1.3;
             return System.Windows.Media.Color.FromRgb(
                 (byte)Math.Min(255, color.R * 1.3),
                 (byte)Math.Min(255, color.G * 1.3),

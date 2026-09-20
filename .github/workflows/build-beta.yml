@@ -98,7 +98,7 @@ jobs:
           # Create WiX project on the fly
           $wixContent = @"
           <Wix xmlns="http://wixtoolset.org/schemas/v4/wxs">
-            <Package Name="WinCleaner" Version="$(var.Version)" Manufacturer="WinCleaner Team" UpgradeCode="PUT-GUID-HERE">
+            <Package Name="WinCleaner" Version="$(var.Version)" Manufacturer="WinCleaner Team" UpgradeCode="2a0f7af2-52af-4029-835f-233463fb1681">
               <MajorUpgrade DowngradeErrorMessage="A newer version of WinCleaner is already installed." />
               <MediaTemplate EmbedCab="yes" />
               <Feature Id="Main" Title="WinCleaner" Level="1">
@@ -205,7 +205,7 @@ jobs:
           
           $wixContent = @"
           <Wix xmlns="http://wixtoolset.org/schemas/v4/wxs">
-            <Package Name="WinCleaner Classic" Version="$(var.Version)" Manufacturer="WinCleaner Team" UpgradeCode="PUT-DIFFERENT-GUID-HERE">
+            <Package Name="WinCleaner Classic" Version="$(var.Version)" Manufacturer="WinCleaner Team" UpgradeCode="b334da64-0d1e-4625-af91-f18c3286a9b4">
               <MajorUpgrade DowngradeErrorMessage="A newer version of WinCleaner Classic is already installed." />
               <MediaTemplate EmbedCab="yes" />
               <Feature Id="Main" Title="WinCleaner Classic" Level="1">

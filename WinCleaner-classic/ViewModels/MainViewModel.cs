@@ -737,11 +737,11 @@ namespace WinCleaner.ViewModels
             });
         }
 
-        private void LogDebug(string message) => AddLog(new LogEntry { Level = Models.LogLevel.Debug, Message = message, Source = "Scanner" });
-        private void LogInfo(string message) => AddLog(new LogEntry { Level = Models.LogLevel.Info, Message = message, Source = "System" });
-        private void LogSuccess(string message) => AddLog(new LogEntry { Level = Models.LogLevel.Success, Message = message, Source = "Cleaner" });
-        private void LogWarning(string message) => AddLog(new LogEntry { Level = Models.LogLevel.Warning, Message = message, Source = "System" });
-        private void LogError(string message) => AddLog(new LogEntry { Level = Models.LogLevel.Error, Message = message, Source = "Error" });
+        private new void LogDebug(string message) => AddLog(new LogEntry { Level = Models.LogLevel.Debug, Message = message, Source = "Scanner" });
+        private new void LogInfo(string message) => AddLog(new LogEntry { Level = Models.LogLevel.Info, Message = message, Source = "System" });
+        private new void LogSuccess(string message) => AddLog(new LogEntry { Level = Models.LogLevel.Success, Message = message, Source = "Cleaner" });
+        private new void LogWarning(string message) => AddLog(new LogEntry { Level = Models.LogLevel.Warning, Message = message, Source = "System" });
+        private new void LogError(string message) => AddLog(new LogEntry { Level = Models.LogLevel.Error, Message = message, Source = "Error" });
 
         private static string FormatBytes(long bytes)
         {

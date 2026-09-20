@@ -23,7 +23,7 @@ namespace WinCleaner.Views
             }
         }
 
-        private void MainWindow_StateChanged(object sender, EventArgs e)
+        private void MainWindow_StateChanged(object? sender, EventArgs e)
         {
             if (WindowState == WindowState.Minimized)
             {

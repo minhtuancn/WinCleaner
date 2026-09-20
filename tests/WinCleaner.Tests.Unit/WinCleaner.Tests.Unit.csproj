@@ -12,4 +12,8 @@
     <ProjectReference Include="..\..\src\WinCleaner.Core\WinCleaner.Core.csproj" />
     <ProjectReference Include="..\..\src\WinCleaner.Infrastructure.Windows\WinCleaner.Infrastructure.Windows.csproj" />
   </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="SQLitePCLRaw.lib.e_sqlite3" Version="2.1.12" />
+  </ItemGroup>
 </Project>

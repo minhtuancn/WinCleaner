@@ -23,6 +23,10 @@ namespace WinCleaner
             _host = CreateHostBuilder().Build();
             await _host.StartAsync();
 
+            // Initialize theme service before creating window
+            var themeService = _host.Services.GetRequiredService<IThemeService>();
+            await themeService.InitializeAsync();
+
             var mainWindow = _host.Services.GetRequiredService<MainWindow>();
             mainWindow.Show();
         }

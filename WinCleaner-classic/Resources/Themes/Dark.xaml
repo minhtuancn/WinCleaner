@@ -68,25 +68,10 @@
     <sys:Double x:Key="FontSizeXLarge">20</sys:Double>
     <sys:Double x:Key="FontSizeTitle">28</sys:Double>
 
-    <!-- Spacing -->
-    <Thickness x:Key="MarginSmall">4</Thickness>
-    <Thickness x:Key="MarginNormal">8</Thickness>
-    <Thickness x:Key="MarginMedium">12</Thickness>
-    <Thickness x:Key="MarginLarge">16</Thickness>
-    <Thickness x:Key="MarginXLarge">24</Thickness>
-    <Thickness x:Key="PaddingSmall">4</Thickness>
-    <Thickness x:Key="PaddingNormal">8</Thickness>
-    <Thickness x:Key="PaddingMedium">12</Thickness>
-    <Thickness x:Key="PaddingLarge">16</Thickness>
-
+    <!-- Corner Radius (referenced via StaticResource in MainWindow.xaml) -->
     <CornerRadius x:Key="CornerRadiusSmall">2</CornerRadius>
     <CornerRadius x:Key="CornerRadiusNormal">4</CornerRadius>
     <CornerRadius x:Key="CornerRadiusMedium">6</CornerRadius>
     <CornerRadius x:Key="CornerRadiusLarge">8</CornerRadius>
-
-    <!-- Shadows -->
-    <DropShadowEffect x:Key="ShadowSmall" BlurRadius="4" ShadowDepth="1" Opacity="0.3" Color="Black"/>
-    <DropShadowEffect x:Key="ShadowMedium" BlurRadius="8" ShadowDepth="2" Opacity="0.4" Color="Black"/>
-    <DropShadowEffect x:Key="ShadowLarge" BlurRadius="16" ShadowDepth="4" Opacity="0.5" Color="Black"/>
 
 </ResourceDictionary>
