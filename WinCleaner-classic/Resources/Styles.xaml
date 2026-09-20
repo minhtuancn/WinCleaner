@@ -956,6 +956,21 @@ Stroke="{DynamicResource TextSecondaryBrush}"
         </Setter>
     </Style>
 
+    <!-- Toolbar Separator Style -->
+    <Style x:Key="ToolbarSeparatorStyle" TargetType="Separator">
+        <Setter Property="Width" Value="1"/>
+        <Setter Property="Margin" Value="0,8"/>
+        <Setter Property="Background" Value="{DynamicResource BorderBrush}"/>
+        <Setter Property="VerticalAlignment" Value="Stretch"/>
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="Separator">
+                    <Border Width="1" Background="{TemplateBinding Background}" VerticalAlignment="Stretch"/>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
     <!-- Additional Converters -->
     <models:BytesToGBConverter x:Key="BytesToGBConverter"/>
     <models:CountToVisibilityConverter x:Key="CountToVisibilityConverter"/>

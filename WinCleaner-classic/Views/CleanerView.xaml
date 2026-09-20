@@ -1,0 +1,329 @@
+<UserControl x:Class="WinCleaner.Views.CleanerView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:design="clr-namespace:WinCleaner.Design"
+             xmlns:vm="clr-namespace:WinCleaner.ViewModels"
+             xmlns:models="clr-namespace:WinCleaner.Models"
+             mc:Ignorable="d"
+             d:DesignHeight="700" d:DesignWidth="1000"
+             Background="{DynamicResource BackgroundBrush}"
+             Foreground="{DynamicResource TextPrimaryBrush}">
+
+    <UserControl.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="/WinCleaner;component/Resources/Styles.xaml"/>
+            </ResourceDictionary.MergedDictionaries>
+
+            <!-- HierarchicalDataTemplate for CleanCategoryGroup (parent items) -->
+            <HierarchicalDataTemplate DataType="{x:Type models:CleanCategoryGroup}" ItemsSource="{Binding Items}">
+                <Grid Margin="0,2">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+
+                    <!-- Group checkbox -->
+                    <CheckBox Grid.Column="0" 
+                              IsChecked="{Binding IsAllSelected, Mode=TwoWay}" 
+                              Style="{StaticResource ModernCheckBox}"
+                              VerticalAlignment="Center"
+                              ToolTip="Chọn/Bỏ chọn tất cả mục trong nhóm"/>
+
+                    <!-- Group name and counts -->
+                    <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center">
+                        <TextBlock Text="{Binding Name}" FontWeight="SemiBold" FontSize="{DynamicResource FontSizeNormal}"/>
+                        <TextBlock Text=" (" Foreground="{DynamicResource TextSecondaryBrush}"/>
+                        <TextBlock Text="{Binding SelectedCount}" Foreground="{DynamicResource PrimaryBrush}" FontWeight="SemiBold"/>
+                        <TextBlock Text="/" Foreground="{DynamicResource TextSecondaryBrush}"/>
+                        <TextBlock Text="{Binding ItemCount}" Foreground="{DynamicResource TextSecondaryBrush}"/>
+                        <TextBlock Text=")" Foreground="{DynamicResource TextSecondaryBrush}"/>
+                    </StackPanel>
+
+                    <!-- Selected size -->
+                    <TextBlock Grid.Column="2" 
+                               Text="{Binding SelectedSize, Converter={StaticResource BytesToStringConverter}}" 
+                               Foreground="{DynamicResource TextSecondaryBrush}"
+                               FontFamily="{StaticResource MonospaceFont}"
+                               VerticalAlignment="Center"
+                               Margin="16,0"/>
+
+                    <!-- Risk badge -->
+                    <Border Grid.Column="3" 
+                            Background="{Binding MaxRiskLevel, Converter={StaticResource RiskLevelToBrushConverter}}"
+                            CornerRadius="{StaticResource RadiusSm}"
+                            Padding="6,2"
+                            Margin="8,0,0,0"
+                            VerticalAlignment="Center"
+                            ToolTip="{Binding MaxRiskLevel, Converter={StaticResource RiskLevelToTooltipConverter}}">
+                        <TextBlock Text="{Binding MaxRiskLevel}" 
+                                   FontSize="{DynamicResource FontSizeSmall}" 
+                                   FontWeight="Bold" 
+                                   Foreground="White"/>
+                    </Border>
+
+                    <!-- Status indicators -->
+                    <StackPanel Grid.Column="4" Orientation="Horizontal" VerticalAlignment="Center">
+                        <TextBlock Text="✓" Foreground="{DynamicResource SuccessBrush}" 
+                                   Visibility="{Binding CleanedCount, Converter={StaticResource IntToVisibilityConverter}, ConverterParameter=gt0}"
+                                   ToolTip="{Binding CleanedCount, StringFormat='Đã dọn: {0} mục'}"/>
+                        <TextBlock Text="✗" Foreground="{DynamicResource ErrorBrush}" 
+                                   Visibility="{Binding FailedCount, Converter={StaticResource IntToVisibilityConverter}, ConverterParameter=gt0}"
+                                   ToolTip="{Binding FailedCount, StringFormat='Thất bại: {0} mục'}"/>
+                    </StackPanel>
+                </Grid>
+            </HierarchicalDataTemplate>
+
+            <!-- DataTemplate for CleanItem (leaf items) -->
+            <DataTemplate DataType="{x:Type models:CleanItem}">
+                <Grid Margin="4,2">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+
+                    <!-- Item checkbox -->
+                    <CheckBox Grid.Column="0" 
+                              IsChecked="{Binding IsSelected, Mode=TwoWay}" 
+                              Style="{StaticResource ModernCheckBox}"
+                              VerticalAlignment="Center"
+                              ToolTip="{Binding RiskLevel, Converter={StaticResource RiskLevelToTooltipConverter}}"/>
+
+                    <!-- Item name and description -->
+                    <StackPanel Grid.Column="1" VerticalAlignment="Center" Margin="8,0,0,0">
+                        <TextBlock Text="{Binding Name}" FontSize="{DynamicResource FontSizeNormal}" FontWeight="Medium" Foreground="{DynamicResource TextPrimaryBrush}" TextTrimming="CharacterEllipsis"/>
+                        <TextBlock Text="{Binding Description}" FontSize="{DynamicResource FontSizeSmall}" Foreground="{DynamicResource TextSecondaryBrush}" TextTrimming="CharacterEllipsis" MaxWidth="400"/>
+                    </StackPanel>
+
+                    <!-- Size -->
+                    <TextBlock Grid.Column="2" 
+                               Text="{Binding SizeFormatted}" 
+                               FontSize="{DynamicResource FontSizeNormal}" 
+                               FontWeight="Bold" 
+                               Foreground="{DynamicResource PrimaryBrush}" 
+                               FontFamily="{StaticResource MonospaceFont}"
+                               VerticalAlignment="Center"
+                               Margin="16,0"/>
+
+                    <!-- Risk badge -->
+                    <Border Grid.Column="3" 
+                            Background="{Binding RiskLevel, Converter={StaticResource RiskLevelToBrushConverter}}"
+                            CornerRadius="{StaticResource RadiusSm}"
+                            Padding="4,1"
+                            Margin="8,0,0,0"
+                            VerticalAlignment="Center"
+                            ToolTip="{Binding RiskLevel, Converter={StaticResource RiskLevelToTooltipConverter}}">
+                        <TextBlock Text="{Binding RiskLevel}" 
+                                   FontSize="{DynamicResource FontSizeSmall}" 
+                                   FontWeight="Bold" 
+                                   Foreground="White"/>
+                    </Border>
+
+                    <!-- Status -->
+                    <TextBlock Grid.Column="4" 
+                               Text="{Binding Status}" 
+                               FontSize="{DynamicResource FontSizeSmall}" 
+                               Foreground="{Binding Status, Converter={StaticResource CleanStatusToBrushConverter}}"
+                               VerticalAlignment="Center"
+                               Margin="8,0,0,0"/>
+                </Grid>
+            </DataTemplate>
+        </ResourceDictionary>
+    </UserControl.Resources>
+
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+
+        <!-- Toolbar -->
+        <Border Grid.Row="0" 
+                Style="{DynamicResource CardStyle}" 
+                Margin="{DynamicResource PageMargin}"
+                VerticalAlignment="Top">
+            <StackPanel Orientation="Horizontal" Margin="{DynamicResource CardPadding}">
+                <!-- Profile Selector -->
+                <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Margin="0,0,24,0">
+                    <TextBlock Text="Profile:" VerticalAlignment="Center" FontWeight="Medium" Margin="0,0,8,0"/>
+                    <ComboBox ItemsSource="{Binding AvailableProfiles}" 
+                              SelectedValue="{Binding SelectedProfile, Mode=TwoWay}" 
+                              SelectedValuePath="Profile"
+                              DisplayMemberPath="DisplayName"
+                              Style="{StaticResource ModernComboBox}"
+                              ItemTemplate="{StaticResource ProfileComboBoxTemplate}"
+                              MinWidth="180"
+                              VerticalAlignment="Center"
+                              ToolTip="{Binding SelectedProfile, Converter={StaticResource CleanProfileToStringConverter}}"/>
+                </StackPanel>
+
+                <Separator Style="{DynamicResource ToolbarSeparatorStyle}" Margin="0,0,24,0"/>
+
+                <!-- Search Box -->
+                <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Margin="0,0,24,0">
+                    <TextBlock Text="Tìm kiếm:" VerticalAlignment="Center" FontWeight="Medium" Margin="0,0,8,0"/>
+                    <TextBox Text="{Binding FilterText, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" 
+                             Style="{StaticResource SearchTextBox}"
+                             Tag="Tìm kiếm mục cần dọn..."
+                             MinWidth="250"
+                             VerticalAlignment="Center"/>
+                </StackPanel>
+
+                <Separator Style="{DynamicResource ToolbarSeparatorStyle}" Margin="0,0,24,0"/>
+
+                <!-- Action Buttons -->
+                <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                    <Button Command="{Binding SelectSafeCommand}" 
+                            Style="{DynamicResource SecondaryButtonStyle}"
+                            Padding="{DynamicResource ButtonPaddingMd}"
+                            ToolTip="Chọn các mục an toàn (rủi ro thấp)">
+                        <StackPanel Orientation="Horizontal">
+                            <Path Data="{x:Static design:Icons.Check}" Fill="{DynamicResource SuccessBrush}" Width="14" Height="14" Stretch="Uniform" Margin="0,0,6,0"/>
+                            <TextBlock Text="Chọn an toàn" VerticalAlignment="Center"/>
+                        </StackPanel>
+                    </Button>
+
+                    <Button Command="{Binding SelectAllCommand}" 
+                            Style="{DynamicResource SecondaryButtonStyle}"
+                            Padding="{DynamicResource ButtonPaddingMd}"
+                            Margin="8,0,0,0"
+                            ToolTip="Chọn tất cả">
+                        <StackPanel Orientation="Horizontal">
+                            <Path Data="{x:Static design:Icons.Check}" Fill="{DynamicResource PrimaryBrush}" Width="14" Height="14" Stretch="Uniform" Margin="0,0,6,0"/>
+                            <TextBlock Text="Chọn tất cả" VerticalAlignment="Center"/>
+                        </StackPanel>
+                    </Button>
+
+                    <Button Command="{Binding DeselectAllCommand}" 
+                            Style="{DynamicResource SecondaryButtonStyle}"
+                            Padding="{DynamicResource ButtonPaddingMd}"
+                            Margin="8,0,0,0"
+                            ToolTip="Bỏ chọn tất cả">
+                        <StackPanel Orientation="Horizontal">
+                            <Path Data="{x:Static design:Icons.X}" Fill="{DynamicResource TextSecondaryBrush}" Width="14" Height="14" Stretch="Uniform" Margin="0,0,6,0"/>
+                            <TextBlock Text="Bỏ chọn tất cả" VerticalAlignment="Center"/>
+                        </StackPanel>
+                    </Button>
+
+                    <Button Command="{Binding ExpandAllCommand}" 
+                            Style="{DynamicResource SecondaryButtonStyle}"
+                            Padding="{DynamicResource ButtonPaddingMd}"
+                            Margin="8,0,0,0"
+                            ToolTip="Mở rộng tất cả nhóm">
+                        <StackPanel Orientation="Horizontal">
+                            <Path Data="{x:Static design:Icons.ChevronDown}" Fill="{DynamicResource TextSecondaryBrush}" Width="14" Height="14" Stretch="Uniform" Margin="0,0,6,0"/>
+                            <TextBlock Text="Mở rộng" VerticalAlignment="Center"/>
+                        </StackPanel>
+                    </Button>
+
+                    <Button Command="{Binding CollapseAllCommand}" 
+                            Style="{DynamicResource SecondaryButtonStyle}"
+                            Padding="{DynamicResource ButtonPaddingMd}"
+                            Margin="8,0,0,0"
+                            ToolTip="Thu gọn tất cả nhóm">
+                        <StackPanel Orientation="Horizontal">
+                            <Path Data="{x:Static design:Icons.ChevronUp}" Fill="{DynamicResource TextSecondaryBrush}" Width="14" Height="14" Stretch="Uniform" Margin="0,0,6,0"/>
+                            <TextBlock Text="Thu gọn" VerticalAlignment="Center"/>
+                        </StackPanel>
+                    </Button>
+                </StackPanel>
+
+                <Separator Style="{DynamicResource ToolbarSeparatorStyle}" Margin="24,0,0,0"/>
+
+                <!-- Scan/Clean Buttons -->
+                <StackPanel Orientation="Horizontal" VerticalAlignment="Center" HorizontalAlignment="Right" Margin="24,0,0,0">
+                    <Button Command="{Binding ScanCommand}" 
+                            Style="{DynamicResource PrimaryButtonStyle}"
+                            Padding="{DynamicResource ButtonPaddingLg}"
+                            MinWidth="120"
+                            IsEnabled="{Binding IsScanning, Converter={StaticResource InverseBoolToVisibilityConverter}, ConverterParameter=collapsed}"
+                            ToolTip="Quét hệ thống tìm các mục có thể dọn">
+                        <StackPanel Orientation="Horizontal">
+                            <Path Data="{x:Static design:Icons.Search}" Fill="{DynamicResource TextOnPrimaryBrush}" Width="16" Height="16" Stretch="Uniform" Margin="0,0,8,0"/>
+                            <TextBlock Text="Quét" VerticalAlignment="Center"/>
+                        </StackPanel>
+                    </Button>
+
+                    <Button Command="{Binding CleanCommand}" 
+                            Style="{DynamicResource DangerButtonStyle}"
+                            Padding="{DynamicResource ButtonPaddingLg}"
+                            MinWidth="120"
+                            Margin="8,0,0,0"
+                            IsEnabled="{Binding TotalSelectedSize, Converter={StaticResource BytesToGBConverter}, ConverterParameter=gt0}"
+                            ToolTip="Dọn dẹp các mục đã chọn">
+                        <StackPanel Orientation="Horizontal">
+                            <Path Data="{x:Static design:Icons.Broom}" Fill="White" Width="16" Height="16" Stretch="Uniform" Margin="0,0,8,0"/>
+                            <TextBlock Text="Dọn dẹp" VerticalAlignment="Center"/>
+                        </StackPanel>
+                    </Button>
+
+                    <Button Command="{Binding CancelCommand}" 
+                            Style="{DynamicResource SecondaryButtonStyle}"
+                            Padding="{DynamicResource ButtonPaddingMd}"
+                            Margin="8,0,0,0"
+                            Visibility="{Binding IsScanning, Converter={StaticResource BoolToVisibilityConverter}}"
+                            ToolTip="Hủy thao tác đang chạy">
+                        <TextBlock Text="Hủy" VerticalAlignment="Center"/>
+                    </Button>
+                </StackPanel>
+            </StackPanel>
+        </Border>
+
+        <!-- Progress Bar -->
+        <Border Grid.Row="1" 
+                Style="{DynamicResource CardStyle}" 
+                Margin="{DynamicResource PageMargin}"
+                Visibility="{Binding IsScanning, Converter={StaticResource BoolToVisibilityConverter}}">
+            <Grid Margin="{DynamicResource CardPadding}">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                </Grid.RowDefinitions>
+                <Grid Grid.Row="0" Margin="0,0,0,8">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+                    <Path Grid.Column="0" Data="{x:Static design:Icons.Clock}" Fill="{DynamicResource PrimaryBrush}" Width="16" Height="16" Stretch="Uniform" VerticalAlignment="Center" Margin="0,0,8,0"/>
+                    <TextBlock Grid.Column="1" Text="{Binding ScanProgressText}" FontSize="{DynamicResource FontSizeMedium}" FontWeight="Medium" Foreground="{DynamicResource TextPrimaryBrush}" VerticalAlignment="Center"/>
+                    <Button Grid.Column="2" Style="{DynamicResource GhostButtonStyle}" Command="{Binding CancelCommand}" Padding="{DynamicResource ButtonPaddingSm}">
+                        <TextBlock Text="Hủy" VerticalAlignment="Center"/>
+                    </Button>
+                </Grid>
+                <ProgressBar Grid.Row="1" Height="6" Value="{Binding OverallProgress}" Maximum="100" Style="{DynamicResource ModernProgressBar}" IsIndeterminate="{Binding IsScanning}"/>
+            </Grid>
+        </Border>
+
+        <!-- TreeView with Virtualization -->
+        <Border Grid.Row="2" 
+                Style="{DynamicResource CardStyle}" 
+                Margin="{DynamicResource PageMargin}">
+            <TreeView ItemsSource="{Binding Categories}" 
+                      VirtualizingStackPanel.IsVirtualizing="True"
+                      VirtualizingStackPanel.VirtualizationMode="Recycling"
+                      ScrollViewer.HorizontalScrollBarVisibility="Disabled"
+                      ScrollViewer.VerticalScrollBarVisibility="Auto"
+                      BorderThickness="0"
+                      Background="Transparent"
+                      ItemContainerStyle="{StaticResource CategoryTreeViewItem}">
+                <TreeView.Resources>
+                    <!-- Ensure TreeViewItem uses virtualization -->
+                    <Style TargetType="TreeViewItem" BasedOn="{StaticResource CategoryTreeViewItem}">
+                        <Setter Property="VirtualizingStackPanel.IsVirtualizing" Value="True"/>
+                        <Setter Property="VirtualizingStackPanel.VirtualizationMode" Value="Recycling"/>
+                    </Style>
+                </TreeView.Resources>
+            </TreeView>
+        </Border>
+    </Grid>
+</UserControl>
