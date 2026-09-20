@@ -11,7 +11,12 @@
   <ItemGroup>
     <ProjectReference Include="..\..\src\WinCleaner.Core\WinCleaner.Core.csproj" />
     <ProjectReference Include="..\..\src\WinCleaner.Infrastructure.Windows\WinCleaner.Infrastructure.Windows.csproj" />
+    <ProjectReference Include="..\..\WinCleaner-classic\WinCleaner.csproj" ReferenceOutputAssembly="false" />
   </ItemGroup>
+
+  <Target Name="CopyClassicAssembly" AfterTargets="Build">
+    <Copy SourceFiles="..\..\WinCleaner-classic\bin\Release\net8.0-windows\win-x64\WinCleaner.dll" DestinationFolder="$(OutputPath)" Condition="Exists('..\..\WinCleaner-classic\bin\Release\net8.0-windows\win-x64\WinCleaner.dll')" />
+  </Target>
 
   <ItemGroup>
     <PackageReference Include="SQLitePCLRaw.lib.e_sqlite3" Version="2.1.12" />

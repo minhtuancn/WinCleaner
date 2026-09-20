@@ -20,7 +20,7 @@ namespace WinCleaner.Design
         public static readonly Geometry Collapse = Parse("M3 9h6V3M9 21V15h6M3 15l7-7 7 7");
         public static readonly Geometry ArrowRight = Parse("M5 12h14M12 5l7 7-7 7");
         public static readonly Geometry ArrowLeft = Parse("M19 12H5M12 19l-7-7 7-7");
-        public static readonly Geometry Clock = Parse("M11.5 2C6.47 2 2 6.47 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 11.5 2zm0 18c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58 8-8 8zm0-12v6l4.5 3-4.5 3z");
+        public static readonly Geometry Clock = Parse("M11.5 2C6.47 2 2 6.47 2 11.5S6.47 20 11.5 20 20 13.53 20 11.5 13.53 2 11.5 2zm0 18c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58 8-8 8zm0-12v6l4.5 3-4.5 3z");
 
         // Actions
         public static readonly Geometry Search = Parse("M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z");
@@ -49,12 +49,29 @@ namespace WinCleaner.Design
         public static readonly Geometry File = Parse("M13 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V9zM13 2v8h8");
         public static readonly Geometry Drive = Parse("M12 2L4 10v8a2 2 0 002 2h12a2 2 0 002-2V10L12 2zM12 6v10M8 10h8");
         public static readonly Geometry Cloud = Parse("M18 10h-1.26A8 8 0 109 20h9a5 5 0 000-10z");
-        public static readonly Geometry Download = Parse("M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M7 10l5 5 5-5M12 15v-8");
-        public static readonly Geometry Upload = Parse("M21 9v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M5 14l5-5 5 5M12 9v8");
+        public static readonly Geometry Download = Parse("M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M7 10l5 5 5-5M12 15V3");
+        public static readonly Geometry Upload = Parse("M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M17 8l-5-5-5 5M12 15v12");
+        public static readonly Geometry Trash = Parse("M3 6h18M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2");
 
+        // Categories
+        public static readonly Geometry Windows = Parse("M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5");
+        public static readonly Geometry Browser = Parse("M23 12l-10 7L1 12l10-7 10 7zM2 12l10 7 10-7");
+        public static readonly Geometry Code = Parse("M16 18l6-6-6-6M8 6l-6 6 6 6");
+        public static readonly Geometry Game = Parse("M12 2a10 10 0 1010 10A10 10 0 0012 2zM12 6v8M8 10h8");
+        public static readonly Geometry TrashBin = Parse("M3 6h18M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2");
+
+        // Hardware
+        public static readonly Geometry Cpu = Parse("M12 2a10 10 0 1010 10A10 10 0 0012 2zm0 18a8 8 0 110-16 8 8 0 010 16z");
+        public static readonly Geometry Memory = Parse("M6 4h16v16H6zM8 6h12v2H8zm0 4h12v2H8zm0 4h12v2H8z");
+        public static readonly Geometry Gpu = Parse("M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h8a2 2 0 002-2V4a2 2 0 002-2zm0 18H6V4h8v16z");
+        public static readonly Geometry Disk = Parse("M12 2a10 10 0 1010 10A10 10 0 0012 2zm0 18a8 8 0 110-16 8 8 0 010 16z");
+
+        // Helpers
         private static Geometry Parse(string pathData)
         {
-            return Geometry.Parse(pathData);
+            var geometry = Geometry.Parse(pathData);
+            geometry.Freeze(); // Freeze for performance/thread-safety
+            return geometry;
         }
     }
 }
