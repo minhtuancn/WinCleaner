@@ -77,6 +77,10 @@ namespace WinCleaner
                     services.AddTransient<ToolsViewModel>();
                     services.AddTransient<SettingsViewModel>();
                     services.AddTransient<ShellViewModel>();
+                    services.AddTransient<SchedulerTabViewModel>();
+                    services.AddTransient<CookieTabViewModel>();
+                    services.AddTransient<ShredTabViewModel>();
+                    services.AddTransient<AppXTabViewModel>();
 
                     // Views
                     services.AddTransient<ShellWindow>(provider => 

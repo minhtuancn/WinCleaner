@@ -52,6 +52,7 @@ namespace WinCleaner.Design
         public static readonly Geometry Download = Parse("M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M7 10l5 5 5-5M12 15V3");
         public static readonly Geometry Upload = Parse("M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M17 8l-5-5-5 5M12 15v12");
         public static readonly Geometry Trash = Parse("M3 6h18M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2");
+        public static readonly Geometry Package = Parse("M21 16V8a2 2 0 00-1-1.73l-7-4a2 2 0 00-2 0l-7 4A2 2 0 003 8v8a2 2 0 001 1.73l7 4a2 2 0 002 0l7-4A2 2 0 0021 16zM12 22V12M3.27 9.27L12 16l8.73-6.73M12 12l7.73 4.4");
 
         // Categories
         public static readonly Geometry Windows = Parse("M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5");
