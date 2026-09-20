@@ -26,6 +26,8 @@
 | **Multi-Language** | English, Vietnamese, German, French, Chinese (Simplified/Traditional) |
 | **CLI & Silent Mode** | Headless operation for automation (`--silent` flag) |
 | **Modern UI** | WPF with Fluent Design, dark/light theme, live operation timeline |
+| **Classic Edition** | Lightweight single-window UI with same core engine |
+| **Container Support** | Docker multi-stage build for CI/CD and headless execution |
 
 ---
 
@@ -73,7 +75,7 @@ WinCleaner/
 │   │   ├── Models/Converters.cs         # All IValueConverter implementations
 │   │   ├── Services/                    # ThemeService, WindowStateService, WpfCrashHandler
 │   │   └── WinCleaner.Infrastructure.Windows.csproj
-│   ├── WinCleaner.App/                  # WPF Application (net8.0-windows)
+│   ├── WinCleaner.App/                  # Modern WPF Application (net8.0-windows)
 │   │   ├── ViewModels/                  # ShellViewModel + 7 page ViewModels
 │   │   ├── Views/                       # ShellWindow + 7 page Views (XAML)
 │   │   ├── Design/                      # Design System (ColorPalette, Typography, Spacing, Icons)
@@ -86,6 +88,16 @@ WinCleaner/
 │   │   ├── CLI/Program.cs               # System.CommandLine commands
 │   │   └── WinCleaner.Cli.csproj
 │   └── WinCleaner.Inspector/            # Blazor WASM Inspector (net8.0, disabled - build issues)
+├── WinCleaner-classic/                  # Classic Edition (Single Window, net8.0-windows)
+│   ├── Design/Icons.cs                  # Vector geometry icons
+│   ├── Resources/                       # Styles, Themes (Light/Dark), SharedThemeResources
+│   ├── ViewModels/MainViewModel.cs      # Single-window ViewModel
+│   ├── Views/MainWindow.xaml            # Main window XAML
+│   ├── Services/                        # ThemeService, SystemScanner, CleanerService, etc.
+│   ├── CLI/Program.cs                   # Classic CLI
+│   ├── WinCleaner.csproj
+│   ├── App.xaml / App.xaml.cs           # DI + Theme initialization
+│   └── app.manifest
 ├── tests/
 │   ├── WinCleaner.Tests.Unit/           # xUnit + Moq + FluentAssertions (48 tests)
 │   └── WinCleaner.Tests.Integration/    # Integration tests (placeholder)
@@ -166,9 +178,26 @@ dotnet run --project src/WinCleaner.Cli -- list
 dotnet run --project src/WinCleaner.Cli -- database update
 ```
 
-### Run WPF App
+### Run WPF App (Modern Edition)
 ```bash
 dotnet run --project src/WinCleaner.App
+```
+
+### Run Classic Edition (Single Window)
+```bash
+dotnet run --project WinCleaner-classic/WinCleaner.csproj
+```
+
+### Run via Docker
+```bash
+# Build image
+docker build -t wincleaner:latest .
+
+# Run CLI
+docker run --rm wincleaner:latest cli scan
+
+# Run Modern App (requires X11/Wayland forwarding on Linux)
+docker run --rm -e DISPLAY=$DISPLAY -v /tmp/.X11-unix:/tmp/.X11-unix wincleaner:latest
 ```
 
 ---
@@ -272,12 +301,14 @@ MIT License — see [LICENSE](LICENSE) for details.
 
 | Metric | Status |
 |--------|--------|
-| **Version** | 2.0.0-beta |
+| **Version** | 2.0.0 |
 | **Target Framework** | .NET 8 |
 | **Tests** | 48 passing |
-| **Coverage** | 90%+ target |
+| **Coverage** | 15% baseline (target 90%+ for v2.1) |
 | **Languages** | 6 supported |
 | **Platforms** | Windows 10/11 x64 |
+| **Editions** | Modern (WPF Shell) + Classic (Single Window) |
+| **Container** | Docker multi-stage build |
 
 ---
 

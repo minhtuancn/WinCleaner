@@ -1,10 +1,10 @@
 {
-  "version": "2.0.0-beta.1",
+  "version": "2.0.0",
   "versionPrefix": "2.0.0",
-  "versionSuffix": "beta.1",
+  "versionSuffix": "",
   "buildNumber": 1,
-  "releaseChannel": "beta",
-  "releaseDate": "2026-09-19",
+  "releaseChannel": "stable",
+  "releaseDate": "2026-09-20",
   "minimumSupportedVersion": "1.0.0",
   "updateCheckUrl": "https://api.github.com/repos/minhtuancn/WinCleaner/releases/latest",
   "downloadBaseUrl": "https://github.com/minhtuancn/WinCleaner/releases/download"
