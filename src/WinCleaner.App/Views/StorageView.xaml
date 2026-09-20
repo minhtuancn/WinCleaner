@@ -43,7 +43,8 @@
                             Command="{Binding LoadAsyncCommand}"
                             IsEnabled="{Binding IsAnalyzing, Converter={StaticResource InverseBoolConverter}}"
                             Padding="24,12"
-                            MinWidth="160">
+                            MinWidth="160"
+                            AutomationProperties.Name="Analyze Storage" AutomationProperties.HelpText="Start analyzing disk usage for the selected drive">
                         <StackPanel Orientation="Horizontal">
                             <Path Data="{x:Static design:Icons.Search}" Fill="{DynamicResource TextOnPrimaryBrush}" Width="16" Height="16" Stretch="Uniform" VerticalAlignment="Center" Margin="0,0,8,0"/>
                             <TextBlock Text="{Binding IsAnalyzing, Converter={StaticResource BoolToTextConverter}, ConverterParameter='Analyze|Analyzing...'}" VerticalAlignment="Center" FontWeight="SemiBold"/>
@@ -116,7 +117,8 @@
             <Border Style="{StaticResource CardStyle}" Padding="{StaticResource PaddingLg}" Margin="0,0,0,24" Visibility="{Binding FolderTree.Count, Converter={StaticResource GreaterThanZeroToVisibilityConverter}}">
                 <StackPanel>
                     <TextBlock Text="Folder Tree" FontSize="{StaticResource FontSizeMedium}" FontWeight="SemiBold" Foreground="{DynamicResource TextPrimaryBrush}" Margin="0,0,0,12"/>
-                    <TreeView ItemsSource="{Binding FolderTree}" Background="Transparent" BorderThickness="0">
+                    <TreeView ItemsSource="{Binding FolderTree}" Background="Transparent" BorderThickness="0"
+                         AutomationProperties.Name="Folder Tree" AutomationProperties.HelpText="Tree view of folder structure with sizes">
                         <TreeView.ItemContainerStyle>
                             <Style TargetType="TreeViewItem">
                                 <Setter Property="IsExpanded" Value="{Binding IsExpanded, Mode=TwoWay}"/>
@@ -132,7 +134,8 @@
                                                         <ColumnDefinition Width="*"/>
                                                         <ColumnDefinition Width="Auto"/>
                                                     </Grid.ColumnDefinitions>
-                                                    <Expander x:Name="expander" Grid.Column="0" IsExpanded="{Binding IsExpanded, RelativeSource={RelativeSource TemplatedParent}, Mode=TwoWay}" VerticalAlignment="Center"/>
+                                                    <Expander x:Name="expander" Grid.Column="0" IsExpanded="{Binding IsExpanded, RelativeSource={RelativeSource TemplatedParent}, Mode=TwoWay}" VerticalAlignment="Center"
+                                                     AutomationProperties.Name="Expand Folder" AutomationProperties.HelpText="Expand or collapse this folder"/>
                                                     <ContentPresenter Grid.Column="1" HorizontalAlignment="Center" VerticalAlignment="Center" RecognizesAccessKey="True"/>
                                                 </Grid>
                                             </Border>

@@ -26,10 +26,12 @@
                     </StackPanel>
 
                     <Border Grid.Column="1" HorizontalAlignment="Center" VerticalAlignment="Center">
-                        <TextBox Width="300" Text="{Binding CustomPath, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource ModernTextBoxStyle}" Tag="Enter folder path..." VerticalAlignment="Center" Margin="0,0,12,0"/>
+                        <TextBox Width="300" Text="{Binding CustomPath, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource ModernTextBoxStyle}" Tag="Enter folder path..." VerticalAlignment="Center" Margin="0,0,12,0"
+                         AutomationProperties.Name="Custom Path" AutomationProperties.HelpText="Enter a folder path to add for manual cleanup"/>
                     </Border>
 
-                    <Button Grid.Column="2" Style="{StaticResource PrimaryButtonStyle}" Command="{Binding AddCustomPathAsyncCommand}" Padding="24,12" MinWidth="140" VerticalAlignment="Center">
+                    <Button Grid.Column="2" Style="{StaticResource PrimaryButtonStyle}" Command="{Binding AddCustomPathAsyncCommand}" Padding="24,12" MinWidth="140" VerticalAlignment="Center"
+                         AutomationProperties.Name="Add Path" AutomationProperties.HelpText="Add the entered folder path for manual cleanup">
                         <StackPanel Orientation="Horizontal">
                             <Path Data="{x:Static design:Icons.Plus}" Fill="{DynamicResource TextOnPrimaryBrush}" Width="16" Height="16" Stretch="Uniform" Margin="0,0,8,0" VerticalAlignment="Center"/>
                             <TextBlock Text="Add Path" VerticalAlignment="Center" FontWeight="SemiBold"/>
@@ -42,7 +44,8 @@
             <Border Style="{StaticResource CardStyle}" Padding="{StaticResource PaddingLg}" Margin="0,0,0,24" Visibility="{Binding RootNodes.Count, Converter={StaticResource GreaterThanZeroToVisibilityConverter}}">
                 <StackPanel>
                     <TextBlock Text="Folders" FontSize="{StaticResource FontSizeMedium}" FontWeight="SemiBold" Foreground="{DynamicResource TextPrimaryBrush}" Margin="0,0,0,12"/>
-                    <TreeView ItemsSource="{Binding RootNodes}" Background="Transparent" BorderThickness="0">
+                    <TreeView ItemsSource="{Binding RootNodes}" Background="Transparent" BorderThickness="0"
+                         AutomationProperties.Name="Folder Tree" AutomationProperties.HelpText="Navigate and select folders for manual cleanup">
                         <TreeView.ItemContainerStyle>
                             <Style TargetType="TreeViewItem">
                                 <Setter Property="IsExpanded" Value="{Binding IsExpanded, Mode=TwoWay}"/>
@@ -58,7 +61,8 @@
                                                         <ColumnDefinition Width="*"/>
                                                         <ColumnDefinition Width="Auto"/>
                                                     </Grid.ColumnDefinitions>
-                                                    <Expander x:Name="expander" Grid.Column="0" IsExpanded="{Binding IsExpanded, RelativeSource={RelativeSource TemplatedParent}, Mode=TwoWay}" VerticalAlignment="Center"/>
+                                                    <Expander x:Name="expander" Grid.Column="0" IsExpanded="{Binding IsExpanded, RelativeSource={RelativeSource TemplatedParent}, Mode=TwoWay}" VerticalAlignment="Center"
+                                                     AutomationProperties.Name="Expand Folder" AutomationProperties.HelpText="Expand or collapse this folder"/>
                                                     <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center">
                                                         <Path Data="{Binding SafetyLevel, Converter={StaticResource SafetyLevelToIconConverter}}" Fill="{Binding SafetyLevel, Converter={StaticResource SafetyLevelToBrushConverter}}" Width="14" Height="14" Stretch="Uniform" VerticalAlignment="Center" Margin="0,0,6,0"/>
                                                         <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center" RecognizesAccessKey="True"/>
@@ -150,7 +154,8 @@
                     </ItemsControl>
 
                     <StackPanel Orientation="Horizontal" Margin="0,16,0,0">
-                        <Button Style="{StaticResource SecondaryButtonStyle}" Command="{Binding OpenInExplorerCommand}" CommandParameter="{Binding NodeDetail.Path}" Padding="16,8">
+                        <Button Style="{StaticResource SecondaryButtonStyle}" Command="{Binding OpenInExplorerCommand}" CommandParameter="{Binding NodeDetail.Path}" Padding="16,8"
+                         AutomationProperties.Name="Open in Explorer" AutomationProperties.HelpText="Open the selected folder in Windows Explorer">
                             <StackPanel Orientation="Horizontal">
                                 <Path Data="{x:Static design:Icons.Folder}" Fill="{DynamicResource TextPrimaryBrush}" Width="16" Height="16" Stretch="Uniform" Margin="0,0,8,0" VerticalAlignment="Center"/>
                                 <TextBlock Text="Open in Explorer" VerticalAlignment="Center" FontWeight="SemiBold"/>

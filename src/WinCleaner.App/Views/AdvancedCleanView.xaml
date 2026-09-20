@@ -28,14 +28,16 @@
 
                     <!-- Profile Selector -->
                     <StackPanel Grid.Column="1" HorizontalAlignment="Center" VerticalAlignment="Center" Orientation="Horizontal" Margin="24,0">
-                        <ComboBox Width="200" ItemsSource="{Binding AvailableProfiles}" SelectedItem="{Binding SelectedProfile}" Margin="0,0,16,0">
+                        <ComboBox Width="200" ItemsSource="{Binding AvailableProfiles}" SelectedItem="{Binding SelectedProfile}" Margin="0,0,16,0"
+                         AutomationProperties.Name="Cleaning Profile" AutomationProperties.HelpText="Select the cleaning profile to use">
                             <ComboBox.ItemTemplate>
                                 <DataTemplate>
                                     <TextBlock Text="{Binding}" FontSize="{StaticResource FontSizeMedium}"/>
                                 </DataTemplate>
                             </ComboBox.ItemTemplate>
                         </ComboBox>
-                        <Button Style="{StaticResource PrimaryButtonStyle}" Command="{Binding ScanAsyncCommand}" IsEnabled="{Binding IsScanning, Converter={StaticResource InverseBoolConverter}}" Padding="16,8" MinWidth="140">
+                        <Button Style="{StaticResource PrimaryButtonStyle}" Command="{Binding ScanAsyncCommand}" IsEnabled="{Binding IsScanning, Converter={StaticResource InverseBoolConverter}}" Padding="16,8" MinWidth="140"
+                         AutomationProperties.Name="Scan" AutomationProperties.HelpText="Start scanning with the selected profile">
                             <StackPanel Orientation="Horizontal">
                                 <Path Data="{x:Static design:Icons.Search}" Fill="{DynamicResource TextOnPrimaryBrush}" Width="16" Height="16" Stretch="Uniform" VerticalAlignment="Center" Margin="0,0,8,0"/>
                                 <TextBlock Text="{Binding IsScanning, Converter={StaticResource BoolToTextConverter}, ConverterParameter='Analyze|Scanning...'}" VerticalAlignment="Center" FontWeight="SemiBold"/>
@@ -43,7 +45,8 @@
                         </Button>
                     </StackPanel>
 
-                    <Button Grid.Column="2" Style="{StaticResource SecondaryButtonStyle}" Command="{Binding ValidatePlanCommand}" IsEnabled="{Binding IsScanning, Converter={StaticResource InverseBoolConverter}}" Padding="16,8" Margin="16,0,0,0">
+                    <Button Grid.Column="2" Style="{StaticResource SecondaryButtonStyle}" Command="{Binding ValidatePlanCommand}" IsEnabled="{Binding IsScanning, Converter={StaticResource InverseBoolConverter}}" Padding="16,8" Margin="16,0,0,0"
+                         AutomationProperties.Name="Validate Plan" AutomationProperties.HelpText="Validate the cleaning plan for safety issues">
                         <StackPanel Orientation="Horizontal">
                             <Path Data="{x:Static design:Icons.Shield}" Fill="{DynamicResource TextPrimaryBrush}" Width="16" Height="16" Stretch="Uniform" Margin="0,0,8,0" VerticalAlignment="Center"/>
                             <TextBlock Text="Validate" VerticalAlignment="Center" FontWeight="SemiBold"/>
@@ -119,7 +122,8 @@
                                             <ColumnDefinition Width="Auto"/>
                                         </Grid.ColumnDefinitions>
 
-                                        <CheckBox Grid.Column="0" IsChecked="{Binding IsAllSelected}" VerticalAlignment="Center" Margin="0,0,12,0" Style="{StaticResource ModernCheckBoxStyle}"/>
+                                        <CheckBox Grid.Column="0" IsChecked="{Binding IsAllSelected}" VerticalAlignment="Center" Margin="0,0,12,0" Style="{StaticResource ModernCheckBoxStyle}"
+                                         AutomationProperties.Name="Select All Items in Category" AutomationProperties.HelpText="Select or deselect all items in this category"/>
                                         <Path Grid.Column="0" Data="{Binding Category, Converter={StaticResource CategoryToIconConverter}}" Fill="{DynamicResource TextSecondaryBrush}" Width="18" Height="18" Stretch="Uniform" VerticalAlignment="Center" Margin="0,0,12,0"/>
                                         <StackPanel Grid.Column="1" VerticalAlignment="Center">
                                             <TextBlock Text="{Binding Name}" FontSize="{StaticResource FontSizeMedium}" FontWeight="Medium" Foreground="{DynamicResource TextPrimaryBrush}"/>
@@ -140,7 +144,8 @@
             <!-- Action Buttons -->
             <Border Style="{StaticResource CardStyle}" Padding="{StaticResource PaddingLg}" Margin="0,24,0,0" Visibility="{Binding ValidatedPlan.IsValid, Converter={StaticResource BooleanToVisibilityConverter}}">
                 <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
-                    <Button Style="{StaticResource PrimaryButtonStyle}" Command="{Binding ExecutePlanCommand}" IsEnabled="{Binding ValidatedPlan.IsValid}" Padding="24,12" MinWidth="160">
+                    <Button Style="{StaticResource PrimaryButtonStyle}" Command="{Binding ExecutePlanCommand}" IsEnabled="{Binding ValidatedPlan.IsValid}" Padding="24,12" MinWidth="160"
+                         AutomationProperties.Name="Clean Now" AutomationProperties.HelpText="Execute the validated cleaning plan">
                         <StackPanel Orientation="Horizontal">
                             <Path Data="{x:Static design:Icons.Broom}" Fill="{DynamicResource TextOnPrimaryBrush}" Width="16" Height="16" Stretch="Uniform" Margin="0,0,8,0" VerticalAlignment="Center"/>
                             <TextBlock Text="Clean Now" VerticalAlignment="Center" FontWeight="SemiBold"/>

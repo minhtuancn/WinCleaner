@@ -124,7 +124,8 @@
                             <ColumnDefinition Width="Auto"/>
                         </Grid.ColumnDefinitions>
                         <TextBlock Grid.Column="0" Text="Recent Logs" FontSize="{StaticResource FontSizeMedium}" FontWeight="SemiBold" Foreground="{DynamicResource TextPrimaryBrush}" VerticalAlignment="Center"/>
-                        <Button Grid.Column="2" Style="{StaticResource SecondaryButtonStyle}" Command="{Binding ClearLogsCommand}" Padding="12,6">
+                        <Button Grid.Column="2" Style="{StaticResource SecondaryButtonStyle}" Command="{Binding ClearLogsCommand}" Padding="12,6"
+                         AutomationProperties.Name="Clear Logs" AutomationProperties.HelpText="Clear all recent log entries">
                             <StackPanel Orientation="Horizontal">
                                 <Path Data="{x:Static design:Icons.Trash}" Fill="{DynamicResource TextPrimaryBrush}" Width="14" Height="14" Stretch="Uniform" Margin="0,0,4,0" VerticalAlignment="Center"/>
                                 <TextBlock Text="Clear" VerticalAlignment="Center" FontSize="{StaticResource FontSizeSmall}" FontWeight="SemiBold"/>
@@ -132,7 +133,8 @@
                         </Button>
                     </Grid>
 
-                    <ListView ItemsSource="{Binding RecentLogs}" MaxHeight="300" Background="Transparent" BorderThickness="0">
+                    <ListView ItemsSource="{Binding RecentLogs}" MaxHeight="300" Background="Transparent" BorderThickness="0"
+                         AutomationProperties.Name="Recent Logs" AutomationProperties.HelpText="View recent log entries">
                         <ListView.ItemContainerStyle>
                             <Style TargetType="ListViewItem">
                                 <Setter Property="Padding" Value="4"/>
@@ -210,31 +212,36 @@
             <!-- Actions -->
             <Border Style="{StaticResource CardStyle}" Padding="{StaticResource PaddingLg}" Margin="0,24,0,0">
                 <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
-                    <Button Style="{StaticResource SecondaryButtonStyle}" Command="{Binding OpenLogFolderCommand}" Padding="16,8" Margin="0,0,8,0">
+                    <Button Style="{StaticResource SecondaryButtonStyle}" Command="{Binding OpenLogFolderCommand}" Padding="16,8" Margin="0,0,8,0"
+                         AutomationProperties.Name="Open Log Folder" AutomationProperties.HelpText="Open the log folder in Windows Explorer">
                         <StackPanel Orientation="Horizontal">
                             <Path Data="{x:Static design:Icons.Folder}" Fill="{DynamicResource TextPrimaryBrush}" Width="16" Height="16" Stretch="Uniform" Margin="0,0,8,0" VerticalAlignment="Center"/>
                             <TextBlock Text="Open Log Folder" VerticalAlignment="Center" FontWeight="SemiBold"/>
                         </StackPanel>
                     </Button>
-                    <Button Style="{StaticResource SecondaryButtonStyle}" Command="{Binding OpenCrashFolderCommand}" Padding="16,8" Margin="0,0,8,0">
+                    <Button Style="{StaticResource SecondaryButtonStyle}" Command="{Binding OpenCrashFolderCommand}" Padding="16,8" Margin="0,0,8,0"
+                         AutomationProperties.Name="Open Crash Folder" AutomationProperties.HelpText="Open the crash reports folder in Windows Explorer">
                         <StackPanel Orientation="Horizontal">
                             <Path Data="{x:Static design:Icons.File}" Fill="{DynamicResource TextPrimaryBrush}" Width="16" Height="16" Stretch="Uniform" Margin="0,0,8,0" VerticalAlignment="Center"/>
                             <TextBlock Text="Open Crash Folder" VerticalAlignment="Center" FontWeight="SemiBold"/>
                         </StackPanel>
                     </Button>
-                    <Button Style="{StaticResource SecondaryButtonStyle}" Command="{Binding ExportDiagnosticsCommand}" Padding="16,8" Margin="0,0,8,0">
+                    <Button Style="{StaticResource SecondaryButtonStyle}" Command="{Binding ExportDiagnosticsCommand}" Padding="16,8" Margin="0,0,8,0"
+                         AutomationProperties.Name="Export Diagnostics" AutomationProperties.HelpText="Export diagnostic information to a file">
                         <StackPanel Orientation="Horizontal">
                             <Path Data="{x:Static design:Icons.Download}" Fill="{DynamicResource TextPrimaryBrush}" Width="16" Height="16" Stretch="Uniform" Margin="0,0,8,0" VerticalAlignment="Center"/>
                             <TextBlock Text="Export Diagnostics" VerticalAlignment="Center" FontWeight="SemiBold"/>
                         </StackPanel>
                     </Button>
-                    <Button Style="{StaticResource SecondaryButtonStyle}" Command="{Binding ExportLogsCommand}" Padding="16,8" Margin="0,0,8,0">
+                    <Button Style="{StaticResource SecondaryButtonStyle}" Command="{Binding ExportLogsCommand}" Padding="16,8" Margin="0,0,8,0"
+                         AutomationProperties.Name="Export Logs" AutomationProperties.HelpText="Export log entries to a file">
                         <StackPanel Orientation="Horizontal">
                             <Path Data="{x:Static design:Icons.Download}" Fill="{DynamicResource TextPrimaryBrush}" Width="16" Height="16" Stretch="Uniform" Margin="0,0,8,0" VerticalAlignment="Center"/>
                             <TextBlock Text="Export Logs" VerticalAlignment="Center" FontWeight="SemiBold"/>
                         </StackPanel>
                     </Button>
-                    <Button Style="{StaticResource PrimaryButtonStyle}" Command="{Binding ExportDiagnosticsCommand}" Padding="24,12" MinWidth="160">
+                    <Button Style="{StaticResource PrimaryButtonStyle}" Command="{Binding ExportDiagnosticsCommand}" Padding="24,12" MinWidth="160"
+                         AutomationProperties.Name="Export Full Diagnostics" AutomationProperties.HelpText="Export full diagnostic report including logs and crash reports">
                         <StackPanel Orientation="Horizontal">
                             <Path Data="{x:Static design:Icons.Check}" Fill="{DynamicResource TextOnPrimaryBrush}" Width="16" Height="16" Stretch="Uniform" Margin="0,0,8,0" VerticalAlignment="Center"/>
                             <TextBlock Text="Export Full Diagnostics" VerticalAlignment="Center" FontWeight="SemiBold"/>

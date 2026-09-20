@@ -148,6 +148,7 @@ namespace WinCleaner
 
                     // ViewModels - App Shell pattern
                     services.AddTransient<ShellViewModel>();
+                    services.AddTransient<MainViewModel>();
                     services.AddTransient<HealthCheckViewModel>();
                     services.AddTransient<AdvancedCleanViewModel>();
                     services.AddTransient<StorageViewModel>();

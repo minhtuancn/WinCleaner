@@ -53,7 +53,9 @@
                                 <Button Style="{StaticResource NavButtonStyle}" 
                                         Command="{Binding DataContext.NavigateCommand, RelativeSource={RelativeSource AncestorType=Window}}"
                                         CommandParameter="{Binding ViewName}"
-                                        ToolTip="{Binding Description}">
+                                        ToolTip="{Binding Description}"
+                                        AutomationProperties.Name="{Binding Label}"
+                                        AutomationProperties.HelpText="{Binding Description}">
                                     <Grid>
                                         <Grid.ColumnDefinitions>
                                             <ColumnDefinition Width="Auto"/>
@@ -74,13 +76,15 @@
                 <!-- Bottom Actions -->
                 <Border Grid.Row="2" Padding="{StaticResource PaddingMd}" BorderBrush="{DynamicResource DividerBrush}" BorderThickness="0,1,0,0">
                     <StackPanel>
-                        <Button Style="{StaticResource SecondaryButtonStyle}" Command="{Binding ToggleThemeCommand}">
+                        <Button Style="{StaticResource SecondaryButtonStyle}" Command="{Binding ToggleThemeCommand}"
+                         AutomationProperties.Name="Toggle Theme" AutomationProperties.HelpText="Switch between light and dark theme">
                             <StackPanel Orientation="Horizontal">
                                 <Path Data="{x:Static design:Icons.Settings}" Fill="{DynamicResource TextPrimaryBrush}" Width="16" Height="16" Stretch="Uniform" Margin="0,0,8,0"/>
                                 <TextBlock Text="Toggle Theme" VerticalAlignment="Center"/>
                             </StackPanel>
                         </Button>
-                        <Button Style="{StaticResource SecondaryButtonStyle}" Command="{Binding ExportDiagnosticsCommand}" Margin="0,8,0,0">
+                        <Button Style="{StaticResource SecondaryButtonStyle}" Command="{Binding ExportDiagnosticsCommand}" Margin="0,8,0,0"
+                         AutomationProperties.Name="Export Diagnostics" AutomationProperties.HelpText="Export diagnostic information to a file">
                             <StackPanel Orientation="Horizontal">
                                 <Path Data="{x:Static design:Icons.Download}" Fill="{DynamicResource TextPrimaryBrush}" Width="16" Height="16" Stretch="Uniform" Margin="0,0,8,0"/>
                                 <TextBlock Text="Export Diagnostics" VerticalAlignment="Center"/>
@@ -104,7 +108,8 @@
                 HorizontalAlignment="Left" VerticalAlignment="Top"
                 Margin="{StaticResource MarginMd}"
                 Width="40" Height="40"
-                ToolTip="Go Back">
+                ToolTip="Go Back"
+                AutomationProperties.Name="Go Back" AutomationProperties.HelpText="Navigate back to the previous view">
             <Path Data="{x:Static design:Icons.ChevronLeft}" Fill="{DynamicResource TextPrimaryBrush}" Width="20" Height="20" Stretch="Uniform"/>
         </Button>
 
@@ -115,7 +120,8 @@
                 HorizontalAlignment="Left" VerticalAlignment="Top"
                 Margin="16,76,0,0"
                 Width="40" Height="40"
-                ToolTip="Toggle Sidebar">
+                ToolTip="Toggle Sidebar"
+                AutomationProperties.Name="Toggle Sidebar" AutomationProperties.HelpText="Show or hide the navigation sidebar">
             <Path Data="{x:Static design:Icons.Menu}" Fill="{DynamicResource TextPrimaryBrush}" Width="20" Height="20" Stretch="Uniform"/>
         </Button>
     </Grid>

@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using System.Windows.Input;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using WinCleaner.Core.Services;
 using WinCleaner.Models;
 using WinCleaner.Services;
 
@@ -23,6 +24,7 @@ namespace WinCleaner.ViewModels
         private readonly IResilienceService _resilience;
         private readonly IAppRunningGuard _appGuard;
         private readonly IPathSafetyValidator _pathValidator;
+        private readonly IResourceService _resourceService;
         private readonly System.Timers.Timer _uiThrottleTimer;
 
         [ObservableProperty]
@@ -70,17 +72,21 @@ namespace WinCleaner.ViewModels
             ICleanupPlanService planService,
             IResilienceService resilience,
             IAppRunningGuard appGuard,
-            IPathSafetyValidator pathValidator)
+            IPathSafetyValidator pathValidator,
+            IResourceService resourceService)
         {
             _scanner = scanner;
             _planService = planService;
             _resilience = resilience;
             _appGuard = appGuard;
             _pathValidator = pathValidator;
+            _resourceService = resourceService;
 
             _uiThrottleTimer = new System.Timers.Timer(UI_UPDATE_THROTTLE_MS);
             _uiThrottleTimer.Elapsed += (s, e) => FlushPendingUpdates();
             _uiThrottleTimer.AutoReset = true;
+            
+            CurrentStage = _resourceService.GetString("LiveTimeline.Ready");
         }
 
         [RelayCommand]
@@ -89,7 +95,7 @@ namespace WinCleaner.ViewModels
             if (IsRunning) return;
 
             IsRunning = true;
-            CurrentStage = "Khởi tạo quét...";
+            CurrentStage = _resourceService.GetString("LiveTimeline.InitializingScan");
             ProgressPercent = 0;
             ItemsFound = 0;
             TotalSizeBytes = 0;
@@ -99,7 +105,7 @@ namespace WinCleaner.ViewModels
             _cts = new CancellationTokenSource();
             _uiThrottleTimer.Start();
 
-            AddEvent("Scan", "Bắt đầu quét hệ thống", TimelineEventType.Info);
+            AddEvent("Scan", _resourceService.GetString("LiveTimeline.ScanStarted"), TimelineEventType.Info);
 
             try
             {
@@ -111,8 +117,8 @@ namespace WinCleaner.ViewModels
 
                 Groups = new ObservableCollection<CleanCategoryGroup>(groups);
                 
-                CurrentStage = "Phân tích độ an toàn...";
-                AddEvent("Safety", "Đang kiểm tra đường dẫn và ứng dụng đang chạy", TimelineEventType.Info);
+                CurrentStage = _resourceService.GetString("LiveTimeline.SafetyAnalysis");
+                AddEvent("Safety", _resourceService.GetString("LiveTimeline.CheckingPaths"), TimelineEventType.Info);
 
                 // Create and validate plan
                 var selectedItems = groups.SelectMany(g => g.Items.Where(i => i.IsSelected)).ToList();
@@ -127,13 +133,13 @@ namespace WinCleaner.ViewModels
 
                 if (!plan.IsValid)
                 {
-                    CurrentStage = "Có lỗi xác thực";
-                    AddEvent("Error", "Kế hoạch không hợp lệ: " + string.Join("; ", plan.ValidationErrors), TimelineEventType.Error);
+                    CurrentStage = _resourceService.GetString("LiveTimeline.ValidationError");
+                    AddEvent("Error", _resourceService.GetString("LiveTimeline.InvalidPlan", string.Join("; ", plan.ValidationErrors)), TimelineEventType.Error);
                     return;
                 }
 
-                CurrentStage = "Thực thi dọn dẹp...";
-                AddEvent("Clean", "Bắt đầu thực thi kế hoạch dọn dẹp", TimelineEventType.Info);
+                CurrentStage = _resourceService.GetString("LiveTimeline.CleanupStarted");
+                AddEvent("Clean", _resourceService.GetString("LiveTimeline.CleanupStarted"), TimelineEventType.Info);
 
                 var result = await _planService.ExecutePlanAsync(plan,
                     new Progress<string>(msg => SafeUpdateStage(msg)),
@@ -141,23 +147,23 @@ namespace WinCleaner.ViewModels
                     _cts.Token);
 
                 CurrentStage = result.OverallStatus == CleanupOverallStatus.Completed 
-                    ? "Hoàn tất" 
+                    ? _resourceService.GetString("LiveTimeline.Completed") 
                     : result.OverallStatus == CleanupOverallStatus.Cancelled 
-                        ? "Đã hủy" 
-                        : "Hoàn tất với cảnh báo";
+                        ? _resourceService.GetString("LiveTimeline.Cancelled") 
+                        : _resourceService.GetString("LiveTimeline.CompletedWithWarnings");
 
                 AddEvent("Complete", $"Dọn dẹp xong: {result.SuccessfulOperations}/{result.TotalSteps} thành công, {result.TotalCleanedFormatted} giải phóng", 
                     result.OverallStatus == CleanupOverallStatus.Completed ? TimelineEventType.Success : TimelineEventType.Warning);
             }
             catch (OperationCanceledException)
             {
-                CurrentStage = "Đã hủy bởi người dùng";
-                AddEvent("Cancel", "Quá trình dọn dẹp đã bị hủy", TimelineEventType.Warning);
+                CurrentStage = _resourceService.GetString("LiveTimeline.CancelledByUser");
+                AddEvent("Cancel", _resourceService.GetString("LiveTimeline.CleanupCancelled"), TimelineEventType.Warning);
             }
             catch (Exception ex)
             {
-                CurrentStage = "Lỗi";
-                AddEvent("Error", $"Lỗi không mong đợi: {ex.Message}", TimelineEventType.Error);
+                CurrentStage = _resourceService.GetString("LiveTimeline.Error");
+                AddEvent("Error", _resourceService.GetString("LiveTimeline.UnexpectedError", ex.Message), TimelineEventType.Error);
             }
             finally
             {
@@ -172,8 +178,8 @@ namespace WinCleaner.ViewModels
         private void Cancel()
         {
             _cts?.Cancel();
-            CurrentStage = "Đang hủy...";
-            AddEvent("Cancel", "Yêu cầu hủy đang được xử lý", TimelineEventType.Warning);
+            CurrentStage = _resourceService.GetString("LiveTimeline.Cancelling");
+            AddEvent("Cancel", _resourceService.GetString("LiveTimeline.CancelRequested"), TimelineEventType.Warning);
         }
 
         [RelayCommand]

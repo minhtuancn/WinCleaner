@@ -12,6 +12,7 @@ using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Microsoft.Extensions.Logging;
 using Microsoft.Win32;
+using WinCleaner.Core.Services;
 using WinCleaner.Models;
 using WinCleaner.Services;
 
@@ -23,6 +24,7 @@ namespace WinCleaner.ViewModels
         private readonly ICleanerService _cleaner;
         private readonly ISettingsService _settingsService;
         private readonly ILogger<MainViewModel> _logger;
+        private readonly IResourceService _resourceService;
         private readonly DispatcherTimer _dateTimeTimer;
         
         private CancellationTokenSource? _scanCts;
@@ -127,12 +129,14 @@ namespace WinCleaner.ViewModels
             ISystemScanner scanner,
             ICleanerService cleaner,
             ISettingsService settingsService,
-            ILogger<MainViewModel> logger)
+            ILogger<MainViewModel> logger,
+            IResourceService resourceService)
         {
             _scanner = scanner;
             _cleaner = cleaner;
             _settingsService = settingsService;
             _logger = logger;
+            _resourceService = resourceService;
 
             ScanCommand = new AsyncRelayCommand(ScanAsync, () => !IsScanning && !IsCleaning);
             CleanCommand = new AsyncRelayCommand(CleanAsync, () => !IsScanning && !IsCleaning && TotalSelectedSize > 0);
@@ -156,9 +160,9 @@ namespace WinCleaner.ViewModels
             {
                 Interval = TimeSpan.FromSeconds(1)
             };
-            _dateTimeTimer.Tick += (s, e) => CurrentDateTime = DateTime.Now.ToString("dddd, dd MMMM yyyy HH:mm:ss", new System.Globalization.CultureInfo("vi-VN"));
+            _dateTimeTimer.Tick += (s, e) => CurrentDateTime = DateTime.Now.ToString("F", System.Globalization.CultureInfo.CurrentUICulture);
             _dateTimeTimer.Start();
-            CurrentDateTime = DateTime.Now.ToString("dddd, dd MMMM yyyy HH:mm:ss", new System.Globalization.CultureInfo("vi-VN"));
+            CurrentDateTime = DateTime.Now.ToString("F", System.Globalization.CultureInfo.CurrentUICulture);
 
             InitializeProfiles();
             LoadCustomFolders();
@@ -172,10 +176,10 @@ namespace WinCleaner.ViewModels
         {
             AvailableProfiles = new ObservableCollection<ProfileOption>
             {
-                new ProfileOption { Profile = CleanProfile.Safe, DisplayName = "An toàn (Khuyến nghị)", Description = "Chỉ dọn các mục rủi ro thấp: cache temp, log, recycle bin" },
-                new ProfileOption { Profile = CleanProfile.Deep, DisplayName = "Sâu (Nâng cao)", Description = "Bao gồm cache trình duyệt, dev tools, driver store cũ" },
-                new ProfileOption { Profile = CleanProfile.Custom, DisplayName = "Tùy chỉnh", Description = "Chọn thủ công các mục cần dọn" },
-                new ProfileOption { Profile = CleanProfile.Nuclear, DisplayName = "Cực đại (Chuyên gia)", Description = "Tất cả mục bao gồm compact OS, hibernation, system restore - CẢNH BÁO" }
+                new ProfileOption { Profile = CleanProfile.Safe, DisplayName = _resourceService.GetString("Main.ProfileSafe"), Description = _resourceService.GetString("Main.ProfileSafeDesc") },
+                new ProfileOption { Profile = CleanProfile.Deep, DisplayName = _resourceService.GetString("Main.ProfileDeep"), Description = _resourceService.GetString("Main.ProfileDeepDesc") },
+                new ProfileOption { Profile = CleanProfile.Custom, DisplayName = _resourceService.GetString("Main.ProfileCustom"), Description = _resourceService.GetString("Main.ProfileCustomDesc") },
+                new ProfileOption { Profile = CleanProfile.Nuclear, DisplayName = _resourceService.GetString("Main.ProfileNuclear"), Description = _resourceService.GetString("Main.ProfileNuclearDesc") }
             };
         }
 
@@ -188,7 +192,7 @@ namespace WinCleaner.ViewModels
                 new InfoCardModel { Icon = "🧠", Title = "RAM", Value = FormatBytes(SystemInfo.TotalPhysicalMemory) },
                 new InfoCardModel { Icon = "⚙", Title = "CPU", Value = $"{SystemInfo.ProcessorCount} cores" },
                 new InfoCardModel { Icon = "👤", Title = "User", Value = SystemInfo.CurrentUser },
-                new InfoCardModel { Icon = "🔐", Title = "Quyền", Value = SystemInfo.IsAdmin ? "Admin" : "User" }
+                new InfoCardModel { Icon = "🔐", Title = _resourceService.GetString("Common.Permission"), Value = SystemInfo.IsAdmin ? _resourceService.GetString("Main.PermissionAdmin") : _resourceService.GetString("Main.PermissionUser") }
             };
         }
 
@@ -218,7 +222,7 @@ namespace WinCleaner.ViewModels
                     }
                 }
 
-                LogInfo("Khởi tạo WinCleaner...");
+                LogInfo(_resourceService.GetString("Main.Initializing"));
                 await LoadSystemInfoAsync();
                 await LoadDrivesAsync();
                 await LoadUserProfilesAsync();
@@ -226,7 +230,7 @@ namespace WinCleaner.ViewModels
             }
             catch (Exception ex)
             {
-                LogError($"Lỗi khởi tạo: {ex.Message}");
+                LogError(_resourceService.GetString("Main.InitError", ex.Message));
             }
         }
 
@@ -235,12 +239,12 @@ namespace WinCleaner.ViewModels
             try
             {
                 SystemInfo = await _scanner.GetSystemInfoAsync();
-                LogInfo($"Hệ điều hành: {SystemInfo.OSVersion} ({SystemInfo.OSArchitecture})");
-                LogInfo($"User: {SystemInfo.CurrentUser} | Admin: {SystemInfo.IsAdmin}");
+                LogInfo(_resourceService.GetString("Main.OSInfo", SystemInfo.OSVersion, SystemInfo.OSArchitecture));
+                LogInfo(_resourceService.GetString("Main.UserInfo", SystemInfo.CurrentUser, SystemInfo.IsAdmin ? _resourceService.GetString("Main.PermissionAdmin") : _resourceService.GetString("Main.PermissionUser")));
             }
             catch (Exception ex)
             {
-                LogError($"Lỗi tải thông tin hệ thống: {ex.Message}");
+                LogError(_resourceService.GetString("Main.SystemInfoError", ex.Message));
             }
         }
 
@@ -252,11 +256,11 @@ namespace WinCleaner.ViewModels
                 Drives.Clear();
                 foreach (var d in drives)
                     Drives.Add(d);
-                LogInfo($"Đã tìm thấy {drives.Count} ổ đĩa");
+                LogInfo(_resourceService.GetString("Main.DrivesFound", drives.Count));
             }
             catch (Exception ex)
             {
-                LogError($"Lỗi tải ổ đĩa: {ex.Message}");
+                LogError(_resourceService.GetString("Main.DrivesError", ex.Message));
             }
         }
 
@@ -268,11 +272,11 @@ namespace WinCleaner.ViewModels
                 UserProfiles.Clear();
                 foreach (var p in profiles)
                     UserProfiles.Add(p);
-                LogInfo($"Đã tìm thấy {profiles.Count} hồ sơ người dùng");
+                LogInfo(_resourceService.GetString("Main.UserProfilesFound", profiles.Count));
             }
             catch (Exception ex)
             {
-                LogError($"Lỗi tải hồ sơ người dùng: {ex.Message}");
+                LogError(_resourceService.GetString("Main.UserProfilesError", ex.Message));
             }
         }
 
@@ -307,7 +311,7 @@ namespace WinCleaner.ViewModels
             }
             catch (Exception ex)
             {
-                LogError($"Lỗi lưu cài đặt: {ex.Message}");
+                LogError(_resourceService.GetString("Main.SaveSettingsError", ex.Message));
             }
         }
 
@@ -318,13 +322,13 @@ namespace WinCleaner.ViewModels
             _scanCts = new CancellationTokenSource();
             IsScanning = true;
             IsProgressIndeterminate = true;
-            ScanProgressText = "Đang quét...";
+            ScanProgressText = _resourceService.GetString("Main.Scanning");
             OverallProgress = 0;
             LogEntries.Clear();
 
             try
             {
-                LogInfo($"Bắt đầu quét với profile: {SelectedProfile}");
+                LogInfo(_resourceService.GetString("Main.ScanStarted", SelectedProfile));
 
                 var groups = await _scanner.ScanAsync(SelectedProfile,
                     new Progress<string>(msg =>
@@ -349,16 +353,16 @@ namespace WinCleaner.ViewModels
                 }
 
                 UpdateTotals();
-                LogSuccess($"Quét hoàn tất: {TotalItems} mục, {FormatBytes(TotalScannableSize)} có thể dọn");
-                ScanProgressText = "Quét hoàn tất";
+                LogSuccess(_resourceService.GetString("Main.ScanCompleted", TotalItems, FormatBytes(TotalScannableSize)));
+                ScanProgressText = _resourceService.GetString("Main.ScanCompletedShort");
             }
             catch (OperationCanceledException)
             {
-                LogWarning("Quét đã bị hủy");
+                LogWarning(_resourceService.GetString("Main.ScanCancelled"));
             }
             catch (Exception ex)
             {
-                LogError($"Lỗi quét: {ex.Message}");
+                LogError(_resourceService.GetString("Main.ScanError", ex.Message));
             }
             finally
             {
@@ -501,8 +505,8 @@ namespace WinCleaner.ViewModels
             if (DryRunMode == false)
             {
                 var result = MessageBox.Show(
-                    $"Sắp dọn dẹp {SelectedItems} mục, giải phóng {FormatBytes(TotalSelectedSize)}.\n\nTiếp tục?",
-                    "Xác nhận dọn dẹp",
+                    _resourceService.GetString("Main.ConfirmCleanMessage", SelectedItems, FormatBytes(TotalSelectedSize)),
+                    _resourceService.GetString("Main.ConfirmCleanTitle"),
                     MessageBoxButton.YesNo,
                     MessageBoxImage.Question);
 
@@ -517,7 +521,7 @@ namespace WinCleaner.ViewModels
 
             try
             {
-                LogInfo($"Bắt đầu dọn dẹp {SelectedItems} mục...");
+                LogInfo(_resourceService.GetString("Main.CleanStarted", SelectedItems));
 
                 var result = await _cleaner.CleanAsync(CleanGroups.ToList(),
                     new Progress<string>(msg => ScanProgressText = msg),
@@ -536,24 +540,24 @@ namespace WinCleaner.ViewModels
 
                 TotalCleanedSize = result.TotalCleanedSize;
                 OverallProgress = 100;
-                ScanProgressText = "Dọn dẹp hoàn tất";
+                ScanProgressText = _resourceService.GetString("Main.CleanCompletedShort");
 
-                LogSuccess($"Hoàn tất! Đã dọn {result.CleanedItems}/{result.TotalItems} mục");
-                LogSuccess($"Giải phóng: {FormatBytes(result.TotalCleanedSize)}");
-                LogSuccess($"Thời gian: {result.Duration:mm\\:ss\\.ff}");
+                LogSuccess(_resourceService.GetString("Main.CleanCompleted", result.CleanedItems, result.TotalItems));
+                LogSuccess(_resourceService.GetString("Main.CleanFreed", FormatBytes(result.TotalCleanedSize)));
+                LogSuccess(_resourceService.GetString("Main.CleanDuration", result.Duration.ToString(@"mm\:ss\.ff")));
 
                 if (result.FailedItems > 0)
-                    LogWarning($"Thất bại: {result.FailedItems} mục");
+                    LogWarning(_resourceService.GetString("Main.CleanFailedItems", result.FailedItems));
 
                 UpdateTotals();
             }
             catch (OperationCanceledException)
             {
-                LogWarning("Dọn dẹp đã bị hủy");
+                LogWarning(_resourceService.GetString("Main.CleanCancelled"));
             }
             catch (Exception ex)
             {
-                LogError($"Lỗi dọn dẹp: {ex.Message}");
+                LogError(_resourceService.GetString("Main.CleanError", ex.Message));
             }
             finally
             {
@@ -569,12 +573,12 @@ namespace WinCleaner.ViewModels
             if (IsScanning)
             {
                 _scanCts?.Cancel();
-                LogWarning("Đang hủy quét...");
+                LogWarning(_resourceService.GetString("Main.CancellingScan"));
             }
             if (IsCleaning)
             {
                 _cleanCts?.Cancel();
-                LogWarning("Đang hủy dọn dẹp...");
+                LogWarning(_resourceService.GetString("Main.CancellingClean"));
             }
         }
 
@@ -626,7 +630,7 @@ namespace WinCleaner.ViewModels
         {
             var dialog = new OpenFolderDialog
             {
-                Title = "Chọn thư mục để dọn dẹp",
+                Title = _resourceService.GetString("Main.SelectFolderTitle"),
                 Multiselect = false
             };
 
@@ -635,7 +639,7 @@ namespace WinCleaner.ViewModels
                 var folder = new CustomFolderModel { Path = dialog.FolderName };
                 CustomFolders.Add(folder);
                 _ = SaveSettingsAsync();
-                LogInfo($"Đã thêm thư mục tùy chỉnh: {dialog.FolderName}");
+                LogInfo(_resourceService.GetString("Main.FolderAdded", dialog.FolderName));
             }
         }
 
@@ -645,7 +649,7 @@ namespace WinCleaner.ViewModels
             {
                 CustomFolders.Remove(folder);
                 _ = SaveSettingsAsync();
-                LogInfo($"Đã xóa thư mục tùy chỉnh: {folder.Path}");
+                LogInfo(_resourceService.GetString("Main.FolderRemoved", folder.Path));
             }
         }
 
@@ -658,14 +662,14 @@ namespace WinCleaner.ViewModels
         {
             SavedProfiles = new ObservableCollection<SavedProfileModel>
             {
-                new SavedProfileModel { Name = "Default Safe", Profile = CleanProfile.Safe, CreatedDate = DateTime.Now },
-                new SavedProfileModel { Name = "Default Deep", Profile = CleanProfile.Deep, CreatedDate = DateTime.Now }
+                new SavedProfileModel { Name = _resourceService.GetString("Main.ProfileSafe"), Profile = CleanProfile.Safe, CreatedDate = DateTime.Now },
+                new SavedProfileModel { Name = _resourceService.GetString("Main.ProfileDeep"), Profile = CleanProfile.Deep, CreatedDate = DateTime.Now }
             };
         }
 
         private void SaveCurrentProfile()
         {
-            var name = Microsoft.VisualBasic.Interaction.InputBox("Nhập tên profile:", "Lưu Profile", $"My Profile {DateTime.Now:yyyyMMdd}");
+            var name = Microsoft.VisualBasic.Interaction.InputBox(_resourceService.GetString("Main.SaveProfileTitle"), _resourceService.GetString("Main.SaveProfilePrompt"), _resourceService.GetString("Main.SaveProfileDefault", DateTime.Now));
             if (!string.IsNullOrWhiteSpace(name))
             {
                 var profile = new SavedProfileModel
@@ -676,7 +680,7 @@ namespace WinCleaner.ViewModels
                     CustomFolders = CustomFolders.Select(f => f.Path).ToList()
                 };
                 SavedProfiles.Add(profile);
-                LogInfo($"Đã lưu profile: {name}");
+                LogInfo(_resourceService.GetString("Main.ProfileSaved", name));
             }
         }
 
@@ -693,7 +697,7 @@ namespace WinCleaner.ViewModels
                 }
                 _ = SaveSettingsAsync();
                 _ = ScanAsync();
-                LogInfo($"Đã tải profile: {profile.Name}");
+                LogInfo(_resourceService.GetString("Main.ProfileLoaded", profile.Name));
             }
         }
 
@@ -713,17 +717,17 @@ namespace WinCleaner.ViewModels
                 var lines = LogEntries.Select(e => $"[{e.FormattedTime}] [{e.Level}] [{e.Source}] {e.Message}");
                 await File.WriteAllLinesAsync(path, lines);
 
-                LogSuccess($"Đã xuất log: {path}");
+                LogSuccess(_resourceService.GetString("Main.LogExported", path));
             }
             catch (Exception ex)
             {
-                LogError($"Lỗi xuất log: {ex.Message}");
+                LogError(_resourceService.GetString("Main.LogExportError", ex.Message));
             }
         }
 
         private void OpenSettings()
         {
-            LogInfo("Mở cài đặt...");
+            LogInfo(_resourceService.GetString("Main.OpeningSettings"));
             // TODO: Open settings window
         }
 

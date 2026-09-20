@@ -31,7 +31,8 @@
 
                     <StackPanel Orientation="Horizontal" Margin="0,8,0,0">
                         <TextBlock Text="Language" FontSize="{StaticResource FontSizeMedium}" FontWeight="Medium" Foreground="{DynamicResource TextPrimaryBrush}" VerticalAlignment="Center" Width="140"/>
-                        <ComboBox Width="200" ItemsSource="{Binding AvailableLanguages}" SelectedItem="{Binding Language}" Margin="12,0,0,0" VerticalAlignment="Center">
+                        <ComboBox Width="200" ItemsSource="{Binding AvailableLanguages}" SelectedItem="{Binding Language}" Margin="12,0,0,0" VerticalAlignment="Center"
+                         AutomationProperties.Name="Language Selection" AutomationProperties.HelpText="Select the application language">
                             <ComboBox.ItemTemplate>
                                 <DataTemplate>
                                     <TextBlock Text="{Binding}"/>
@@ -42,7 +43,8 @@
 
                     <StackPanel Orientation="Horizontal" Margin="0,8,0,0">
                         <TextBlock Text="Theme" FontSize="{StaticResource FontSizeMedium}" FontWeight="Medium" Foreground="{DynamicResource TextPrimaryBrush}" VerticalAlignment="Center" Width="140"/>
-                        <ComboBox Width="160" ItemsSource="{Binding AvailableThemes}" SelectedItem="{Binding SelectedTheme}" Margin="12,0,0,0" VerticalAlignment="Center">
+                        <ComboBox Width="160" ItemsSource="{Binding AvailableThemes}" SelectedItem="{Binding SelectedTheme}" Margin="12,0,0,0" VerticalAlignment="Center"
+                         AutomationProperties.Name="Theme Selection" AutomationProperties.HelpText="Select the application theme">
                             <ComboBox.ItemTemplate>
                                 <DataTemplate>
                                     <TextBlock Text="{Binding}"/>
@@ -52,10 +54,14 @@
                     </StackPanel>
 
                     <StackPanel Orientation="Horizontal" Margin="0,8,0,0">
-                        <CheckBox Content="Minimize to tray" IsChecked="{Binding MinimizeToTray}" VerticalAlignment="Center" Style="{StaticResource ModernCheckBoxStyle}"/>
-                        <CheckBox Content="Auto-close after clean" IsChecked="{Binding AutoCloseAfterClean}" VerticalAlignment="Center" Margin="24,0,0,0" Style="{StaticResource ModernCheckBoxStyle}"/>
-                        <CheckBox Content="Show hidden files" IsChecked="{Binding ShowHiddenFiles}" VerticalAlignment="Center" Margin="24,0,0,0" Style="{StaticResource ModernCheckBoxStyle}"/>
-                        <CheckBox Content="Confirm before delete" IsChecked="{Binding ConfirmBeforeDelete}" VerticalAlignment="Center" Margin="24,0,0,0" Style="{StaticResource ModernCheckBoxStyle}"/>
+                        <CheckBox Content="Minimize to tray" IsChecked="{Binding MinimizeToTray}" VerticalAlignment="Center" Style="{StaticResource ModernCheckBoxStyle}"
+                         AutomationProperties.Name="Minimize to Tray" AutomationProperties.HelpText="Minimize the application to the system tray when closed"/>
+                        <CheckBox Content="Auto-close after clean" IsChecked="{Binding AutoCloseAfterClean}" VerticalAlignment="Center" Margin="24,0,0,0" Style="{StaticResource ModernCheckBoxStyle}"
+                         AutomationProperties.Name="Auto Close After Clean" AutomationProperties.HelpText="Automatically close the application after cleaning completes"/>
+                        <CheckBox Content="Show hidden files" IsChecked="{Binding ShowHiddenFiles}" VerticalAlignment="Center" Margin="24,0,0,0" Style="{StaticResource ModernCheckBoxStyle}"
+                         AutomationProperties.Name="Show Hidden Files" AutomationProperties.HelpText="Show hidden files in file pickers"/>
+                        <CheckBox Content="Confirm before delete" IsChecked="{Binding ConfirmBeforeDelete}" VerticalAlignment="Center" Margin="24,0,0,0" Style="{StaticResource ModernCheckBoxStyle}"
+                         AutomationProperties.Name="Confirm Before Delete" AutomationProperties.HelpText="Show confirmation dialog before deleting files"/>
                     </StackPanel>
                 </StackPanel>
             </Border>
@@ -68,25 +74,30 @@
                     <StackPanel Orientation="Horizontal" Margin="0,8,0,0">
                         <TextBlock Text="Accent Color" FontSize="{StaticResource FontSizeMedium}" FontWeight="Medium" Foreground="{DynamicResource TextPrimaryBrush}" VerticalAlignment="Center" Width="140"/>
                         <Border Width="40" Height="24" CornerRadius="4" BorderBrush="{DynamicResource BorderBrush}" BorderThickness="1" Margin="12,0,8,0" Background="{Binding AccentColor}" VerticalAlignment="Center"/>
-                        <TextBox Width="100" Text="{Binding AccentColor, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource ModernTextBoxStyle}" VerticalAlignment="Center" ToolTip="Hex color #RRGGBB"/>
-                        <Button Style="{StaticResource SecondaryButtonStyle}" Command="{Binding PickAccentColorCommand}" Padding="8,4" Margin="8,0,0,0" VerticalAlignment="Center">
+                        <TextBox Width="100" Text="{Binding AccentColor, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource ModernTextBoxStyle}" VerticalAlignment="Center" ToolTip="Hex color #RRGGBB"
+                         AutomationProperties.Name="Accent Color" AutomationProperties.HelpText="Enter a hex color code for the accent color (e.g., #0078D4)"/>
+                        <Button Style="{StaticResource SecondaryButtonStyle}" Command="{Binding PickAccentColorCommand}" Padding="8,4" Margin="8,0,0,0" VerticalAlignment="Center"
+                         AutomationProperties.Name="Pick Accent Color" AutomationProperties.HelpText="Open color picker to select accent color">
                             <TextBlock Text="Pick" VerticalAlignment="Center" FontSize="{StaticResource FontSizeSmall}"/>
                         </Button>
                     </StackPanel>
 
                     <StackPanel Orientation="Horizontal" Margin="0,8,0,0">
                         <TextBlock Text="Animations" FontSize="{StaticResource FontSizeMedium}" FontWeight="Medium" Foreground="{DynamicResource TextPrimaryBrush}" VerticalAlignment="Center" Width="140"/>
-                        <CheckBox IsChecked="{Binding EnableAnimations}" VerticalAlignment="Center" Margin="12,0,0,0" Style="{StaticResource ModernCheckBoxStyle}"/>
+                        <CheckBox IsChecked="{Binding EnableAnimations}" VerticalAlignment="Center" Margin="12,0,0,0" Style="{StaticResource ModernCheckBoxStyle}"
+                         AutomationProperties.Name="Enable Animations" AutomationProperties.HelpText="Enable or disable UI animations"/>
                     </StackPanel>
 
                     <StackPanel Orientation="Horizontal" Margin="0,8,0,0">
                         <TextBlock Text="Transparency" FontSize="{StaticResource FontSizeMedium}" FontWeight="Medium" Foreground="{DynamicResource TextPrimaryBrush}" VerticalAlignment="Center" Width="140"/>
-                        <CheckBox IsChecked="{Binding EnableTransparency}" VerticalAlignment="Center" Margin="12,0,0,0" Style="{StaticResource ModernCheckBoxStyle}"/>
+                        <CheckBox IsChecked="{Binding EnableTransparency}" VerticalAlignment="Center" Margin="12,0,0,0" Style="{StaticResource ModernCheckBoxStyle}"
+                         AutomationProperties.Name="Enable Transparency" AutomationProperties.HelpText="Enable or disable window transparency effects"/>
                     </StackPanel>
 
                     <StackPanel Orientation="Horizontal" Margin="0,8,0,0">
                         <TextBlock Text="UI Scale" FontSize="{StaticResource FontSizeMedium}" FontWeight="Medium" Foreground="{DynamicResource TextPrimaryBrush}" VerticalAlignment="Center" Width="140"/>
-                        <Slider Width="200" Minimum="0.5" Maximum="2.0" Value="{Binding UiScale}" TickFrequency="0.1" IsSnapToTickEnabled="True" VerticalAlignment="Center" Margin="12,0,8,0"/>
+                        <Slider Width="200" Minimum="0.5" Maximum="2.0" Value="{Binding UiScale}" TickFrequency="0.1" IsSnapToTickEnabled="True" VerticalAlignment="Center" Margin="12,0,8,0"
+                         AutomationProperties.Name="UI Scale" AutomationProperties.HelpText="Adjust the user interface scaling factor"/>
                         <TextBlock Text="{Binding UiScale, StringFormat='{}{0:P0}'}" FontSize="{StaticResource FontSizeSmall}" Foreground="{DynamicResource TextPrimaryBrush}" VerticalAlignment="Center" Width="50" TextAlignment="Right"/>
                     </StackPanel>
                 </StackPanel>
@@ -99,7 +110,8 @@
 
                     <StackPanel Orientation="Horizontal" Margin="0,8,0,0">
                         <TextBlock Text="Default Profile" FontSize="{StaticResource FontSizeMedium}" FontWeight="Medium" Foreground="{DynamicResource TextPrimaryBrush}" VerticalAlignment="Center" Width="140"/>
-                        <ComboBox Width="160" ItemsSource="{Binding AvailableProfiles}" SelectedItem="{Binding SelectedProfile}" VerticalAlignment="Center">
+                        <ComboBox Width="160" ItemsSource="{Binding AvailableProfiles}" SelectedItem="{Binding SelectedProfile}" VerticalAlignment="Center"
+                         AutomationProperties.Name="Default Profile" AutomationProperties.HelpText="Select the default cleaning profile">
                             <ComboBox.ItemTemplate>
                                 <DataTemplate>
                                     <TextBlock Text="{Binding}"/>
@@ -110,12 +122,14 @@
 
                     <StackPanel Orientation="Horizontal" Margin="0,8,0,0">
                         <TextBlock Text="Dry-run Mode" FontSize="{StaticResource FontSizeMedium}" FontWeight="Medium" Foreground="{DynamicResource TextPrimaryBrush}" VerticalAlignment="Center" Width="140"/>
-                        <CheckBox IsChecked="{Binding DryRunMode, Mode=TwoWay}" VerticalAlignment="Center" Margin="12,0,0,0" Style="{StaticResource ModernCheckBoxStyle}"/>
+                        <CheckBox IsChecked="{Binding DryRunMode, Mode=TwoWay}" VerticalAlignment="Center" Margin="12,0,0,0" Style="{StaticResource ModernCheckBoxStyle}"
+                         AutomationProperties.Name="Dry Run Mode" AutomationProperties.HelpText="Enable dry run mode to simulate cleaning without deleting files"/>
                     </StackPanel>
 
                     <StackPanel Orientation="Horizontal" Margin="0,8,0,0">
                         <TextBlock Text="Max Log Entries" FontSize="{StaticResource FontSizeMedium}" FontWeight="Medium" Foreground="{DynamicResource TextPrimaryBrush}" VerticalAlignment="Center" Width="140"/>
-                        <TextBox Width="80" Text="{Binding MaxLogEntries, Mode=TwoWay}" Style="{StaticResource ModernTextBoxStyle}" VerticalAlignment="Center" Margin="12,0,0,0"/>
+                        <TextBox Width="80" Text="{Binding MaxLogEntries, Mode=TwoWay}" Style="{StaticResource ModernTextBoxStyle}" VerticalAlignment="Center" Margin="12,0,0,0"
+                         AutomationProperties.Name="Max Log Entries" AutomationProperties.HelpText="Maximum number of log entries to keep"/>
                     </StackPanel>
                 </StackPanel>
             </Border>
@@ -130,7 +144,8 @@
                             <ColumnDefinition Width="Auto"/>
                         </Grid.ColumnDefinitions>
                         <TextBlock Grid.Column="0" Text="Excluded Paths" FontSize="{StaticResource FontSizeMedium}" FontWeight="SemiBold" Foreground="{DynamicResource TextPrimaryBrush}" VerticalAlignment="Center"/>
-                        <Button Grid.Column="2" Style="{StaticResource SecondaryButtonStyle}" Command="{Binding AddExcludedPathCommand}" Padding="12,6">
+                        <Button Grid.Column="2" Style="{StaticResource SecondaryButtonStyle}" Command="{Binding AddExcludedPathCommand}" Padding="12,6"
+                         AutomationProperties.Name="Add Excluded Path" AutomationProperties.HelpText="Add a new excluded path to the list">
                             <StackPanel Orientation="Horizontal">
                                 <Path Data="{x:Static design:Icons.Plus}" Fill="{DynamicResource TextPrimaryBrush}" Width="14" Height="14" Stretch="Uniform" Margin="0,0,4,0" VerticalAlignment="Center"/>
                                 <TextBlock Text="Add" VerticalAlignment="Center" FontSize="{StaticResource FontSizeSmall}"/>
@@ -148,7 +163,8 @@
                                             <ColumnDefinition Width="Auto"/>
                                         </Grid.ColumnDefinitions>
                                         <TextBlock Grid.Column="0" Text="{Binding}" FontSize="{StaticResource FontSizeSmall}" Foreground="{DynamicResource TextPrimaryBrush}" VerticalAlignment="Center" TextTrimming="CharacterEllipsis"/>
-                                        <Button Grid.Column="1" Style="{StaticResource IconButtonStyle}" Command="{Binding DataContext.RemoveExcludedPathCommand, RelativeSource={RelativeSource AncestorType=UserControl}}" CommandParameter="{Binding}" Padding="4" Margin="8,0,0,0" ToolTip="Remove">
+                                        <Button Grid.Column="1" Style="{StaticResource IconButtonStyle}" Command="{Binding DataContext.RemoveExcludedPathCommand, RelativeSource={RelativeSource AncestorType=UserControl}}" CommandParameter="{Binding}" Padding="4" Margin="8,0,0,0" ToolTip="Remove"
+                         AutomationProperties.Name="Remove Excluded Path" AutomationProperties.HelpText="Remove this excluded path from the list">
                                             <Path Data="{x:Static design:Icons.X}" Fill="{DynamicResource TextSecondaryBrush}" Width="14" Height="14" Stretch="Uniform"/>
                                         </Button>
                                     </Grid>
@@ -169,7 +185,8 @@
                             <ColumnDefinition Width="Auto"/>
                         </Grid.ColumnDefinitions>
                         <TextBlock Grid.Column="0" Text="Custom Paths" FontSize="{StaticResource FontSizeMedium}" FontWeight="SemiBold" Foreground="{DynamicResource TextPrimaryBrush}" VerticalAlignment="Center"/>
-                        <Button Grid.Column="2" Style="{StaticResource SecondaryButtonStyle}" Command="{Binding AddCustomPathCommand}" Padding="12,6">
+                        <Button Grid.Column="2" Style="{StaticResource SecondaryButtonStyle}" Command="{Binding AddCustomPathCommand}" Padding="12,6"
+                         AutomationProperties.Name="Add Custom Path" AutomationProperties.HelpText="Add a new custom path to the list">
                             <StackPanel Orientation="Horizontal">
                                 <Path Data="{x:Static design:Icons.Plus}" Fill="{DynamicResource TextPrimaryBrush}" Width="14" Height="14" Stretch="Uniform" Margin="0,0,4,0" VerticalAlignment="Center"/>
                                 <TextBlock Text="Add" VerticalAlignment="Center" FontSize="{StaticResource FontSizeSmall}"/>
@@ -187,7 +204,8 @@
                                             <ColumnDefinition Width="Auto"/>
                                         </Grid.ColumnDefinitions>
                                         <TextBlock Grid.Column="0" Text="{Binding}" FontSize="{StaticResource FontSizeSmall}" Foreground="{DynamicResource TextPrimaryBrush}" VerticalAlignment="Center" TextTrimming="CharacterEllipsis"/>
-                                        <Button Grid.Column="1" Style="{StaticResource IconButtonStyle}" Command="{Binding DataContext.RemoveCustomPathCommand, RelativeSource={RelativeSource AncestorType=UserControl}}" CommandParameter="{Binding}" Padding="4" Margin="8,0,0,0" ToolTip="Remove">
+                                        <Button Grid.Column="1" Style="{StaticResource IconButtonStyle}" Command="{Binding DataContext.RemoveCustomPathCommand, RelativeSource={RelativeSource AncestorType=UserControl}}" CommandParameter="{Binding}" Padding="4" Margin="8,0,0,0" ToolTip="Remove"
+                         AutomationProperties.Name="Remove Custom Path" AutomationProperties.HelpText="Remove this custom path from the list">
                                             <Path Data="{x:Static design:Icons.X}" Fill="{DynamicResource TextSecondaryBrush}" Width="14" Height="14" Stretch="Uniform"/>
                                         </Button>
                                     </Grid>
@@ -205,12 +223,14 @@
 
                     <StackPanel Orientation="Horizontal" Margin="0,8,0,0">
                         <TextBlock Text="Auto Check" FontSize="{StaticResource FontSizeMedium}" FontWeight="Medium" Foreground="{DynamicResource TextPrimaryBrush}" VerticalAlignment="Center" Width="140"/>
-                        <CheckBox IsChecked="{Binding AutoCheckUpdates}" VerticalAlignment="Center" Margin="12,0,0,0" Style="{StaticResource ModernCheckBoxStyle}"/>
+                        <CheckBox IsChecked="{Binding AutoCheckUpdates}" VerticalAlignment="Center" Margin="12,0,0,0" Style="{StaticResource ModernCheckBoxStyle}"
+                         AutomationProperties.Name="Auto Check Updates" AutomationProperties.HelpText="Automatically check for updates on startup"/>
                     </StackPanel>
 
                     <StackPanel Orientation="Horizontal" Margin="0,8,0,0">
                         <TextBlock Text="Channel" FontSize="{StaticResource FontSizeMedium}" FontWeight="Medium" Foreground="{DynamicResource TextPrimaryBrush}" VerticalAlignment="Center" Width="140"/>
-                        <ComboBox Width="160" ItemsSource="{Binding AvailableChannels}" SelectedItem="{Binding UpdateChannel}" VerticalAlignment="Center" Margin="12,0,0,0">
+                        <ComboBox Width="160" ItemsSource="{Binding AvailableChannels}" SelectedItem="{Binding UpdateChannel}" VerticalAlignment="Center" Margin="12,0,0,0"
+                         AutomationProperties.Name="Update Channel" AutomationProperties.HelpText="Select the update channel (Stable, Beta, Preview)">
                             <ComboBox.ItemTemplate>
                                 <DataTemplate>
                                     <TextBlock Text="{Binding}"/>
@@ -220,8 +240,10 @@
                     </StackPanel>
 
                     <StackPanel Orientation="Horizontal" Margin="0,8,0,0">
-                        <CheckBox Content="Auto Download" IsChecked="{Binding AutoDownloadUpdates}" VerticalAlignment="Center" Margin="12,0,0,0" Style="{StaticResource ModernCheckBoxStyle}"/>
-                        <CheckBox Content="Auto Install" IsChecked="{Binding AutoInstallUpdates}" VerticalAlignment="Center" Margin="24,0,0,0" Style="{StaticResource ModernCheckBoxStyle}"/>
+                        <CheckBox Content="Auto Download" IsChecked="{Binding AutoDownloadUpdates}" VerticalAlignment="Center" Margin="12,0,0,0" Style="{StaticResource ModernCheckBoxStyle}"
+                         AutomationProperties.Name="Auto Download Updates" AutomationProperties.HelpText="Automatically download updates when available"/>
+                        <CheckBox Content="Auto Install" IsChecked="{Binding AutoInstallUpdates}" VerticalAlignment="Center" Margin="24,0,0,0" Style="{StaticResource ModernCheckBoxStyle}"
+                         AutomationProperties.Name="Auto Install Updates" AutomationProperties.HelpText="Automatically install downloaded updates"/>
                     </StackPanel>
 
                     <Border Style="{StaticResource CardStyle}" Padding="12" Margin="0,12,0,0" Background="{DynamicResource BackgroundBrush}" CornerRadius="{StaticResource CornerRadiusNormal}" Visibility="{Binding IsUpdateAvailable, Converter={StaticResource BoolToVisibilityConverter}}">
@@ -230,10 +252,12 @@
                             <TextBlock Text="{Binding AvailableUpdate.Version}" FontSize="{StaticResource FontSizeSmall}" Foreground="{DynamicResource TextPrimaryBrush}"/>
                             <TextBlock Text="{Binding AvailableUpdate.ReleaseNotes}" FontSize="{StaticResource FontSizeSmall}" Foreground="{DynamicResource TextSecondaryBrush}" TextWrapping="Wrap" Margin="0,4,0,8"/>
                             <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
-                                <Button Style="{StaticResource SecondaryButtonStyle}" Command="{Binding DismissUpdateCommand}" Padding="12,6" Margin="0,0,8,0">
+                                <Button Style="{StaticResource SecondaryButtonStyle}" Command="{Binding DismissUpdateCommand}" Padding="12,6" Margin="0,0,8,0"
+                         AutomationProperties.Name="Dismiss Update" AutomationProperties.HelpText="Dismiss the available update notification">
                                     <TextBlock Text="Dismiss" VerticalAlignment="Center"/>
                                 </Button>
-                                <Button Style="{StaticResource PrimaryButtonStyle}" Command="{Binding DownloadAndInstallUpdateCommand}" IsEnabled="{Binding UpdateStatus, Converter={StaticResource InverseBoolToVisibilityConverter}, ConverterParameter=not}" Padding="16,6" MinWidth="120">
+                                <Button Style="{StaticResource PrimaryButtonStyle}" Command="{Binding DownloadAndInstallUpdateCommand}" IsEnabled="{Binding UpdateStatus, Converter={StaticResource InverseBoolToVisibilityConverter}, ConverterParameter=not}" Padding="16,6" MinWidth="120"
+                         AutomationProperties.Name="Download and Install Update" AutomationProperties.HelpText="Download and install the available update">
                                     <StackPanel Orientation="Horizontal">
                                         <Path Data="{x:Static design:Icons.Download}" Fill="{DynamicResource TextOnPrimaryBrush}" Width="14" Height="14" Stretch="Uniform" VerticalAlignment="Center" Margin="0,0,6,0"/>
                                         <TextBlock Text="{Binding UpdateStatus, Converter={StaticResource BoolToTextConverter}, ConverterParameter='Install|Installing...'}" VerticalAlignment="Center" FontWeight="SemiBold"/>
@@ -244,7 +268,8 @@
                     </Border>
 
                     <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,8,0,0">
-                        <Button Style="{StaticResource SecondaryButtonStyle}" Command="{Binding CheckForUpdatesCommand}" Padding="12,6" Margin="0,0,8,0" IsEnabled="{Binding UpdateStatus, Converter={StaticResource InverseBoolToVisibilityConverter}, ConverterParameter=not}">
+                        <Button Style="{StaticResource SecondaryButtonStyle}" Command="{Binding CheckForUpdatesCommand}" Padding="12,6" Margin="0,0,8,0" IsEnabled="{Binding UpdateStatus, Converter={StaticResource InverseBoolToVisibilityConverter}, ConverterParameter=not}"
+                         AutomationProperties.Name="Check for Updates" AutomationProperties.HelpText="Check for available updates">
                             <StackPanel Orientation="Horizontal">
                                 <Path Data="{x:Static design:Icons.Refresh}" Fill="{DynamicResource TextPrimaryBrush}" Width="14" Height="14" Stretch="Uniform" VerticalAlignment="Center" Margin="0,0,6,0"/>
                                 <TextBlock Text="{Binding UpdateStatus, Converter={StaticResource BoolToTextConverter}, ConverterParameter='Check|Checking...'}" VerticalAlignment="Center" FontWeight="SemiBold"/>
@@ -257,25 +282,29 @@
             <!-- Actions -->
             <Border Style="{StaticResource CardStyle}" Padding="{StaticResource PaddingLg}" Margin="0,24,0,0">
                 <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
-                    <Button Style="{StaticResource SecondaryButtonStyle}" Command="{Binding ExportSettingsCommand}" Padding="16,8" Margin="0,0,8,0">
+                    <Button Style="{StaticResource SecondaryButtonStyle}" Command="{Binding ExportSettingsCommand}" Padding="16,8" Margin="0,0,8,0"
+                         AutomationProperties.Name="Export Settings" AutomationProperties.HelpText="Export current settings to a file">
                         <StackPanel Orientation="Horizontal">
                             <Path Data="{x:Static design:Icons.Download}" Fill="{DynamicResource TextPrimaryBrush}" Width="16" Height="16" Stretch="Uniform" Margin="0,0,8,0" VerticalAlignment="Center"/>
                             <TextBlock Text="Export Settings" VerticalAlignment="Center" FontWeight="SemiBold"/>
                         </StackPanel>
                     </Button>
-                    <Button Style="{StaticResource SecondaryButtonStyle}" Command="{Binding ImportSettingsCommand}" Padding="16,8" Margin="0,0,8,0">
+                    <Button Style="{StaticResource SecondaryButtonStyle}" Command="{Binding ImportSettingsCommand}" Padding="16,8" Margin="0,0,8,0"
+                         AutomationProperties.Name="Import Settings" AutomationProperties.HelpText="Import settings from a file">
                         <StackPanel Orientation="Horizontal">
                             <Path Data="{x:Static design:Icons.Upload}" Fill="{DynamicResource TextPrimaryBrush}" Width="16" Height="16" Stretch="Uniform" Margin="0,0,8,0" VerticalAlignment="Center"/>
                             <TextBlock Text="Import Settings" VerticalAlignment="Center" FontWeight="SemiBold"/>
                         </StackPanel>
                     </Button>
-                    <Button Style="{StaticResource DangerButtonStyle}" Command="{Binding ResetToDefaultsCommand}" Padding="16,8" Margin="0,0,8,0">
+                    <Button Style="{StaticResource DangerButtonStyle}" Command="{Binding ResetToDefaultsCommand}" Padding="16,8" Margin="0,0,8,0"
+                         AutomationProperties.Name="Reset to Defaults" AutomationProperties.HelpText="Reset all settings to their default values">
                         <StackPanel Orientation="Horizontal">
                             <Path Data="{x:Static design:Icons.Refresh}" Fill="{DynamicResource TextOnPrimaryBrush}" Width="16" Height="16" Stretch="Uniform" Margin="0,0,8,0" VerticalAlignment="Center"/>
                             <TextBlock Text="Reset to Defaults" VerticalAlignment="Center" FontWeight="SemiBold"/>
                         </StackPanel>
                     </Button>
-                    <Button Style="{StaticResource PrimaryButtonStyle}" Command="{Binding SaveCommand}" Padding="24,12" MinWidth="160">
+                    <Button Style="{StaticResource PrimaryButtonStyle}" Command="{Binding SaveCommand}" Padding="24,12" MinWidth="160"
+                         AutomationProperties.Name="Save Settings" AutomationProperties.HelpText="Save all settings changes">
                         <StackPanel Orientation="Horizontal">
                             <Path Data="{x:Static design:Icons.Check}" Fill="{DynamicResource TextOnPrimaryBrush}" Width="16" Height="16" Stretch="Uniform" Margin="0,0,8,0" VerticalAlignment="Center"/>
                             <TextBlock Text="Save Settings" VerticalAlignment="Center" FontWeight="SemiBold"/>

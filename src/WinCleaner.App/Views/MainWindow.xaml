@@ -92,10 +92,12 @@
                             <TextBlock x:Name="DateTimeText" FontSize="{StaticResource FontSizeSmall}" Foreground="{StaticResource TextSecondaryBrush}" FontFamily="{StaticResource MonospaceFont}"/>
                             <TextBlock Text="{Binding SystemInfo.OSVersion}" FontSize="{StaticResource FontSizeSmall}" Foreground="{StaticResource TextDisabledBrush}"/>
                         </StackPanel>
-                        <Button Style="{StaticResource GhostButtonStyle}" Command="{Binding RefreshDrivesCommand}" ToolTip="Làm mới ổ đĩa" Padding="6">
+                        <Button Style="{StaticResource GhostButtonStyle}" Command="{Binding RefreshDrivesCommand}" ToolTip="Làm mới ổ đĩa" Padding="6"
+                         AutomationProperties.Name="Refresh Drives" AutomationProperties.HelpText="Refresh the list of drives">
                             <TextBlock Text="🔄" FontSize="14"/>
                         </Button>
-                        <Button Style="{StaticResource GhostButtonStyle}" Command="{Binding OpenSettingsCommand}" ToolTip="Cài đặt (Ctrl+,)" Padding="6">
+                        <Button Style="{StaticResource GhostButtonStyle}" Command="{Binding OpenSettingsCommand}" ToolTip="Cài đặt (Ctrl+,)" Padding="6"
+                         AutomationProperties.Name="Open Settings" AutomationProperties.HelpText="Open the settings window">
                             <TextBlock Text="⚙" FontSize="14"/>
                         </Button>
                     </StackPanel>
@@ -155,52 +157,61 @@
                               DisplayMemberPath="DisplayName"
                               Style="{StaticResource ModernComboBox}"
                               VerticalAlignment="Center"
-                              ToolTip="Chọn cấu hình dọn dép"/>
+                              ToolTip="Chọn cấu hình dọn dép"
+                              AutomationProperties.Name="Cleaning Profile" AutomationProperties.HelpText="Select the cleaning profile to use"/>
                 </StackPanel>
 
                 <!-- Search/Filter -->
-                <TextBox Grid.Column="1" 
-                         Width="350" 
-                         HorizontalAlignment="Center"
-                         VerticalAlignment="Center"
-                         Text="{Binding FilterText, UpdateSourceTrigger=PropertyChanged, Delay=250}"
-                         Style="{StaticResource SearchTextBox}"
-                         Tag="🔍 Tìm kiếm mục cần dọn..."/>
+<TextBox Grid.Column="1" 
+                          Width="350" 
+                          HorizontalAlignment="Center"
+                          VerticalAlignment="Center"
+                          Text="{Binding FilterText, UpdateSourceTrigger=PropertyChanged, Delay=250}"
+                          Style="{StaticResource SearchTextBox}"
+                          Tag="🔍 Tìm kiếm mục cần dọn..."
+                          AutomationProperties.Name="Search" AutomationProperties.HelpText="Search for cleanable items by name"/>
 
                 <!-- Action Buttons -->
                 <StackPanel Grid.Column="2" Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Center">
-                    <Button Style="{StaticResource SecondaryButtonStyle}" Command="{Binding SelectSafeCommand}" ToolTip="Chọn các mục an toàn (Safe/Low risk)" Padding="10,6">
+                    <Button Style="{StaticResource SecondaryButtonStyle}" Command="{Binding SelectSafeCommand}" ToolTip="Chọn các mục an toàn (Safe/Low risk)" Padding="10,6"
+                         AutomationProperties.Name="Select Safe Items" AutomationProperties.HelpText="Select only safe items with low risk">
                         <StackPanel Orientation="Horizontal">
                             <TextBlock Text="✓" FontSize="12" Margin="0,0,4,0"/>
                             <TextBlock Text="An toàn"/>
                         </StackPanel>
                     </Button>
-                    <Button Style="{StaticResource SecondaryButtonStyle}" Command="{Binding SelectAllCommand}" ToolTip="Chọn tất cả" Padding="10,6">
+                    <Button Style="{StaticResource SecondaryButtonStyle}" Command="{Binding SelectAllCommand}" ToolTip="Chọn tất cả" Padding="10,6"
+                         AutomationProperties.Name="Select All" AutomationProperties.HelpText="Select all cleanable items">
                         <StackPanel Orientation="Horizontal">
                             <TextBlock Text="☐" FontSize="12" Margin="0,0,4,0"/>
                             <TextBlock Text="Tất cả"/>
                         </StackPanel>
                     </Button>
-                    <Button Style="{StaticResource SecondaryButtonStyle}" Command="{Binding DeselectAllCommand}" ToolTip="Bỏ chọn tất cả" Padding="10,6">
+                    <Button Style="{StaticResource SecondaryButtonStyle}" Command="{Binding DeselectAllCommand}" ToolTip="Bỏ chọn tất cả" Padding="10,6"
+                         AutomationProperties.Name="Deselect All" AutomationProperties.HelpText="Deselect all cleanable items">
                         <StackPanel Orientation="Horizontal">
                             <TextBlock Text="☑" FontSize="12" Margin="0,0,4,0"/>
                             <TextBlock Text="Bỏ tất cả"/>
                         </StackPanel>
                     </Button>
-                    <CheckBox Content="Dry Run" IsChecked="{Binding DryRunMode, Mode=TwoWay}" Style="{StaticResource ModernCheckBox}" VerticalAlignment="Center" Margin="12,0,8,0" ToolTip="Chỉ mô phỏng, không xóa thực tế"/>
-                    <Button Style="{StaticResource PrimaryButtonStyle}" Command="{Binding ScanCommand}" IsEnabled="{Binding IsScanning, Converter={StaticResource InverseBoolToVisibilityConverter}, ConverterParameter=not}" Padding="14,6" MinWidth="90">
+                    <CheckBox Content="Dry Run" IsChecked="{Binding DryRunMode, Mode=TwoWay}" Style="{StaticResource ModernCheckBox}" VerticalAlignment="Center" Margin="12,0,8,0" ToolTip="Chỉ mô phỏng, không xóa thực tế"
+                         AutomationProperties.Name="Dry Run Mode" AutomationProperties.HelpText="Enable dry run mode to simulate cleaning without deleting files"/>
+                    <Button Style="{StaticResource PrimaryButtonStyle}" Command="{Binding ScanCommand}" IsEnabled="{Binding IsScanning, Converter={StaticResource InverseBoolToVisibilityConverter}, ConverterParameter=not}" Padding="14,6" MinWidth="90"
+                         AutomationProperties.Name="Scan" AutomationProperties.HelpText="Start scanning for cleanable items">
                         <StackPanel Orientation="Horizontal">
                             <TextBlock Text="🔍" FontSize="12" Margin="0,0,4,0"/>
                             <TextBlock Text="Quét"/>
                         </StackPanel>
                     </Button>
-                    <Button Style="{StaticResource DangerButtonStyle}" Command="{Binding CleanCommand}" IsEnabled="{Binding IsCleaning, Converter={StaticResource InverseBoolToVisibilityConverter}, ConverterParameter=not}" Padding="14,6" MinWidth="110">
+                    <Button Style="{StaticResource DangerButtonStyle}" Command="{Binding CleanCommand}" IsEnabled="{Binding IsCleaning, Converter={StaticResource InverseBoolToVisibilityConverter}, ConverterParameter=not}" Padding="14,6" MinWidth="110"
+                         AutomationProperties.Name="Clean" AutomationProperties.HelpText="Clean the selected items">
                         <StackPanel Orientation="Horizontal">
                             <TextBlock Text="🧹" FontSize="12" Margin="0,0,4,0"/>
                             <TextBlock Text="Dọn dẹp"/>
                         </StackPanel>
                     </Button>
-                    <Button Style="{StaticResource SecondaryButtonStyle}" Command="{Binding CancelCommand}" IsEnabled="{Binding IsScanning}" Visibility="{Binding IsScanning, Converter={StaticResource BoolToVisibilityConverter}}" Padding="12,6">
+                    <Button Style="{StaticResource SecondaryButtonStyle}" Command="{Binding CancelCommand}" IsEnabled="{Binding IsScanning}" Visibility="{Binding IsScanning, Converter={StaticResource BoolToVisibilityConverter}}" Padding="12,6"
+                         AutomationProperties.Name="Cancel" AutomationProperties.HelpText="Cancel the current operation">
                         <StackPanel Orientation="Horizontal">
                             <TextBlock Text="✕" FontSize="12" Margin="0,0,4,0"/>
                             <TextBlock Text="Hủy"/>
@@ -233,10 +244,12 @@
                         </Grid.ColumnDefinitions>
                         <TextBlock Text="Mục có thể dọn dẹp" FontSize="{StaticResource FontSizeMedium}" FontWeight="SemiBold" Foreground="{StaticResource TextPrimaryBrush}"/>
                         <StackPanel Grid.Column="1" Orientation="Horizontal" HorizontalAlignment="Right">
-                            <Button Style="{StaticResource GhostButtonStyle}" Command="{Binding ExpandAllCommand}" ToolTip="Mở rộng tất cả" Padding="6">
+                            <Button Style="{StaticResource GhostButtonStyle}" Command="{Binding ExpandAllCommand}" ToolTip="Mở rộng tất cả" Padding="6"
+                         AutomationProperties.Name="Expand All" AutomationProperties.HelpText="Expand all tree view items">
                                 <TextBlock Text="⤢" FontSize="12"/>
                             </Button>
-                            <Button Style="{StaticResource GhostButtonStyle}" Command="{Binding CollapseAllCommand}" ToolTip="Thu gọn tất cả" Padding="6" Margin="4,0,0,0">
+                            <Button Style="{StaticResource GhostButtonStyle}" Command="{Binding CollapseAllCommand}" ToolTip="Thu gọn tất cả" Padding="6" Margin="4,0,0,0"
+                         AutomationProperties.Name="Collapse All" AutomationProperties.HelpText="Collapse all tree view items">
                                 <TextBlock Text="⤡" FontSize="12"/>
                             </Button>
                         </StackPanel>
@@ -248,7 +261,8 @@
                               BorderThickness="0"
                               Background="Transparent"
                               VirtualizingPanel.IsVirtualizing="True"
-                              VirtualizingPanel.VirtualizationMode="Recycling">
+                              VirtualizingPanel.VirtualizationMode="Recycling"
+                              AutomationProperties.Name="Clean Items" AutomationProperties.HelpText="Tree view of cleanable items organized by category">
                         <TreeView.ItemTemplate>
                             <HierarchicalDataTemplate ItemsSource="{Binding Items}">
                                 <!-- Category Header is handled by CategoryTreeViewItem style -->
@@ -265,7 +279,8 @@
                                         <ColumnDefinition Width="Auto"/>
                                     </Grid.ColumnDefinitions>
                                     
-                                    <CheckBox IsChecked="{Binding IsSelected, Mode=TwoWay}" Style="{StaticResource ModernCheckBox}" VerticalAlignment="Center" ToolTip="{Binding Description}"/>
+                                    <CheckBox IsChecked="{Binding IsSelected, Mode=TwoWay}" Style="{StaticResource ModernCheckBox}" VerticalAlignment="Center" ToolTip="{Binding Description}"
+                                         AutomationProperties.Name="Select Item" AutomationProperties.HelpText="Select or deselect this item for cleaning"/>
                                     
                                     <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center" Margin="6,0,0,0">
                                         <TextBlock Text="{Binding Name}" VerticalAlignment="Center" FontSize="{StaticResource FontSizeNormal}"/>
@@ -320,8 +335,10 @@
                     </Grid.RowDefinitions>
 
                     <!-- Tab Control for Details/Log -->
-                    <TabControl Grid.Row="0" Grid.RowSpan="3" BorderThickness="0" Background="Transparent" Padding="0">
-                        <TabItem Header="Chi tiết" Style="{StaticResource ModernTabItem}">
+                    <TabControl Grid.Row="0" Grid.RowSpan="3" BorderThickness="0" Background="Transparent" Padding="0"
+                         AutomationProperties.Name="Details and Log" AutomationProperties.HelpText="Tab control for item details and console log">
+                        <TabItem Header="Chi tiết" Style="{StaticResource ModernTabItem}"
+                         AutomationProperties.Name="Details" AutomationProperties.HelpText="View details of the selected item">
                             <ScrollViewer VerticalScrollBarVisibility="Auto" Padding="10">
                                 <StackPanel>
                                     <!-- Selected Item Details -->
@@ -361,11 +378,13 @@
                                         <StackPanel>
                                             <Grid Margin="0,0,0,8">
                                                 <TextBlock Text="Thư mục tùy chỉnh" FontWeight="SemiBold" FontSize="{StaticResource FontSizeSmall}"/>
-                                                <Button Style="{StaticResource GhostButtonStyle}" Command="{Binding AddCustomFolderCommand}" ToolTip="Thêm thư mục" Padding="6" HorizontalAlignment="Right">
+                                                <Button Style="{StaticResource GhostButtonStyle}" Command="{Binding AddCustomFolderCommand}" ToolTip="Thêm thư mục" Padding="6" HorizontalAlignment="Right"
+                         AutomationProperties.Name="Add Custom Folder" AutomationProperties.HelpText="Add a custom folder to clean">
                                                     <TextBlock Text="+"/>
                                                 </Button>
                                             </Grid>
-                                            <ListBox ItemsSource="{Binding CustomFolders}" BorderThickness="0" Background="Transparent" MaxHeight="150" Style="{StaticResource ModernListBox}">
+                                            <ListBox ItemsSource="{Binding CustomFolders}" BorderThickness="0" Background="Transparent" MaxHeight="150" Style="{StaticResource ModernListBox}"
+                         AutomationProperties.Name="Custom Folders" AutomationProperties.HelpText="List of custom folders to clean">
                                                 <ListBox.ItemTemplate>
                                                     <DataTemplate>
                                                         <Border Background="{StaticResource SurfaceBrush}" BorderBrush="{StaticResource BorderBrush}" BorderThickness="1" CornerRadius="{StaticResource CornerRadiusNormal}" Padding="8" Margin="0,2">
@@ -378,7 +397,8 @@
                                                                     <TextBlock Text="{Binding Path}" FontFamily="{StaticResource MonospaceFont}" FontSize="{StaticResource FontSizeSmall}"/>
                                                                     <TextBlock Text="{Binding SizeFormatted}" Foreground="{StaticResource TextSecondaryBrush}" FontSize="{StaticResource FontSizeSmall}" FontFamily="{StaticResource MonospaceFont}"/>
                                                                 </StackPanel>
-                                                                <Button Grid.Column="1" Style="{StaticResource GhostButtonStyle}" Command="{Binding DataContext.RemoveCustomFolderCommand, RelativeSource={RelativeSource AncestorType=ListBox}}" CommandParameter="{Binding}" ToolTip="Xóa" Padding="4" Margin="8,0,0,0">
+                                                                <Button Grid.Column="1" Style="{StaticResource GhostButtonStyle}" Command="{Binding DataContext.RemoveCustomFolderCommand, RelativeSource={RelativeSource AncestorType=ListBox}}" CommandParameter="{Binding}" ToolTip="Xóa" Padding="4" Margin="8,0,0,0"
+                         AutomationProperties.Name="Remove Custom Folder" AutomationProperties.HelpText="Remove this custom folder">
                                                                     <TextBlock Text="🗑" FontSize="11"/>
                                                                 </Button>
                                                             </Grid>
@@ -394,18 +414,21 @@
                                         <StackPanel>
                                             <Grid Margin="0,0,0,8">
                                                 <TextBlock Text="Profile đã lưu" FontWeight="SemiBold" FontSize="{StaticResource FontSizeSmall}"/>
-                                                <Button Style="{StaticResource GhostButtonStyle}" Command="{Binding SaveCurrentProfileCommand}" ToolTip="Lưu profile hiện tại" Padding="6" HorizontalAlignment="Right">
+                                                <Button Style="{StaticResource GhostButtonStyle}" Command="{Binding SaveCurrentProfileCommand}" ToolTip="Lưu profile hiện tại" Padding="6" HorizontalAlignment="Right"
+                         AutomationProperties.Name="Save Current Profile" AutomationProperties.HelpText="Save the current profile with a custom name">
                                                     <TextBlock Text="💾"/>
                                                 </Button>
                                             </Grid>
-                                            <ComboBox ItemsSource="{Binding SavedProfiles}" SelectedItem="{Binding SelectedSavedProfile, Mode=TwoWay}" Style="{StaticResource ModernComboBox}" MinHeight="36" DisplayMemberPath="Name"/>
+<ComboBox ItemsSource="{Binding SavedProfiles}" SelectedItem="{Binding SelectedSavedProfile, Mode=TwoWay}" Style="{StaticResource ModernComboBox}" MinHeight="36" DisplayMemberPath="Name"
+                          AutomationProperties.Name="Saved Profiles" AutomationProperties.HelpText="Select a saved profile to load"/>
                                         </StackPanel>
                                     </Border>
                                 </StackPanel>
                             </ScrollViewer>
                         </TabItem>
 
-                        <TabItem Header="Console" Style="{StaticResource ModernTabItem}">
+                        <TabItem Header="Console" Style="{StaticResource ModernTabItem}"
+                         AutomationProperties.Name="Console" AutomationProperties.HelpText="View the console log">
                             <Grid Margin="10">
                                 <Grid.RowDefinitions>
                                     <RowDefinition Height="Auto"/>
@@ -420,11 +443,14 @@
                                     </Grid.ColumnDefinitions>
                                     <TextBlock Text="Console Log" FontSize="{StaticResource FontSizeMedium}" FontWeight="SemiBold" VerticalAlignment="Center"/>
                                     <StackPanel Grid.Column="1" Orientation="Horizontal">
-                                        <CheckBox Content="Tự cuộn" IsChecked="{Binding AutoScrollLog, Mode=TwoWay}" Style="{StaticResource ModernCheckBox}" VerticalAlignment="Center" Margin="0,0,8,0"/>
-                                        <Button Style="{StaticResource GhostButtonStyle}" Command="{Binding ClearLogCommand}" ToolTip="Xóa log" Padding="6">
+                                        <CheckBox Content="Tự cuộn" IsChecked="{Binding AutoScrollLog, Mode=TwoWay}" Style="{StaticResource ModernCheckBox}" VerticalAlignment="Center" Margin="0,0,8,0"
+                         AutomationProperties.Name="Auto Scroll Log" AutomationProperties.HelpText="Automatically scroll the log to show new entries"/>
+                                        <Button Style="{StaticResource GhostButtonStyle}" Command="{Binding ClearLogCommand}" ToolTip="Xóa log" Padding="6"
+                         AutomationProperties.Name="Clear Log" AutomationProperties.HelpText="Clear all log entries">
                                             <TextBlock Text="🗑" FontSize="11"/>
                                         </Button>
-                                        <Button Style="{StaticResource GhostButtonStyle}" Command="{Binding ExportLogCommand}" ToolTip="Xuất log" Padding="6" Margin="4,0,0,0">
+                                        <Button Style="{StaticResource GhostButtonStyle}" Command="{Binding ExportLogCommand}" ToolTip="Xuất log" Padding="6" Margin="4,0,0,0"
+                         AutomationProperties.Name="Export Log" AutomationProperties.HelpText="Export log entries to a file">
                                             <TextBlock Text="💾" FontSize="11"/>
                                         </Button>
                                     </StackPanel>

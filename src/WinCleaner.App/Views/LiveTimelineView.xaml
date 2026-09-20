@@ -107,7 +107,8 @@
                     <Button Style="{StaticResource PrimaryButtonStyle}" 
                             Command="{Binding StartScanCommand}" 
                             IsEnabled="{Binding IsRunning, Converter={StaticResource InverseBoolToVisibilityConverter}}"
-                            Padding="16,8" Margin="0,0,8,0">
+                            Padding="16,8" Margin="0,0,8,0"
+                            AutomationProperties.Name="Start Scan" AutomationProperties.HelpText="Start scanning and cleaning operation">
                         <StackPanel Orientation="Horizontal">
                             <Path Data="{x:Static design:Icons.Search}" Fill="{DynamicResource TextOnPrimaryBrush}" Width="16" Height="16" Stretch="Uniform" Margin="0,0,8,0" VerticalAlignment="Center"/>
                             <TextBlock Text="Quét" VerticalAlignment="Center" FontWeight="SemiBold"/>
@@ -116,7 +117,8 @@
                     <Button Style="{StaticResource SecondaryButtonStyle}" 
                             Command="{Binding CancelCommand}" 
                             IsEnabled="{Binding CanCancel}"
-                            Padding="16,8">
+                            Padding="16,8"
+                            AutomationProperties.Name="Cancel Operation" AutomationProperties.HelpText="Cancel the running scan and clean operation">
                         <StackPanel Orientation="Horizontal">
                             <Path Data="{x:Static design:Icons.X}" Fill="{DynamicResource TextPrimaryBrush}" Width="16" Height="16" Stretch="Uniform" Margin="0,0,8,0" VerticalAlignment="Center"/>
                             <TextBlock Text="Hủy" VerticalAlignment="Center" FontWeight="SemiBold"/>
@@ -162,12 +164,14 @@
                     <ComboBox Grid.Column="2" Width="140" Margin="8 ,0,0,0" 
                               ItemsSource="{Binding EventTypeFilterOptions}" 
                               SelectedIndex="0"
-                              ToolTip="Lọc theo loại sự kiện"/>
+                              ToolTip="Lọc theo loại sự kiện"
+                              AutomationProperties.Name="Event Type Filter" AutomationProperties.HelpText="Filter events by type"/>
                 </Grid>
 
                 <ListView Grid.Row="1" ItemsSource="{Binding Events}" 
                           Background="Transparent" BorderThickness="0" 
-                          ScrollViewer.HorizontalScrollBarVisibility="Disabled">
+                          ScrollViewer.HorizontalScrollBarVisibility="Disabled"
+                          AutomationProperties.Name="Event Timeline" AutomationProperties.HelpText="View the timeline of events during the operation">
                     <ListView.ItemContainerStyle>
                         <Style TargetType="ListViewItem">
                             <Setter Property="Padding" Value="8,4"/>
