@@ -542,6 +542,25 @@ namespace WinCleaner.Models
         }
     }
 
+    public class EnumToStringConverter : System.Windows.Data.IValueConverter
+    {
+        public static readonly EnumToStringConverter Instance = new();
+
+        public object Convert(object value, Type targetType, object parameter, System.Globalization.CultureInfo culture)
+        {
+            if (value is Enum enumValue)
+            {
+                return enumValue.ToString();
+            }
+            return value?.ToString() ?? "";
+        }
+
+        public object ConvertBack(object value, Type targetType, object parameter, System.Globalization.CultureInfo culture)
+        {
+            throw new NotImplementedException();
+        }
+    }
+
     public class RiskLevelToTooltipConverter : System.Windows.Data.IValueConverter
     {
         public object Convert(object value, Type targetType, object parameter, System.Globalization.CultureInfo culture)

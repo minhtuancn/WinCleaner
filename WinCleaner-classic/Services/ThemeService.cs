@@ -23,6 +23,7 @@ namespace WinCleaner.Services
         Task<bool> SetTransparencyEnabledAsync(bool enabled);
         Task<bool> SetUiScaleAsync(double scale);
         Task<bool> SetUseSystemThemeAsync(bool useSystem);
+        Task<bool> SetUpdateSettingsAsync(bool autoCheck, UpdateChannel channel, bool autoDownload, bool autoInstall);
         Task<bool> ToggleThemeAsync();
         Task<bool> ApplyThemeAsync(AppTheme theme);
         bool IsDarkThemeActive();
@@ -227,6 +228,25 @@ namespace WinCleaner.Services
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Failed to set use system theme");
+            }
+            return false;
+        }
+
+        public async Task<bool> SetUpdateSettingsAsync(bool autoCheck, UpdateChannel channel, bool autoDownload, bool autoInstall)
+        {
+            try
+            {
+                _settings.AutoCheckUpdates = autoCheck;
+                _settings.UpdateChannel = channel;
+                _settings.AutoDownloadUpdates = autoDownload;
+                _settings.AutoInstallUpdates = autoInstall;
+                
+                await SaveSettingsAsync();
+                return true;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Failed to set update settings");
             }
             return false;
         }

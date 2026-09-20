@@ -978,4 +978,107 @@ Stroke="{DynamicResource TextSecondaryBrush}"
     <models:BoolToBrushConverter x:Key="BoolToBrushConverter"/>
     <models:BoolToStringConverter x:Key="BoolToStringConverter"/>
 
+    <!-- ToggleSwitch Style -->
+    <Style x:Key="ToggleSwitch" TargetType="CheckBox">
+        <Setter Property="Width" Value="52"/>
+        <Setter Property="Height" Value="28"/>
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="CheckBox">
+                    <Border x:Name="track" 
+                            Width="{TemplateBinding Width}" 
+                            Height="{TemplateBinding Height}"
+                            CornerRadius="14"
+                            Background="{DynamicResource BorderBrush}"
+                            BorderBrush="{DynamicResource BorderBrush}"
+                            BorderThickness="1"
+                            SnapsToDevicePixels="True">
+                        <Ellipse x:Name="thumb" 
+                                 Width="22" 
+                                 Height="22" 
+                                 Fill="White"
+                                 HorizontalAlignment="Left"
+                                 VerticalAlignment="Center"
+                                 Margin="2,0,0,0">
+                            <Ellipse.Effect>
+                                <DropShadowEffect BlurRadius="4" ShadowDepth="1" Opacity="0.2" Color="Black"/>
+                            </Ellipse.Effect>
+                        </Ellipse>
+                    </Border>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsChecked" Value="True">
+                            <Setter TargetName="track" Property="Background" Value="{DynamicResource PrimaryBrush}"/>
+                            <Setter TargetName="track" Property="BorderBrush" Value="{DynamicResource PrimaryBrush}"/>
+                            <Setter TargetName="thumb" Property="HorizontalAlignment" Value="Right"/>
+                            <Setter TargetName="thumb" Property="Margin" Value="0,0,2,0"/>
+                        </Trigger>
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Setter TargetName="track" Property="BorderBrush" Value="{DynamicResource PrimaryBrush}"/>
+                        </Trigger>
+                        <Trigger Property="IsEnabled" Value="False">
+                            <Setter TargetName="track" Property="Opacity" Value="0.5"/>
+                            <Setter TargetName="thumb" Property="Opacity" Value="0.5"/>
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <!-- Settings Expander Style -->
+    <Style x:Key="SettingsExpanderStyle" TargetType="Expander">
+        <Setter Property="Background" Value="{DynamicResource SurfaceBrush}"/>
+        <Setter Property="BorderBrush" Value="{DynamicResource BorderBrush}"/>
+        <Setter Property="BorderThickness" Value="1"/>
+        <Setter Property="Margin" Value="0,0,0,8"/>
+        <Setter Property="HeaderTemplate">
+            <Setter.Value>
+                <DataTemplate>
+                    <TextBlock Text="{Binding}" 
+                               FontSize="{DynamicResource FontSizeLarge}" 
+                               FontWeight="SemiBold" 
+                               Foreground="{DynamicResource TextPrimaryBrush}"
+                               Margin="8,4"/>
+                </DataTemplate>
+            </Setter.Value>
+        </Setter>
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="Expander">
+                    <Border Background="{TemplateBinding Background}" 
+                            BorderBrush="{TemplateBinding BorderBrush}" 
+                            BorderThickness="{TemplateBinding BorderThickness}"
+                            CornerRadius="{StaticResource RadiusMd}"
+                            SnapsToDevicePixels="True">
+                        <DockPanel>
+                            <ToggleButton x:Name="HeaderSite" 
+                                          ContentTemplate="{TemplateBinding HeaderTemplate}" 
+                                          Content="{TemplateBinding Header}"
+                                          DockPanel.Dock="Top"
+                                          Padding="12,8"
+                                          HorizontalAlignment="Stretch"
+                                          Background="Transparent"
+                                          BorderThickness="0,0,0,1"
+                                          BorderBrush="{DynamicResource BorderBrush}"
+                                          IsChecked="{Binding IsExpanded, RelativeSource={RelativeSource TemplatedParent}, Mode=TwoWay}"
+                                          Foreground="{DynamicResource TextPrimaryBrush}"
+                                          FontWeight="SemiBold"
+                                          FontSize="{DynamicResource FontSizeLarge}"
+                                          Style="{StaticResource ExpanderToggleButtonStyle}"/>
+                            <ContentPresenter x:Name="ExpandSite" 
+                                              DockPanel.Dock="Bottom" 
+                                              Visibility="Collapsed"
+                                              Margin="12,8"/>
+                        </DockPanel>
+                    </Border>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsExpanded" Value="True">
+                            <Setter TargetName="ExpandSite" Property="Visibility" Value="Visible"/>
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
 </ResourceDictionary>

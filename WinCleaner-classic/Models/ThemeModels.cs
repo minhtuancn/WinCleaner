@@ -13,6 +13,13 @@ namespace WinCleaner.Models
         System
     }
 
+    public enum UpdateChannel
+    {
+        Stable,
+        Beta,
+        Preview
+    }
+
     public class ThemeSettings : ObservableObject
     {
         private AppTheme _currentTheme = AppTheme.System;
@@ -21,6 +28,12 @@ namespace WinCleaner.Models
         private bool _enableAnimations = true;
         private bool _enableTransparency = true;
         private double _uiScale = 1.0;
+
+        // Update settings
+        private bool _autoCheckUpdates = true;
+        private UpdateChannel _updateChannel = UpdateChannel.Stable;
+        private bool _autoDownloadUpdates = false;
+        private bool _autoInstallUpdates = false;
 
         public AppTheme CurrentTheme
         {
@@ -65,5 +78,30 @@ namespace WinCleaner.Models
             AppTheme.System => "System Default",
             _ => "System Default"
         };
+
+        // Update settings properties
+        public bool AutoCheckUpdates
+        {
+            get => _autoCheckUpdates;
+            set => SetProperty(ref _autoCheckUpdates, value);
+        }
+
+        public UpdateChannel UpdateChannel
+        {
+            get => _updateChannel;
+            set => SetProperty(ref _updateChannel, value);
+        }
+
+        public bool AutoDownloadUpdates
+        {
+            get => _autoDownloadUpdates;
+            set => SetProperty(ref _autoDownloadUpdates, value);
+        }
+
+        public bool AutoInstallUpdates
+        {
+            get => _autoInstallUpdates;
+            set => SetProperty(ref _autoInstallUpdates, value);
+        }
     }
 }

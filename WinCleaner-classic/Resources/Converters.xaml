@@ -16,6 +16,7 @@
     <models:BoolToAdminTextConverter x:Key="BoolToAdminTextConverter"/>
     <models:CleanProfileToStringConverter x:Key="CleanProfileToStringConverter"/>
     <models:EnumToCollectionConverter x:Key="EnumToCollectionConverter"/>
+    <models:EnumToStringConverter x:Key="EnumToStringConverter"/>
     <models:DriveUsageToBrushConverter x:Key="DriveUsageToBrushConverter"/>
 
 </ResourceDictionary>

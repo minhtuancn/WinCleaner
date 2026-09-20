@@ -1,0 +1,226 @@
+<UserControl x:Class="WinCleaner.Views.SettingsView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:vm="clr-namespace:WinCleaner.ViewModels"
+             xmlns:models="clr-namespace:WinCleaner.Models"
+             xmlns:design="clr-namespace:WinCleaner.Design"
+             mc:Ignorable="d"
+             d:DesignHeight="700" d:DesignWidth="1000"
+             Background="{DynamicResource BackgroundBrush}"
+             Foreground="{DynamicResource TextPrimaryBrush}">
+
+    <UserControl.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="/WinCleaner;component/Resources/Styles.xaml"/>
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+    </UserControl.Resources>
+
+    <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
+        <StackPanel Margin="{DynamicResource PageMargin}">
+            <!-- Header -->
+            <Border Margin="{DynamicResource MarginBottomLg}">
+                <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                    <Border Width="40" Height="40" CornerRadius="{DynamicResource RadiusMd}" Background="{DynamicResource PrimaryBrush}">
+                        <Path Data="{x:Static design:Icons.Settings}" Fill="{DynamicResource TextOnPrimaryBrush}" Width="20" Height="20" Stretch="Uniform" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                    </Border>
+                    <StackPanel Margin="{DynamicResource MarginLeftMd}" VerticalAlignment="Center">
+                        <TextBlock Text="Settings" FontSize="{DynamicResource FontSizeXLarge}" FontWeight="Bold" Foreground="{DynamicResource TextPrimaryBrush}"/>
+                        <TextBlock Text="Configure WinCleaner preferences" FontSize="{DynamicResource FontSizeMedium}" Foreground="{DynamicResource TextSecondaryBrush}"/>
+                    </StackPanel>
+                </StackPanel>
+            </Border>
+
+            <!-- Appearance Section -->
+            <Expander Header="Appearance" IsExpanded="True" Margin="{DynamicResource MarginBottomMd}" Style="{DynamicResource SettingsExpanderStyle}">
+                <StackPanel Margin="{DynamicResource CardPadding}">
+
+                    <!-- Theme -->
+                    <Grid Margin="{DynamicResource MarginBottomMd}">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+                        <TextBlock Grid.Column="0" Text="Theme" FontSize="{DynamicResource FontSizeMedium}" FontWeight="Medium" Foreground="{DynamicResource TextPrimaryBrush}" VerticalAlignment="Center" Width="140"/>
+                        <ComboBox Grid.Column="1" Width="200" ItemsSource="{Binding AvailableThemes}" SelectedItem="{Binding SelectedTheme}" VerticalAlignment="Center">
+                            <ComboBox.ItemTemplate>
+                                <DataTemplate>
+                                    <TextBlock Text="{Binding Converter={StaticResource EnumToStringConverter}}"/>
+                                </DataTemplate>
+                            </ComboBox.ItemTemplate>
+                        </ComboBox>
+                    </Grid>
+
+                    <!-- Use System Theme -->
+                    <Grid Margin="{DynamicResource MarginBottomMd}">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+                        <TextBlock Grid.Column="0" Text="Follow System Theme" FontSize="{DynamicResource FontSizeMedium}" FontWeight="Medium" Foreground="{DynamicResource TextPrimaryBrush}" VerticalAlignment="Center" Width="140"/>
+                        <CheckBox Grid.Column="1" IsChecked="{Binding UseSystemTheme}" Style="{StaticResource ToggleSwitch}" VerticalAlignment="Center" Width="200"/>
+                    </Grid>
+
+                    <!-- Accent Color -->
+                    <Grid Margin="{DynamicResource MarginBottomMd}">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+                        <TextBlock Grid.Column="0" Text="Accent Color" FontSize="{DynamicResource FontSizeMedium}" FontWeight="Medium" Foreground="{DynamicResource TextPrimaryBrush}" VerticalAlignment="Center" Width="140"/>
+                        <Border Grid.Column="1" Width="40" Height="40" CornerRadius="{DynamicResource RadiusSm}" Margin="0,0,12,0" BorderBrush="{DynamicResource BorderBrush}" BorderThickness="1">
+                            <Border.Background>
+                                <SolidColorBrush Color="{Binding AccentColor}"/>
+                            </Border.Background>
+                        </Border>
+                        <Button Grid.Column="2" Content="Pick Color" Command="{Binding PickAccentColorCommand}" Style="{DynamicResource SecondaryButtonStyle}" Padding="{DynamicResource ButtonPaddingMd}" VerticalAlignment="Center" Width="120"/>
+                    </Grid>
+
+                    <!-- Enable Animations -->
+                    <Grid Margin="{DynamicResource MarginBottomMd}">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+                        <TextBlock Grid.Column="0" Text="Enable Animations" FontSize="{DynamicResource FontSizeMedium}" FontWeight="Medium" Foreground="{DynamicResource TextPrimaryBrush}" VerticalAlignment="Center" Width="140"/>
+                        <CheckBox Grid.Column="1" IsChecked="{Binding EnableAnimations}" Style="{StaticResource ToggleSwitch}" VerticalAlignment="Center" Width="200"/>
+                    </Grid>
+
+                    <!-- Enable Transparency -->
+                    <Grid Margin="{DynamicResource MarginBottomMd}">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+                        <TextBlock Grid.Column="0" Text="Enable Transparency" FontSize="{DynamicResource FontSizeMedium}" FontWeight="Medium" Foreground="{DynamicResource TextPrimaryBrush}" VerticalAlignment="Center" Width="140"/>
+                        <CheckBox Grid.Column="1" IsChecked="{Binding EnableTransparency}" Style="{StaticResource ToggleSwitch}" VerticalAlignment="Center" Width="200"/>
+                    </Grid>
+
+                    <!-- UI Scale -->
+                    <Grid Margin="{DynamicResource MarginBottomMd}">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+                        <TextBlock Grid.Column="0" Text="UI Scale" FontSize="{DynamicResource FontSizeMedium}" FontWeight="Medium" Foreground="{DynamicResource TextPrimaryBrush}" VerticalAlignment="Center" Width="140"/>
+                        <Slider Grid.Column="1" Width="200" Minimum="0.5" Maximum="2.0" Value="{Binding UiScale}" TickFrequency="0.1" IsSnapToTickEnabled="True" VerticalAlignment="Center"
+                                Foreground="{DynamicResource PrimaryBrush}"/>
+                    </Grid>
+
+                </StackPanel>
+            </Expander>
+
+            <!-- Localization Section -->
+            <Expander Header="Localization" IsExpanded="True" Margin="{DynamicResource MarginBottomMd}" Style="{DynamicResource SettingsExpanderStyle}">
+                <StackPanel Margin="{DynamicResource CardPadding}">
+
+                    <!-- Language -->
+                    <Grid Margin="{DynamicResource MarginBottomMd}">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+                        <TextBlock Grid.Column="0" Text="Language" FontSize="{DynamicResource FontSizeMedium}" FontWeight="Medium" Foreground="{DynamicResource TextPrimaryBrush}" VerticalAlignment="Center" Width="140"/>
+                        <ComboBox Grid.Column="1" Width="200" ItemsSource="{Binding Languages}" SelectedItem="{Binding SelectedLanguage}" VerticalAlignment="Center"/>
+                    </Grid>
+
+                </StackPanel>
+            </Expander>
+
+            <!-- Updates Section -->
+            <Expander Header="Updates" IsExpanded="True" Margin="{DynamicResource MarginBottomMd}" Style="{DynamicResource SettingsExpanderStyle}">
+                <StackPanel Margin="{DynamicResource CardPadding}">
+
+                    <!-- Auto Check Updates -->
+                    <Grid Margin="{DynamicResource MarginBottomMd}">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+                        <TextBlock Grid.Column="0" Text="Auto Check Updates" FontSize="{DynamicResource FontSizeMedium}" FontWeight="Medium" Foreground="{DynamicResource TextPrimaryBrush}" VerticalAlignment="Center" Width="140"/>
+                        <CheckBox Grid.Column="1" IsChecked="{Binding AutoCheckUpdates}" Style="{StaticResource ToggleSwitch}" VerticalAlignment="Center" Width="200"/>
+                    </Grid>
+
+                    <!-- Update Channel -->
+                    <Grid Margin="{DynamicResource MarginBottomMd}">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+                        <TextBlock Grid.Column="0" Text="Update Channel" FontSize="{DynamicResource FontSizeMedium}" FontWeight="Medium" Foreground="{DynamicResource TextPrimaryBrush}" VerticalAlignment="Center" Width="140"/>
+                        <ComboBox Grid.Column="1" Width="200" ItemsSource="{Binding AvailableChannels}" SelectedItem="{Binding SelectedChannel}" VerticalAlignment="Center">
+                            <ComboBox.ItemTemplate>
+                                <DataTemplate>
+                                    <TextBlock Text="{Binding Converter={StaticResource EnumToStringConverter}}"/>
+                                </DataTemplate>
+                            </ComboBox.ItemTemplate>
+                        </ComboBox>
+                    </Grid>
+
+                    <!-- Auto Download Updates -->
+                    <Grid Margin="{DynamicResource MarginBottomMd}">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+                        <TextBlock Grid.Column="0" Text="Auto Download Updates" FontSize="{DynamicResource FontSizeMedium}" FontWeight="Medium" Foreground="{DynamicResource TextPrimaryBrush}" VerticalAlignment="Center" Width="140"/>
+                        <CheckBox Grid.Column="1" IsChecked="{Binding AutoDownloadUpdates}" Style="{StaticResource ToggleSwitch}" VerticalAlignment="Center" Width="200"/>
+                    </Grid>
+
+                    <!-- Auto Install Updates -->
+                    <Grid Margin="{DynamicResource MarginBottomMd}">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+                        <TextBlock Grid.Column="0" Text="Auto Install Updates" FontSize="{DynamicResource FontSizeMedium}" FontWeight="Medium" Foreground="{DynamicResource TextPrimaryBrush}" VerticalAlignment="Center" Width="140"/>
+                        <CheckBox Grid.Column="1" IsChecked="{Binding AutoInstallUpdates}" Style="{StaticResource ToggleSwitch}" VerticalAlignment="Center" Width="200"/>
+                    </Grid>
+
+                </StackPanel>
+            </Expander>
+
+            <!-- Advanced Section -->
+            <Expander Header="Advanced" IsExpanded="False" Margin="{DynamicResource MarginBottomMd}" Style="{DynamicResource SettingsExpanderStyle}">
+                <StackPanel Margin="{DynamicResource CardPadding}">
+
+                    <!-- Create Restore Point -->
+                    <Grid Margin="{DynamicResource MarginBottomMd}">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+                        <TextBlock Grid.Column="0" Text="Create Restore Point" FontSize="{DynamicResource FontSizeMedium}" FontWeight="Medium" Foreground="{DynamicResource TextPrimaryBrush}" VerticalAlignment="Center" Width="140" ToolTip="Create a system restore point before cleaning operations"/>
+                        <CheckBox Grid.Column="1" IsChecked="{Binding CreateRestorePoint}" Style="{StaticResource ToggleSwitch}" VerticalAlignment="Center" Width="200"/>
+                    </Grid>
+
+                    <!-- Log Retention Days -->
+                    <Grid Margin="{DynamicResource MarginBottomMd}">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+                        <TextBlock Grid.Column="0" Text="Log Retention (Days)" FontSize="{DynamicResource FontSizeMedium}" FontWeight="Medium" Foreground="{DynamicResource TextPrimaryBrush}" VerticalAlignment="Center" Width="140"/>
+                        <TextBox Grid.Column="1" Width="200" Text="{Binding LogRetentionDays, UpdateSourceTrigger=PropertyChanged}" VerticalAlignment="Center"
+                                 BorderBrush="{DynamicResource BorderBrush}" Background="{DynamicResource SurfaceBrush}" Foreground="{DynamicResource TextPrimaryBrush}"
+                                 Padding="{DynamicResource ControlPadding}"/>
+                    </Grid>
+
+                </StackPanel>
+            </Expander>
+
+            <!-- Action Buttons -->
+            <Border Margin="{DynamicResource MarginTopLg}" Padding="{DynamicResource CardPadding}" Style="{DynamicResource CardStyle}">
+                <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+                    <Button Content="Reset to Defaults" Command="{Binding ResetToDefaultsAsyncCommand}" Style="{DynamicResource GhostButtonStyle}" Padding="{DynamicResource ButtonPaddingMd}" Margin="0,0,8,0"/>
+                    <Button Content="Save Settings" Command="{Binding SaveAsyncCommand}" Style="{DynamicResource PrimaryButtonStyle}" Padding="{DynamicResource ButtonPaddingMd}"/>
+                </StackPanel>
+            </Border>
+
+        </StackPanel>
+    </ScrollViewer>
+</UserControl>
