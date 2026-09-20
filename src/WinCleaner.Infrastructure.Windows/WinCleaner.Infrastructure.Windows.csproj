@@ -21,7 +21,7 @@
     <PackageReference Include="Microsoft.Extensions.Hosting" Version="9.0.0" />
     <PackageReference Include="Microsoft.Extensions.Logging" Version="9.0.0" />
     <PackageReference Include="Microsoft.Extensions.Http" Version="9.0.0" />
-    <PackageReference Include="Microsoft.Win32.SystemEvents" Version="9.0.0" />
+    <PackageReference Include="Microsoft.Win32.SystemEvents" Version="10.0.12" />
     <PackageReference Include="SQLitePCLRaw.lib.e_sqlite3" Version="2.1.12" />
     <PackageReference Include="System.Management" Version="9.0.0" />
   </ItemGroup>
