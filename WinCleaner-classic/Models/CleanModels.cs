@@ -667,4 +667,105 @@ namespace WinCleaner.Models
             throw new NotImplementedException();
         }
     }
+
+    public class BytesToGBConverter : System.Windows.Data.IValueConverter
+    {
+        public object Convert(object value, Type targetType, object parameter, System.Globalization.CultureInfo culture)
+        {
+            if (value is long bytes)
+            {
+                double gb = bytes / (1024.0 * 1024.0 * 1024.0);
+                return $"{gb:F1}";
+            }
+            if (value is double dblBytes)
+            {
+                double gb = dblBytes / (1024.0 * 1024.0 * 1024.0);
+                return $"{gb:F1}";
+            }
+            return "0.0";
+        }
+
+        public object ConvertBack(object value, Type targetType, object parameter, System.Globalization.CultureInfo culture)
+        {
+            throw new NotImplementedException();
+        }
+    }
+
+    public class CountToVisibilityConverter : System.Windows.Data.IValueConverter
+    {
+        public object Convert(object value, Type targetType, object parameter, System.Globalization.CultureInfo culture)
+        {
+            if (value is int count)
+                return count > 0 ? Visibility.Visible : Visibility.Collapsed;
+            if (value is System.Collections.ICollection collection)
+                return collection.Count > 0 ? Visibility.Visible : Visibility.Collapsed;
+            return Visibility.Collapsed;
+        }
+
+        public object ConvertBack(object value, Type targetType, object parameter, System.Globalization.CultureInfo culture)
+        {
+            throw new NotImplementedException();
+        }
+    }
+
+    public class InverseCountToVisibilityConverter : System.Windows.Data.IValueConverter
+    {
+        public object Convert(object value, Type targetType, object parameter, System.Globalization.CultureInfo culture)
+        {
+            if (value is int count)
+                return count == 0 ? Visibility.Visible : Visibility.Collapsed;
+            if (value is System.Collections.ICollection collection)
+                return collection.Count == 0 ? Visibility.Visible : Visibility.Collapsed;
+            return Visibility.Visible;
+        }
+
+        public object ConvertBack(object value, Type targetType, object parameter, System.Globalization.CultureInfo culture)
+        {
+            throw new NotImplementedException();
+        }
+    }
+
+    public class BoolToBrushConverter : System.Windows.Data.IValueConverter
+    {
+        public object Convert(object value, Type targetType, object parameter, System.Globalization.CultureInfo culture)
+        {
+            if (value is bool b && parameter is string param)
+            {
+                var parts = param.Split(':');
+                if (parts.Length == 2)
+                {
+                    var trueBrush = parts[0];
+                    var falseBrush = parts[1];
+                    return Application.Current.FindResource(b ? trueBrush : falseBrush);
+                }
+            }
+            return Application.Current.FindResource("PrimaryBrush");
+        }
+
+        public object ConvertBack(object value, Type targetType, object parameter, System.Globalization.CultureInfo culture)
+        {
+            throw new NotImplementedException();
+        }
+    }
+
+    public class BoolToStringConverter : System.Windows.Data.IValueConverter
+    {
+        public object Convert(object value, Type targetType, object parameter, System.Globalization.CultureInfo culture)
+        {
+            if (value is bool b && parameter is string param)
+            {
+                var parts = param.Split(':');
+                if (parts.Length == 2)
+                {
+                    return b ? parts[0] : parts[1];
+                }
+            }
+            return "";
+        }
+
+        public object ConvertBack(object value, Type targetType, object parameter, System.Globalization.CultureInfo culture)
+        {
+            throw new NotImplementedException();
+        }
+    }
 }

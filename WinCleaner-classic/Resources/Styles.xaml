@@ -870,4 +870,97 @@ Stroke="{DynamicResource TextSecondaryBrush}"
     <!-- Divider Brush -->
     <SolidColorBrush x:Key="DividerBrush" Color="{StaticResource BorderColor}" Opacity="0.5"/>
 
+    <!-- Dashboard Card Styles -->
+    <Style x:Key="CardStyle" TargetType="Border">
+        <Setter Property="Background" Value="{DynamicResource SurfaceBrush}"/>
+        <Setter Property="BorderBrush" Value="{DynamicResource BorderBrush}"/>
+        <Setter Property="BorderThickness" Value="1"/>
+        <Setter Property="CornerRadius" Value="{StaticResource RadiusLg}"/>
+        <Setter Property="Effect" Value="{StaticResource ShadowSmall}"/>
+        <Setter Property="Padding" Value="{DynamicResource PaddingLg}"/>
+    </Style>
+
+    <Thickness x:Key="CardMargin">8</Thickness>
+    <Thickness x:Key="CardHeaderMargin">0,0,0,12</Thickness>
+    <Thickness x:Key="CardContentMargin">0</Thickness>
+    <Thickness x:Key="CardFooterMargin">0,12,0,0</Thickness>
+    <Thickness x:Key="CardPadding">16</Thickness>
+
+    <Thickness x:Key="PageMargin">24</Thickness>
+    <Thickness x:Key="MarginBottomMd">0,0,0,16</Thickness>
+    <Thickness x:Key="MarginBottomLg">0,0,0,24</Thickness>
+    <Thickness x:Key="MarginLeftMd">0,0,12,0</Thickness>
+    <Thickness x:Key="MarginLeftLg">0,0,16,0</Thickness>
+    <Thickness x:Key="PaddingXLarge">48</Thickness>
+
+    <Thickness x:Key="ButtonPaddingSm">8,4</Thickness>
+    <Thickness x:Key="ButtonPaddingMd">12,6</Thickness>
+    <Thickness x:Key="ButtonPaddingLg">20,10</Thickness>
+
+    <!-- Drive Card Style -->
+    <Style x:Key="DriveCardStyle" TargetType="Border">
+        <Setter Property="Background" Value="{DynamicResource SurfaceBrush}"/>
+        <Setter Property="BorderBrush" Value="{DynamicResource BorderBrush}"/>
+        <Setter Property="BorderThickness" Value="1"/>
+        <Setter Property="CornerRadius" Value="{StaticResource RadiusMd}"/>
+        <Setter Property="Padding" Value="{DynamicResource PaddingMd}"/>
+    </Style>
+
+    <!-- Junk Item Style -->
+    <Style x:Key="JunkItemStyle" TargetType="Border">
+        <Setter Property="Background" Value="{DynamicResource BackgroundBrush}"/>
+        <Setter Property="BorderBrush" Value="{DynamicResource BorderBrush}"/>
+        <Setter Property="BorderThickness" Value="1"/>
+        <Setter Property="CornerRadius" Value="{StaticResource RadiusMd}"/>
+        <Setter Property="Padding" Value="{DynamicResource PaddingMd}"/>
+    </Style>
+
+    <!-- Action Button Style -->
+    <Style x:Key="ActionButtonStyle" TargetType="Button" BasedOn="{StaticResource BaseButtonStyle}">
+        <Setter Property="Background" Value="Transparent"/>
+        <Setter Property="Foreground" Value="{DynamicResource TextPrimaryBrush}"/>
+        <Setter Property="BorderBrush" Value="{DynamicResource BorderBrush}"/>
+        <Setter Property="BorderThickness" Value="1"/>
+        <Setter Property="Padding" Value="{DynamicResource PaddingMd}"/>
+        <Setter Property="HorizontalContentAlignment" Value="Center"/>
+        <Setter Property="VerticalContentAlignment" Value="Center"/>
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="Button">
+                    <Border x:Name="border" 
+                            Background="{TemplateBinding Background}" 
+                            BorderBrush="{TemplateBinding BorderBrush}" 
+                            BorderThickness="{TemplateBinding BorderThickness}"
+                            CornerRadius="{StaticResource RadiusMd}"
+                            Padding="{TemplateBinding Padding}"
+                            SnapsToDevicePixels="True">
+                        <ContentPresenter HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}" 
+                                          VerticalAlignment="{TemplateBinding VerticalContentAlignment}" 
+                                          RecognizesAccessKey="True"/>
+                    </Border>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Setter TargetName="border" Property="Background" Value="{DynamicResource HoverBrush}"/>
+                            <Setter TargetName="border" Property="BorderBrush" Value="{DynamicResource PrimaryBrush}"/>
+                        </Trigger>
+                        <Trigger Property="IsPressed" Value="True">
+                            <Setter TargetName="border" Property="Background" Value="{DynamicResource PressedBrush}"/>
+                        </Trigger>
+                        <Trigger Property="IsEnabled" Value="False">
+                            <Setter Property="Foreground" Value="{DynamicResource TextDisabledBrush}"/>
+                            <Setter Property="Opacity" Value="0.5"/>
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <!-- Additional Converters -->
+    <models:BytesToGBConverter x:Key="BytesToGBConverter"/>
+    <models:CountToVisibilityConverter x:Key="CountToVisibilityConverter"/>
+    <models:InverseCountToVisibilityConverter x:Key="InverseCountToVisibilityConverter"/>
+    <models:BoolToBrushConverter x:Key="BoolToBrushConverter"/>
+    <models:BoolToStringConverter x:Key="BoolToStringConverter"/>
+
 </ResourceDictionary>

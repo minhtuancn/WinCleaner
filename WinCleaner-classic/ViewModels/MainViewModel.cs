@@ -105,7 +105,21 @@ namespace WinCleaner.ViewModels
         [ObservableProperty]
         private string _currentDateTime = "";
 
+        [ObservableProperty]
+        private bool _isProgressIndeterminate = false;
+
         public bool HasSelectedItem => SelectedItem != null;
+
+        // Dashboard-specific computed properties
+        public IEnumerable<CleanItem> TopJunkItems => CleanGroups
+            .SelectMany(g => g.Items)
+            .Where(i => i.SizeBytes > 0)
+            .OrderByDescending(i => i.SizeBytes)
+            .Take(10);
+
+        public IEnumerable<LogEntry> RecentLogEntries => LogEntries
+            .OrderByDescending(e => e.Timestamp)
+            .Take(20);
 
         public string Title => "Dashboard";
         public Geometry Icon => Icons.Monitor;
@@ -128,6 +142,7 @@ namespace WinCleaner.ViewModels
         public ICommand RemoveCustomFolderCommand { get; }
         public ICommand SaveCurrentProfileCommand { get; }
         public ICommand LoadSavedProfileCommand { get; }
+        public ICommand ToggleDryRunCommand { get; }
 
         public MainViewModel(
             ISystemScanner scanner,
@@ -157,6 +172,7 @@ namespace WinCleaner.ViewModels
             RemoveCustomFolderCommand = new RelayCommand<CustomFolderModel>(RemoveCustomFolder);
             SaveCurrentProfileCommand = new RelayCommand(SaveCurrentProfile);
             LoadSavedProfileCommand = new RelayCommand<SavedProfileModel>(LoadSavedProfile);
+            ToggleDryRunCommand = new RelayCommand(() => DryRunMode = !DryRunMode);
 
             _dateTimeTimer = new DispatcherTimer
             {
@@ -292,6 +308,7 @@ namespace WinCleaner.ViewModels
         {
             _cleaner.DryRunMode = value;
             _ = SaveSettingsAsync();
+            OnPropertyChanged(nameof(DryRunMode));
         }
 
         partial void OnSelectedProfileChanged(CleanProfile value)
@@ -484,6 +501,21 @@ namespace WinCleaner.ViewModels
             OnPropertyChanged(nameof(HasSelectedItem));
         }
 
+        partial void OnCleanGroupsChanged(ObservableCollection<CleanCategoryGroup> value)
+        {
+            OnPropertyChanged(nameof(TopJunkItems));
+        }
+
+        partial void OnTotalScannableSizeChanged(long value)
+        {
+            OnPropertyChanged(nameof(TopJunkItems));
+        }
+
+        partial void OnLogEntriesChanged(ObservableCollection<LogEntry> value)
+        {
+            OnPropertyChanged(nameof(RecentLogEntries));
+        }
+
         private void UpdateTotals()
         {
             TotalItems = CleanGroups.Sum(g => g.ItemCount);
@@ -491,6 +523,7 @@ namespace WinCleaner.ViewModels
             TotalScannableSize = CleanGroups.Sum(g => g.TotalSize);
             TotalSelectedSize = CleanGroups.Sum(g => g.SelectedSize);
             TotalCleanedSize = CleanGroups.Sum(g => g.CleanedSize);
+            OnPropertyChanged(nameof(TopJunkItems));
         }
 
         private void UpdateCommandStates()

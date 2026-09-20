@@ -1,0 +1,372 @@
+<UserControl x:Class="WinCleaner.Views.DashboardView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:design="clr-namespace:WinCleaner.Design"
+             xmlns:vm="clr-namespace:WinCleaner.ViewModels"
+             xmlns:models="clr-namespace:WinCleaner.Models"
+             mc:Ignorable="d"
+             d:DesignHeight="700" d:DesignWidth="1000"
+             Background="{DynamicResource BackgroundBrush}"
+             Foreground="{DynamicResource TextPrimaryBrush}">
+
+    <UserControl.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="/WinCleaner;component/Resources/Styles.xaml"/>
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+    </UserControl.Resources>
+
+    <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
+        <Grid Margin="{DynamicResource PageMargin}">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="*"/>
+            </Grid.RowDefinitions>
+
+            <!-- Header -->
+            <Border Grid.Row="0" Margin="{DynamicResource MarginBottomMd}">
+                <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                    <Border Width="40" Height="40" CornerRadius="{DynamicResource RadiusMd}" Background="{DynamicResource PrimaryBrush}">
+                        <Path Data="{x:Static design:Icons.Monitor}" Fill="{DynamicResource TextOnPrimaryBrush}" Width="20" Height="20" Stretch="Uniform" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                    </Border>
+                    <StackPanel Margin="{DynamicResource MarginLeftMd}" VerticalAlignment="Center">
+                        <TextBlock Text="Dashboard" FontSize="{DynamicResource FontSizeXLarge}" FontWeight="Bold" Foreground="{DynamicResource TextPrimaryBrush}"/>
+                        <TextBlock Text="System health and quick actions" FontSize="{DynamicResource FontSizeMedium}" Foreground="{DynamicResource TextSecondaryBrush}"/>
+                    </StackPanel>
+                </StackPanel>
+            </Border>
+
+            <!-- Card Grid: Health, Disk, Top Junk, Quick Actions -->
+            <UniformGrid Grid.Row="1" Columns="2" Rows="2" Margin="{DynamicResource MarginBottomLg}">
+                
+                <!-- Health Card -->
+                <Border Style="{DynamicResource CardStyle}" Margin="{DynamicResource CardMargin}">
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="*"/>
+                            <RowDefinition Height="Auto"/>
+                        </Grid.RowDefinitions>
+
+                        <Grid Grid.Row="0" Margin="{DynamicResource CardHeaderMargin}">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+                            <Border Width="36" Height="36" CornerRadius="{DynamicResource RadiusSm}" Background="{DynamicResource SuccessBrush}">
+                                <Path Data="{x:Static design:Icons.Shield}" Fill="{DynamicResource TextOnPrimaryBrush}" Width="18" Height="18" Stretch="Uniform" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                            </Border>
+                            <StackPanel Grid.Column="1" Margin="{DynamicResource MarginLeftMd}" VerticalAlignment="Center">
+                                <TextBlock Text="System Health" FontSize="{DynamicResource FontSizeLarge}" FontWeight="SemiBold" Foreground="{DynamicResource TextPrimaryBrush}"/>
+                                <TextBlock Text="Overall system status" FontSize="{DynamicResource FontSizeSmall}" Foreground="{DynamicResource TextSecondaryBrush}"/>
+                            </StackPanel>
+                        </Grid>
+
+                        <StackPanel Grid.Row="1" Margin="{DynamicResource CardContentMargin}" Orientation="Horizontal" VerticalAlignment="Center" HorizontalAlignment="Center">
+                            <!-- Health Score Ring -->
+                            <Border Width="80" Height="80" CornerRadius="40" BorderBrush="{DynamicResource SuccessBrush}" BorderThickness="6" Background="Transparent">
+                                <Grid>
+                                    <TextBlock Text="95%" FontSize="{DynamicResource FontSizeXLarge}" FontWeight="Bold" Foreground="{DynamicResource SuccessBrush}" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                </Grid>
+                            </Border>
+                            <StackPanel Margin="{DynamicResource MarginLeftLg}" VerticalAlignment="Center">
+                                <TextBlock Text="Excellent" FontSize="{DynamicResource FontSizeXLarge}" FontWeight="Bold" Foreground="{DynamicResource SuccessBrush}"/>
+                                <TextBlock Text="No critical issues detected" FontSize="{DynamicResource FontSizeSmall}" Foreground="{DynamicResource TextSecondaryBrush}"/>
+                            </StackPanel>
+                        </StackPanel>
+
+                        <StackPanel Grid.Row="2" Margin="{DynamicResource CardFooterMargin}" Orientation="Horizontal" HorizontalAlignment="Center">
+                            <Button Style="{DynamicResource GhostButtonStyle}" Command="{Binding ScanCommand}" Padding="{DynamicResource ButtonPaddingMd}" MinWidth="100">
+                                <StackPanel Orientation="Horizontal">
+                                    <Path Data="{x:Static design:Icons.Search}" Fill="{DynamicResource TextPrimaryBrush}" Width="14" Height="14" Stretch="Uniform" Margin="0,0,6,0"/>
+                                    <TextBlock Text="Run Scan" VerticalAlignment="Center"/>
+                                </StackPanel>
+                            </Button>
+                        </StackPanel>
+                    </Grid>
+                </Border>
+
+                <!-- Disk Usage Card -->
+                <Border Style="{DynamicResource CardStyle}" Margin="{DynamicResource CardMargin}">
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="*"/>
+                            <RowDefinition Height="Auto"/>
+                        </Grid.RowDefinitions>
+
+                        <Grid Grid.Row="0" Margin="{DynamicResource CardHeaderMargin}">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+                            <Border Width="36" Height="36" CornerRadius="{DynamicResource RadiusSm}" Background="{DynamicResource PrimaryBrush}">
+                                <Path Data="{x:Static design:Icons.Disk}" Fill="{DynamicResource TextOnPrimaryBrush}" Width="18" Height="18" Stretch="Uniform" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                            </Border>
+                            <StackPanel Grid.Column="1" Margin="{DynamicResource MarginLeftMd}" VerticalAlignment="Center">
+                                <TextBlock Text="Disk Usage" FontSize="{DynamicResource FontSizeLarge}" FontWeight="SemiBold" Foreground="{DynamicResource TextPrimaryBrush}"/>
+                                <TextBlock Text="Storage overview" FontSize="{DynamicResource FontSizeSmall}" Foreground="{DynamicResource TextSecondaryBrush}"/>
+                            </StackPanel>
+                        </Grid>
+
+                        <ItemsControl Grid.Row="1" ItemsSource="{Binding Drives}" Margin="{DynamicResource CardContentMargin}">
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate>
+                                    <Border Style="{DynamicResource DriveCardStyle}" Margin="0,0,0,8">
+                                        <Grid>
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="Auto"/>
+                                                <ColumnDefinition Width="*"/>
+                                                <ColumnDefinition Width="Auto"/>
+                                            </Grid.ColumnDefinitions>
+                                            <Path Grid.Column="0" Data="{x:Static design:Icons.Drive}" Fill="{DynamicResource TextSecondaryBrush}" Width="20" Height="20" Stretch="Uniform" VerticalAlignment="Center" Margin="0,0,10,0"/>
+                                            <StackPanel Grid.Column="1" VerticalAlignment="Center">
+                                                <TextBlock Text="{Binding Name}" FontWeight="Medium" FontSize="{DynamicResource FontSizeMedium}" Foreground="{DynamicResource TextPrimaryBrush}"/>
+                                                <TextBlock FontSize="{DynamicResource FontSizeSmall}" Foreground="{DynamicResource TextSecondaryBrush}" FontFamily="{DynamicResource MonospaceFont}">
+                                                    <Run Text="{Binding FreeSpaceFormatted, Mode=OneWay}"/> free of <Run Text="{Binding TotalSizeFormatted, Mode=OneWay}"/>
+                                                    <Run Text=" ("/><Run Text="{Binding FreePercent, Mode=OneWay, StringFormat='{}{0:0.#}%'}"/><Run Text=" free)"/>
+                                                </TextBlock>
+                                            </StackPanel>
+                                            <ProgressBar Grid.Column="2" Width="100" Height="6" Value="{Binding UsedPercent, Mode=OneWay}" Maximum="100" Style="{DynamicResource ModernProgressBar}" VerticalAlignment="Center" Margin="10,0,0,0"
+                                                         Foreground="{Binding UsedPercent, Mode=OneWay, Converter={StaticResource DriveUsageToBrushConverter}}"/>
+                                        </Grid>
+                                    </Border>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+
+                        <Button Grid.Row="2" Style="{DynamicResource GhostButtonStyle}" Command="{Binding RefreshDrivesCommand}" HorizontalAlignment="Center" Margin="{DynamicResource CardFooterMargin}" Padding="{DynamicResource ButtonPaddingMd}">
+                            <StackPanel Orientation="Horizontal">
+                                <Path Data="{x:Static design:Icons.Refresh}" Fill="{DynamicResource TextPrimaryBrush}" Width="14" Height="14" Stretch="Uniform" Margin="0,0,6,0"/>
+                                <TextBlock Text="Refresh" VerticalAlignment="Center"/>
+                            </StackPanel>
+                        </Button>
+                    </Grid>
+                </Border>
+
+                <!-- Top Junk Card -->
+                <Border Style="{DynamicResource CardStyle}" Margin="{DynamicResource CardMargin}">
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="*"/>
+                            <RowDefinition Height="Auto"/>
+                        </Grid.RowDefinitions>
+
+                        <Grid Grid.Row="0" Margin="{DynamicResource CardHeaderMargin}">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="Auto"/>
+                            </Grid.ColumnDefinitions>
+                            <Border Width="36" Height="36" CornerRadius="{DynamicResource RadiusSm}" Background="{DynamicResource WarningBrush}">
+                                <Path Data="{x:Static design:Icons.Trash}" Fill="{DynamicResource TextOnPrimaryBrush}" Width="18" Height="18" Stretch="Uniform" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                            </Border>
+                            <StackPanel Grid.Column="1" Margin="{DynamicResource MarginLeftMd}" VerticalAlignment="Center">
+                                <TextBlock Text="Top Junk" FontSize="{DynamicResource FontSizeLarge}" FontWeight="SemiBold" Foreground="{DynamicResource TextPrimaryBrush}"/>
+                                <TextBlock Text="Largest cleanable items" FontSize="{DynamicResource FontSizeSmall}" Foreground="{DynamicResource TextSecondaryBrush}"/>
+                            </StackPanel>
+                            <TextBlock Grid.Column="2" Text="{Binding TotalScannableSize, StringFormat='{}{0:F1} GB', Converter={StaticResource BytesToGBConverter}}" FontSize="{DynamicResource FontSizeMedium}" FontWeight="Bold" Foreground="{DynamicResource PrimaryBrush}" VerticalAlignment="Center" FontFamily="{DynamicResource MonospaceFont}"/>
+                        </Grid>
+
+                        <ListBox Grid.Row="1" ItemsSource="{Binding TopJunkItems}" BorderThickness="0" Background="Transparent" Margin="{DynamicResource CardContentMargin}" MaxHeight="200">
+                            <ListBox.ItemTemplate>
+                                <DataTemplate>
+                                    <Border Style="{DynamicResource JunkItemStyle}" Margin="0,0,0,6">
+                                        <Grid>
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="Auto"/>
+                                                <ColumnDefinition Width="*"/>
+                                                <ColumnDefinition Width="Auto"/>
+                                            </Grid.ColumnDefinitions>
+                                            <Border Grid.Column="0" Width="32" Height="32" CornerRadius="{DynamicResource RadiusSm}" Background="{Binding RiskBrush}" Margin="0,0,10,0">
+                                                <Path Data="{Binding CategoryIcon}" Fill="White" Width="16" Height="16" Stretch="Uniform" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                            </Border>
+                                            <StackPanel Grid.Column="1" VerticalAlignment="Center">
+                                                <TextBlock Text="{Binding Name}" FontSize="{DynamicResource FontSizeMedium}" FontWeight="Medium" Foreground="{DynamicResource TextPrimaryBrush}" TextTrimming="CharacterEllipsis"/>
+                                                <TextBlock Text="{Binding CategoryName}" FontSize="{DynamicResource FontSizeSmall}" Foreground="{DynamicResource TextSecondaryBrush}"/>
+                                            </StackPanel>
+                                            <TextBlock Grid.Column="2" Text="{Binding SizeFormatted}" FontSize="{DynamicResource FontSizeMedium}" FontWeight="Bold" Foreground="{DynamicResource PrimaryBrush}" FontFamily="{DynamicResource MonospaceFont}" VerticalAlignment="Center" Margin="10,0,0,0"/>
+                                        </Grid>
+                                    </Border>
+                                </DataTemplate>
+                            </ListBox.ItemTemplate>
+                        </ListBox>
+
+                        <Button Grid.Row="2" Style="{DynamicResource GhostButtonStyle}" Command="{Binding ScanCommand}" HorizontalAlignment="Center" Margin="{DynamicResource CardFooterMargin}" Padding="{DynamicResource ButtonPaddingMd}">
+                            <StackPanel Orientation="Horizontal">
+                                <Path Data="{x:Static design:Icons.Search}" Fill="{DynamicResource TextPrimaryBrush}" Width="14" Height="14" Stretch="Uniform" Margin="0,0,6,0"/>
+                                <TextBlock Text="Scan for More" VerticalAlignment="Center"/>
+                            </StackPanel>
+                        </Button>
+                    </Grid>
+                </Border>
+
+                <!-- Quick Actions Card -->
+                <Border Style="{DynamicResource CardStyle}" Margin="{DynamicResource CardMargin}">
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="*"/>
+                        </Grid.RowDefinitions>
+
+                        <Grid Grid.Row="0" Margin="{DynamicResource CardHeaderMargin}">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+                            <Border Width="36" Height="36" CornerRadius="{DynamicResource RadiusSm}" Background="{DynamicResource InfoBrush}">
+                                <Path Data="{x:Static design:Icons.Broom}" Fill="{DynamicResource TextOnPrimaryBrush}" Width="18" Height="18" Stretch="Uniform" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                            </Border>
+                            <StackPanel Grid.Column="1" Margin="{DynamicResource MarginLeftMd}" VerticalAlignment="Center">
+                                <TextBlock Text="Quick Actions" FontSize="{DynamicResource FontSizeLarge}" FontWeight="SemiBold" Foreground="{DynamicResource TextPrimaryBrush}"/>
+                                <TextBlock Text="Common cleanup tasks" FontSize="{DynamicResource FontSizeSmall}" Foreground="{DynamicResource TextSecondaryBrush}"/>
+                            </StackPanel>
+                        </Grid>
+
+                        <UniformGrid Grid.Row="1" Columns="2" Rows="2" Margin="{DynamicResource CardContentMargin}">
+                            <!-- Safe Clean Button -->
+                            <Button Style="{DynamicResource ActionButtonStyle}" Command="{Binding SelectSafeCommand}" ToolTip="Select safe items only" Margin="4">
+                                <StackPanel>
+                                    <Border Width="48" Height="48" CornerRadius="{DynamicResource RadiusMd}" Background="{DynamicResource SuccessBrush}" Margin="0,0,0,8">
+                                        <Path Data="{x:Static design:Icons.Check}" Fill="{DynamicResource TextOnPrimaryBrush}" Width="24" Height="24" Stretch="Uniform" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                    </Border>
+                                    <TextBlock Text="Safe Clean" FontSize="{DynamicResource FontSizeMedium}" FontWeight="Medium" Foreground="{DynamicResource TextPrimaryBrush}" HorizontalAlignment="Center" TextWrapping="Wrap"/>
+                                    <TextBlock Text="Low risk items" FontSize="{DynamicResource FontSizeSmall}" Foreground="{DynamicResource TextSecondaryBrush}" HorizontalAlignment="Center" TextWrapping="Wrap"/>
+                                </StackPanel>
+                            </Button>
+
+                            <!-- Deep Clean Button -->
+                            <Button Style="{DynamicResource ActionButtonStyle}" Command="{Binding ProfileChangedCommand}" CommandParameter="{x:Static models:CleanProfile.Deep}" ToolTip="Select deep clean profile" Margin="4">
+                                <StackPanel>
+                                    <Border Width="48" Height="48" CornerRadius="{DynamicResource RadiusMd}" Background="{DynamicResource PrimaryBrush}" Margin="0,0,0,8">
+                                        <Path Data="{x:Static design:Icons.Broom}" Fill="{DynamicResource TextOnPrimaryBrush}" Width="24" Height="24" Stretch="Uniform" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                    </Border>
+                                    <TextBlock Text="Deep Clean" FontSize="{DynamicResource FontSizeMedium}" FontWeight="Medium" Foreground="{DynamicResource TextPrimaryBrush}" HorizontalAlignment="Center" TextWrapping="Wrap"/>
+                                    <TextBlock Text="Browser cache, dev tools" FontSize="{DynamicResource FontSizeSmall}" Foreground="{DynamicResource TextSecondaryBrush}" HorizontalAlignment="Center" TextWrapping="Wrap"/>
+                                </StackPanel>
+                            </Button>
+
+                            <!-- Dry Run Toggle Button -->
+                            <Button Style="{DynamicResource ActionButtonStyle}" Command="{Binding ToggleDryRunCommand}" ToolTip="Toggle dry run mode" Margin="4">
+                                <StackPanel>
+                                    <Border Width="48" Height="48" CornerRadius="{DynamicResource RadiusMd}" Background="{Binding DryRunMode, Converter={StaticResource BoolToBrushConverter}, ConverterParameter='WarningBrush:PrimaryBrush'}" Margin="0,0,0,8">
+                                        <Path Data="{x:Static design:Icons.AlertTriangle}" Fill="{DynamicResource TextOnPrimaryBrush}" Width="24" Height="24" Stretch="Uniform" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                    </Border>
+                                    <TextBlock Text="Dry Run" FontSize="{DynamicResource FontSizeMedium}" FontWeight="Medium" Foreground="{DynamicResource TextPrimaryBrush}" HorizontalAlignment="Center" TextWrapping="Wrap"/>
+                                    <TextBlock Text="{Binding DryRunMode, Converter={StaticResource BoolToStringConverter}, ConverterParameter='Simulation:Live'}" FontSize="{DynamicResource FontSizeSmall}" Foreground="{DynamicResource TextSecondaryBrush}" HorizontalAlignment="Center" TextWrapping="Wrap"/>
+                                </StackPanel>
+                            </Button>
+
+                            <!-- Settings Button -->
+                            <Button Style="{DynamicResource ActionButtonStyle}" Command="{Binding OpenSettingsCommand}" ToolTip="Open settings" Margin="4">
+                                <StackPanel>
+                                    <Border Width="48" Height="48" CornerRadius="{DynamicResource RadiusMd}" Background="{DynamicResource SurfaceBrush}" BorderBrush="{DynamicResource BorderBrush}" BorderThickness="1" Margin="0,0,0,8">
+                                        <Path Data="{x:Static design:Icons.Settings}" Fill="{DynamicResource TextPrimaryBrush}" Width="24" Height="24" Stretch="Uniform" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                    </Border>
+                                    <TextBlock Text="Settings" FontSize="{DynamicResource FontSizeMedium}" FontWeight="Medium" Foreground="{DynamicResource TextPrimaryBrush}" HorizontalAlignment="Center" TextWrapping="Wrap"/>
+                                    <TextBlock Text="Configure WinCleaner" FontSize="{DynamicResource FontSizeSmall}" Foreground="{DynamicResource TextSecondaryBrush}" HorizontalAlignment="Center" TextWrapping="Wrap"/>
+                                </StackPanel>
+                            </Button>
+                        </UniformGrid>
+                    </Grid>
+                </Border>
+
+            </UniformGrid>
+
+            <!-- Scan Progress Section (shown when scanning) -->
+            <Border Grid.Row="2" Style="{DynamicResource CardStyle}" Margin="{DynamicResource MarginBottomMd}" Visibility="{Binding IsScanning, Converter={StaticResource BoolToVisibilityConverter}}">
+                <Grid Margin="{DynamicResource CardPadding}">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                    </Grid.RowDefinitions>
+                    <Grid Grid.Row="0" Margin="0,0,0,8">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="Auto"/>
+                        </Grid.ColumnDefinitions>
+                        <Path Grid.Column="0" Data="{x:Static design:Icons.Clock}" Fill="{DynamicResource PrimaryBrush}" Width="16" Height="16" Stretch="Uniform" VerticalAlignment="Center" Margin="0,0,8,0"/>
+                        <TextBlock Grid.Column="1" Text="{Binding ScanProgressText}" FontSize="{DynamicResource FontSizeMedium}" FontWeight="Medium" Foreground="{DynamicResource TextPrimaryBrush}" VerticalAlignment="Center"/>
+                        <Button Grid.Column="2" Style="{DynamicResource GhostButtonStyle}" Command="{Binding CancelCommand}" Padding="{DynamicResource ButtonPaddingSm}">
+                            <TextBlock Text="Cancel" VerticalAlignment="Center"/>
+                        </Button>
+                    </Grid>
+                    <ProgressBar Grid.Row="1" Height="6" Value="{Binding OverallProgress}" Maximum="100" Style="{DynamicResource ModernProgressBar}" IsIndeterminate="{Binding IsProgressIndeterminate}"/>
+                </Grid>
+            </Border>
+
+            <!-- Recent Activity / Log Preview -->
+            <Border Grid.Row="3" Style="{DynamicResource CardStyle}" Margin="{DynamicResource MarginBottomMd}" Visibility="{Binding LogEntries.Count, Converter={StaticResource CountToVisibilityConverter}}">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                    </Grid.RowDefinitions>
+                    <Grid Grid.Row="0" Margin="{DynamicResource CardHeaderMargin}">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="Auto"/>
+                        </Grid.ColumnDefinitions>
+                        <Border Width="36" Height="36" CornerRadius="{DynamicResource RadiusSm}" Background="{DynamicResource SurfaceBrush}" BorderBrush="{DynamicResource BorderBrush}" BorderThickness="1">
+                            <Path Data="{x:Static design:Icons.Info}" Fill="{DynamicResource TextSecondaryBrush}" Width="18" Height="18" Stretch="Uniform" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        </Border>
+                        <StackPanel Grid.Column="1" Margin="{DynamicResource MarginLeftMd}" VerticalAlignment="Center">
+                            <TextBlock Text="Recent Activity" FontSize="{DynamicResource FontSizeLarge}" FontWeight="SemiBold" Foreground="{DynamicResource TextPrimaryBrush}"/>
+                            <TextBlock Text="Latest scan and clean operations" FontSize="{DynamicResource FontSizeSmall}" Foreground="{DynamicResource TextSecondaryBrush}"/>
+                        </StackPanel>
+                        <Button Grid.Column="2" Style="{DynamicResource GhostButtonStyle}" Command="{Binding ExportLogCommand}" Padding="{DynamicResource ButtonPaddingMd}" ToolTip="Export full log">
+                            <StackPanel Orientation="Horizontal">
+                                <Path Data="{x:Static design:Icons.Download}" Fill="{DynamicResource TextPrimaryBrush}" Width="14" Height="14" Stretch="Uniform" Margin="0,0,6,0"/>
+                                <TextBlock Text="Export Log" VerticalAlignment="Center"/>
+                            </StackPanel>
+                        </Button>
+                    </Grid>
+                    <ListBox Grid.Row="1" ItemsSource="{Binding RecentLogEntries}" BorderThickness="0" Background="Transparent" Margin="{DynamicResource CardContentMargin}" MaxHeight="150">
+                        <ListBox.ItemTemplate>
+                            <DataTemplate>
+                                <Border Margin="0,2" Padding="8,4" Background="{Binding Level, Converter={StaticResource LogLevelToBackgroundConverter}}" CornerRadius="{DynamicResource RadiusSm}">
+                                    <Grid>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="Auto"/>
+                                            <ColumnDefinition Width="Auto"/>
+                                            <ColumnDefinition Width="*"/>
+                                        </Grid.ColumnDefinitions>
+                                        <TextBlock Grid.Column="0" Text="{Binding FormattedTime}" FontFamily="{DynamicResource MonospaceFont}" FontSize="{DynamicResource FontSizeSmall}" Foreground="{DynamicResource TextSecondaryBrush}"/>
+                                        <TextBlock Grid.Column="1" Text="{Binding Level}" FontSize="{DynamicResource FontSizeSmall}" FontWeight="Bold" Foreground="{Binding Level, Converter={StaticResource LogLevelToBrushConverter}}" Margin="8,0" Width="60"/>
+                                        <TextBlock Grid.Column="2" Text="{Binding Message}" FontFamily="{DynamicResource MonospaceFont}" FontSize="{DynamicResource FontSizeSmall}" Foreground="{DynamicResource TextPrimaryBrush}" TextWrapping="Wrap" TextTrimming="CharacterEllipsis"/>
+                                    </Grid>
+                                </Border>
+                            </DataTemplate>
+                        </ListBox.ItemTemplate>
+                    </ListBox>
+                </Grid>
+            </Border>
+
+            <!-- Empty State -->
+            <Border Grid.Row="4" Style="{DynamicResource CardStyle}" Visibility="{Binding LogEntries.Count, Converter={StaticResource InverseCountToVisibilityConverter}}">
+                <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center" Margin="{DynamicResource PaddingXLarge}">
+                    <Border Width="64" Height="64" CornerRadius="32" Background="{DynamicResource SurfaceBrush}" BorderBrush="{DynamicResource BorderBrush}" BorderThickness="1" Margin="0,0,0,16">
+                        <Path Data="{x:Static design:Icons.Broom}" Fill="{DynamicResource TextSecondaryBrush}" Width="32" Height="32" Stretch="Uniform" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                    </Border>
+                    <TextBlock Text="Ready to Clean" FontSize="{DynamicResource FontSizeXLarge}" FontWeight="Bold" Foreground="{DynamicResource TextPrimaryBrush}" HorizontalAlignment="Center" Margin="0,0,0,8"/>
+                    <TextBlock Text="Click 'Run Scan' to analyze your system for cleanable items" FontSize="{DynamicResource FontSizeMedium}" Foreground="{DynamicResource TextSecondaryBrush}" HorizontalAlignment="Center" TextWrapping="Wrap" TextAlignment="Center" MaxWidth="400"/>
+                    <Button Style="{DynamicResource PrimaryButtonStyle}" Command="{Binding ScanCommand}" Margin="0,24,0,0" Padding="{DynamicResource ButtonPaddingLg}" MinWidth="160">
+                        <StackPanel Orientation="Horizontal">
+                            <Path Data="{x:Static design:Icons.Search}" Fill="{DynamicResource TextOnPrimaryBrush}" Width="16" Height="16" Stretch="Uniform" Margin="0,0,8,0"/>
+                            <TextBlock Text="Run Scan" VerticalAlignment="Center"/>
+                        </StackPanel>
+                    </Button>
+                </StackPanel>
+            </Border>
+        </Grid>
+    </ScrollViewer>
+</UserControl>
