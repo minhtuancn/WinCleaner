@@ -68,10 +68,4 @@
     <sys:Double x:Key="FontSizeXLarge">20</sys:Double>
     <sys:Double x:Key="FontSizeTitle">28</sys:Double>
 
-    <!-- Corner Radius (referenced via StaticResource in MainWindow.xaml) -->
-    <CornerRadius x:Key="CornerRadiusSmall">2</CornerRadius>
-    <CornerRadius x:Key="CornerRadiusNormal">4</CornerRadius>
-    <CornerRadius x:Key="CornerRadiusMedium">6</CornerRadius>
-    <CornerRadius x:Key="CornerRadiusLarge">8</CornerRadius>
-
 </ResourceDictionary>
