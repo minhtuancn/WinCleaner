@@ -1,0 +1,5 @@
+# SDD ledger — plan: docs/superpowers/plans/2026-09-20-classic-ui-fluent-refactor.md
+
+Task 1: complete (commits 60dc5d1, review clean)
+Task 2: complete (commits a789185, review clean)
+Task 3: complete (commits ae2359c, review clean)
