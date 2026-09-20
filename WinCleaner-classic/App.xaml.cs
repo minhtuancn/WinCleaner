@@ -27,8 +27,8 @@ namespace WinCleaner
             var themeService = _host.Services.GetRequiredService<IThemeService>();
             await themeService.InitializeAsync();
 
-            var mainWindow = _host.Services.GetRequiredService<MainWindow>();
-            mainWindow.Show();
+            var shellWindow = _host.Services.GetRequiredService<ShellWindow>();
+            shellWindow.Show();
         }
 
         protected override async void OnExit(ExitEventArgs e)
@@ -73,12 +73,16 @@ namespace WinCleaner
 
                     // ViewModels
                     services.AddTransient<MainViewModel>();
+                    services.AddTransient<CleanerViewModel>();
+                    services.AddTransient<ToolsViewModel>();
+                    services.AddTransient<SettingsViewModel>();
+                    services.AddTransient<ShellViewModel>();
 
                     // Views
-                    services.AddTransient<MainWindow>(provider => 
+                    services.AddTransient<ShellWindow>(provider => 
                     {
-                        var vm = provider.GetRequiredService<MainViewModel>();
-                        return new MainWindow { DataContext = vm };
+                        var vm = provider.GetRequiredService<ShellViewModel>();
+                        return new ShellWindow { DataContext = vm };
                     });
                 });
         }

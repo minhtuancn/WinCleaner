@@ -7,6 +7,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Input;
+using System.Windows.Media;
 using System.Windows.Threading;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
@@ -14,10 +15,11 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Win32;
 using WinCleaner.Models;
 using WinCleaner.Services;
+using WinCleaner.Design;
 
 namespace WinCleaner.ViewModels
 {
-    public partial class MainViewModel : BaseViewModel
+    public partial class MainViewModel : BaseViewModel, INavigableViewModel
     {
         private readonly ISystemScanner _scanner;
         private readonly ICleanerService _cleaner;
@@ -104,6 +106,10 @@ namespace WinCleaner.ViewModels
         private string _currentDateTime = "";
 
         public bool HasSelectedItem => SelectedItem != null;
+
+        public string Title => "Dashboard";
+        public Geometry Icon => Icons.Monitor;
+        public bool IsSelected { get; set; }
 
         public ICommand ScanCommand { get; }
         public ICommand CleanCommand { get; }
