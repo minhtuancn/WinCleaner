@@ -870,6 +870,45 @@ Stroke="{DynamicResource TextSecondaryBrush}"
     <!-- Divider Brush -->
     <SolidColorBrush x:Key="DividerBrush" Color="{StaticResource BorderColor}" Opacity="0.5"/>
 
+    <!-- Easing Functions -->
+    <CubicEase x:Key="EaseOutQuart" EasingMode="EaseOut"/>
+    <CubicEase x:Key="EaseInQuart" EasingMode="EaseIn"/>
+
+    <!-- Animation Resources -->
+    <sys:Boolean x:Key="EnableAnimations">True</sys:Boolean>
+
+    <Storyboard x:Key="FadeInStoryboard">
+        <DoubleAnimation 
+            Storyboard.TargetProperty="Opacity"
+            From="0" To="1" 
+            Duration="0:0:0.2"
+            EasingFunction="{StaticResource EaseOutQuart}"/>
+    </Storyboard>
+
+    <Storyboard x:Key="FadeOutStoryboard">
+        <DoubleAnimation 
+            Storyboard.TargetProperty="Opacity"
+            From="1" To="0" 
+            Duration="0:0:0.15"
+            EasingFunction="{StaticResource EaseInQuart}"/>
+    </Storyboard>
+
+    <Storyboard x:Key="SlideInStoryboard">
+        <DoubleAnimation 
+            Storyboard.TargetProperty="(UIElement.RenderTransform).(TranslateTransform.X)"
+            From="-280" To="0" 
+            Duration="0:0:0.3"
+            EasingFunction="{StaticResource EaseOutQuart}"/>
+    </Storyboard>
+
+    <Storyboard x:Key="SlideOutStoryboard">
+        <DoubleAnimation 
+            Storyboard.TargetProperty="(UIElement.RenderTransform).(TranslateTransform.X)"
+            From="0" To="-280" 
+            Duration="0:0:0.25"
+            EasingFunction="{StaticResource EaseInQuart}"/>
+    </Storyboard>
+
     <!-- Dashboard Card Styles -->
     <Style x:Key="CardStyle" TargetType="Border">
         <Setter Property="Background" Value="{DynamicResource SurfaceBrush}"/>

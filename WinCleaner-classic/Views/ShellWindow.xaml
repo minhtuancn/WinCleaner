@@ -14,6 +14,89 @@
         Background="{DynamicResource BackgroundBrush}"
         Foreground="{DynamicResource TextPrimaryBrush}">
 
+    <Window.Resources>
+        <!-- DataTriggers for animations (respect EnableAnimations setting) -->
+        <Style x:Key="AnimatedSidebarStyle" TargetType="Border">
+            <Setter Property="RenderTransform">
+                <Setter.Value>
+                    <TranslateTransform X="0"/>
+                </Setter.Value>
+            </Setter>
+            <Style.Triggers>
+                <MultiDataTrigger>
+                    <MultiDataTrigger.Conditions>
+                        <Condition Binding="{Binding IsSidebarOpen}" Value="False"/>
+                        <Condition Binding="{DynamicResource EnableAnimations}" Value="True"/>
+                    </MultiDataTrigger.Conditions>
+                    <MultiDataTrigger.EnterActions>
+                        <BeginStoryboard>
+                            <Storyboard>
+                                <DoubleAnimation 
+                                    Storyboard.TargetProperty="(Border.RenderTransform).(TranslateTransform.X)"
+                                    From="0" To="-280" 
+                                    Duration="0:0:0.25"
+                                    EasingFunction="{StaticResource EaseInQuart}"/>
+                            </Storyboard>
+                        </BeginStoryboard>
+                    </MultiDataTrigger.EnterActions>
+                    <MultiDataTrigger.ExitActions>
+                        <BeginStoryboard>
+                            <Storyboard>
+                                <DoubleAnimation 
+                                    Storyboard.TargetProperty="(Border.RenderTransform).(TranslateTransform.X)"
+                                    From="-280" To="0" 
+                                    Duration="0:0:0.3"
+                                    EasingFunction="{StaticResource EaseOutQuart}"/>
+                            </Storyboard>
+                        </BeginStoryboard>
+                    </MultiDataTrigger.ExitActions>
+                </MultiDataTrigger>
+            </Style.Triggers>
+        </Style>
+
+        <Style x:Key="AnimatedContentControlStyle" TargetType="ContentControl">
+            <Setter Property="RenderTransform">
+                <Setter.Value>
+                    <TranslateTransform X="0" Y="0"/>
+                </Setter.Value>
+            </Setter>
+            <Setter Property="Opacity" Value="1"/>
+            <Style.Triggers>
+                <DataTrigger Binding="{Binding CurrentView}" Value="{x:Null}">
+                    <Setter Property="Opacity" Value="0"/>
+                </DataTrigger>
+                <MultiDataTrigger>
+                    <MultiDataTrigger.Conditions>
+                        <Condition Binding="{Binding CurrentView}" Value="{x:Null}"/>
+                        <Condition Binding="{DynamicResource EnableAnimations}" Value="True"/>
+                    </MultiDataTrigger.Conditions>
+                    <MultiDataTrigger.EnterActions>
+                        <BeginStoryboard>
+                            <Storyboard>
+                                <DoubleAnimation 
+                                    Storyboard.TargetProperty="Opacity"
+                                    From="1" To="0" 
+                                    Duration="0:0:0.15"
+                                    EasingFunction="{StaticResource EaseInQuart}"/>
+                            </Storyboard>
+                        </BeginStoryboard>
+                    </MultiDataTrigger.EnterActions>
+                    <MultiDataTrigger.ExitActions>
+                        <BeginStoryboard>
+                            <Storyboard>
+                                <DoubleAnimation 
+                                    Storyboard.TargetProperty="Opacity"
+                                    From="0" To="1" 
+                                    Duration="0:0:0.2"
+                                    EasingFunction="{StaticResource EaseOutQuart}"/>
+                            </Storyboard>
+                        </BeginStoryboard>
+                    </MultiDataTrigger.ExitActions>
+                </MultiDataTrigger>
+            </Style.Triggers>
+        </Style>
+    </Window.Resources>
+
     <Grid>
         <Grid.ColumnDefinitions>
             <ColumnDefinition x:Name="SidebarColumn" Width="280"/>
@@ -22,6 +105,7 @@
 
         <!-- Sidebar -->
         <Border Grid.Column="0" 
+                Style="{StaticResource AnimatedSidebarStyle}"
                 Background="{DynamicResource SurfaceBrush}" 
                 BorderBrush="{DynamicResource BorderBrush}" 
                 BorderThickness="0,0,1,0">
@@ -86,7 +170,7 @@
 
         <!-- Main Content -->
         <Border Grid.Column="1" Background="{DynamicResource BackgroundBrush}">
-            <ContentControl Content="{Binding CurrentView}"/>
+            <ContentControl Content="{Binding CurrentView}" Style="{StaticResource AnimatedContentControlStyle}"/>
         </Border>
 
         <!-- Sidebar Toggle (for narrow widths) -->
