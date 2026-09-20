@@ -64,6 +64,9 @@ namespace WinCleaner
                     services.AddSingleton<ISecureDeleteService, SecureDeleteService>();
                     services.AddSingleton<ICustomRuleService, CustomRuleService>();
                     services.AddSingleton<ISchedulerService, SchedulerService>();
+                    services.AddSingleton<ITaskSchedulerService, TaskSchedulerService>();
+                    services.AddSingleton<ICookieService, CookieService>();
+                    services.AddSingleton<ISecureDeleteService, SecureDeleteService>();
                     services.AddSingleton<IAppxService, AppxService>();
                     services.AddSingleton<IExplorerIntegrationService, ExplorerIntegrationService>();
                     services.AddSingleton<IWindowStateService, WindowStateService>();

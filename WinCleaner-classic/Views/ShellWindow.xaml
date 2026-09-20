@@ -26,7 +26,7 @@
                 <MultiDataTrigger>
                     <MultiDataTrigger.Conditions>
                         <Condition Binding="{Binding IsSidebarOpen}" Value="False"/>
-                        <Condition Binding="{DynamicResource EnableAnimations}" Value="True"/>
+                        <Condition Binding="{Binding Source={StaticResource EnableAnimations}}" Value="True"/>
                     </MultiDataTrigger.Conditions>
                     <MultiDataTrigger.EnterActions>
                         <BeginStoryboard>
@@ -68,7 +68,7 @@
                 <MultiDataTrigger>
                     <MultiDataTrigger.Conditions>
                         <Condition Binding="{Binding CurrentView}" Value="{x:Null}"/>
-                        <Condition Binding="{DynamicResource EnableAnimations}" Value="True"/>
+                        <Condition Binding="{Binding Source={StaticResource EnableAnimations}}" Value="True"/>
                     </MultiDataTrigger.Conditions>
                     <MultiDataTrigger.EnterActions>
                         <BeginStoryboard>
