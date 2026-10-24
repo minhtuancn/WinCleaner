@@ -385,13 +385,13 @@ jobs:
 
     steps:
       - name: Download Modern artifacts
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v8
         with:
           name: WinCleaner-Modern-${{ needs.validate-version.outputs.version }}
           path: release/modern
 
       - name: Download Classic artifacts (if built)
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v8
         continue-on-error: true
         with:
           name: WinCleaner-Classic-${{ needs.validate-version.outputs.version }}
@@ -422,7 +422,7 @@ jobs:
     if: ${{ github.event.inputs.publish_nuget == 'true' && needs.validate-version.outputs.is_prerelease == 'false' && needs.build-modern.result == 'success' }}
     steps:
       - name: Download artifacts
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v8
         with:
           name: WinCleaner-Modern-${{ needs.validate-version.outputs.version }}
           path: artifacts/modern

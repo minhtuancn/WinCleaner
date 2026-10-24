@@ -266,13 +266,13 @@ jobs:
 
     steps:
       - name: Download Modern artifacts
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v8
         with:
           name: WinCleaner-Modern-${{ needs.build-modern.outputs.version }}
           path: release/modern
 
       - name: Download Classic artifacts
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v8
         with:
           name: WinCleaner-Classic-${{ needs.build-modern.outputs.version }}
           path: release/classic
