@@ -151,7 +151,7 @@ jobs:
           echo "installer_path=artifacts/modern/${installerName}" >> $env:GITHUB_OUTPUT
 
       - name: Upload Modern UI artifacts
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: WinCleaner-Modern-${{ env.VERSION }}
           path: |
@@ -247,7 +247,7 @@ jobs:
           echo "installer_path=artifacts/classic/${installerName}" >> $env:GITHUB_OUTPUT
 
       - name: Upload Classic UI artifacts
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: WinCleaner-Classic-${{ needs.build-modern.outputs.version }}
           path: |

@@ -249,7 +249,7 @@ jobs:
           echo "EOF" >> $env:GITHUB_OUTPUT
 
       - name: Upload Modern artifacts
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: WinCleaner-Modern-${{ needs.validate-version.outputs.version }}
           path: |
@@ -365,7 +365,7 @@ jobs:
           $checksums -join "`n" | Set-Content "artifacts/classic/SHA256SUMS.txt"
 
       - name: Upload Classic artifacts
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: WinCleaner-Classic-${{ needs.validate-version.outputs.version }}
           path: |
